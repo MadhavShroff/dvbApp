@@ -1,0 +1,128 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="250dp"
+    android:layout_height="110dp"
+    android:layout_marginStart="3dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constLayout"
+        android:layout_width="250dp"
+        android:layout_height="110dp"
+        android:background="@color/green1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/max"
+            android:layout_width="60dp"
+            android:layout_height="32dp"
+            android:background="@color/green2"
+            android:gravity="center"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:singleLine="true"
+            android:textColor="@color/mainParamsTextTop"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/maxText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/value"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/maxText"
+            android:layout_width="60dp"
+            android:layout_height="23dp"
+            android:background="@color/green2"
+            android:gravity="top|center"
+            android:text="@string/max"
+            android:textColor="@color/mainParamsTextTop"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/min"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/value"
+            app:layout_constraintTop_toBottomOf="@id/max" />
+
+        <TextView
+            android:id="@+id/min"
+            android:layout_width="60dp"
+            android:layout_height="32dp"
+            android:background="@color/green3"
+            android:gravity="center"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:singleLine="true"
+            android:textColor="@color/mainParamsTextBottom"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/minText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/value"
+            app:layout_constraintTop_toBottomOf="@id/maxText" />
+
+        <TextView
+            android:id="@+id/minText"
+            android:layout_width="60dp"
+            android:layout_height="23dp"
+            android:background="@color/green3"
+            android:gravity="center|top"
+            android:text="@string/min"
+            android:textColor="@color/mainParamsTextBottom"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/value"
+            app:layout_constraintTop_toBottomOf="@id/min" />
+
+        <TextView
+            android:id="@+id/setValue"
+            android:layout_width="90dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end|center"
+            android:gravity="start"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:textColor="@color/mainParamsTextRight"
+            android:textSize="18sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/value"
+            android:layout_width="190dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:text="@string/_123_4"
+            android:textColor="@color/mainParamsTextRight"
+            android:textSize="45sp"
+            app:layout_constraintBottom_toTopOf="@id/label"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toEndOf="@id/maxText"
+            app:layout_constraintTop_toBottomOf="@id/setValue" />
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/mainParamsTextRight"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/minText"
+            app:layout_constraintRight_toLeftOf="@id/unit"
+            app:layout_constraintTop_toBottomOf="@id/value" />
+
+        <TextView
+            android:id="@+id/unit"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="5dp"
+            android:textAlignment="textEnd"
+            android:textColor="@color/mainParamsTextRight"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/value" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

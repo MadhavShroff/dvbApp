@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/rounded_corner_heading"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="@string/controls"
+        android:textAllCaps="true"
+        android:textColor="#ffffff"
+        android:textSize="35sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:gravity="center|top"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/controls_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="140dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center|start"
+                        android:text="@string/mode1"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/controls_mode_current"
+                        android:layout_width="110dp"
+                        android:layout_height="45dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <ImageButton
+                        android:id="@+id/controls_mode_change"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/greenEditButton"
+                        android:src="@drawable/ic_action_name"
+                        android:text="@string/edit" />
+                </LinearLayout>
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_fio2"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/fio2"
+                    app:controlUnit="@string/percent"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_vt"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/vt"
+                    app:controlUnit="@string/ml"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_pinsp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/p_insp"
+                    app:controlUnit="@string/cm_h2o"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_plimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/p_limit"
+                    app:controlUnit="@string/cm_h2o"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_peep"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/peep"
+                    app:controlUnit="@string/cm_h2o"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_ps"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/ps"
+                    app:controlUnit="@string/cm_h2o"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_vtrig"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/vtrig"
+                    app:controlUnit="@string/lpm"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_rtotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/rtotal"
+                    app:controlUnit="@string/b_min"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_tinsp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/t_insp"
+                    app:controlUnit="@string/s"
+                    app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_ie"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/i_e"
+                    app:controlUnit=""
+                    app:current="" />
+
+                <TextView
+                    android:id="@+id/highlight_text"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/send"
+                android:layout_width="250dp"
+                android:layout_height="84dp"
+                android:backgroundTint="@color/colorAccent"
+                android:drawableTint="#000000"
+                android:hapticFeedbackEnabled="true"
+                android:paddingBottom="0dp"
+                android:text="@string/confirm"
+                android:textColor="#000000"
+                android:textSize="22sp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="50dp"
+                android:layout_height="40dp"
+                android:rotation="180"
+                android:src="@drawable/scroll_down_icon"
+                android:tint="#a1a1a1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/stopVentilation"
+                android:layout_width="250dp"
+                android:layout_height="84dp"
+                android:layout_marginTop="150dp"
+                android:backgroundTint="#ffffff"
+                android:hapticFeedbackEnabled="true"
+                android:text="@string/stop_ventilation"
+                android:textColor="#000000"
+                android:textSize="22sp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

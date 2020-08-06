@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <usb-device vendor-id="9025" />                   <!-- 0x2341 / ......: Arduino -->
+    <usb-device
+        product-id="1155"
+        vendor-id="5824" /> <!-- 0x16C0 / 0x0483: Teensyduino  -->
+    <usb-device
+        product-id="8260"
+        vendor-id="1003" /> <!-- 0x03EB / 0x2044: Atmel Lufa -->
+    <usb-device
+        product-id="4"
+        vendor-id="7855" /> <!-- 0x1eaf / 0x0004: Leaflabs Maple -->
+    <usb-device
+        product-id="516"
+        vendor-id="3368" /> <!-- 0x0d28 / 0x0204: ARM mbed -->
+</resources>

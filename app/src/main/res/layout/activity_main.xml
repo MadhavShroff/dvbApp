@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/alarm"
+        android:layout_width="250dp"
+        android:layout_height="105dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/rounded_corner_red"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="@string/alarms"
+        android:textAlignment="gravity"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/modeBox"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="ALARMS" />
+
+    <TextView
+        android:id="@+id/modeBox"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:height="155dp"
+        android:background="@drawable/rouded_corner_mode_box"
+        android:gravity="center"
+        android:text="@string/dashes"
+        android:textColor="@color/yellow"
+        android:textSize="58sp"
+        app:layout_constraintBottom_toTopOf="@id/pinsp"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alarm" />
+
+    <com.dvbinventek.dvbapp.customViews.MainParamsView
+        android:id="@+id/pinsp"
+        android:layout_width="253dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="4dp"
+        app:label="P Insp"
+        app:layout_constraintBottom_toTopOf="@id/peep"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/modeBox"
+        app:unit="(cm H20)"
+        app:value="0" />
+
+    <com.dvbinventek.dvbapp.customViews.MainParamsView
+        android:id="@+id/peep"
+        android:layout_width="253dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="2dp"
+        app:label="@string/PEEP"
+        app:layout_constraintBottom_toTopOf="@id/vtf"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pinsp"
+        app:unit="(l)"
+        app:value="0" />
+
+    <com.dvbinventek.dvbapp.customViews.MainParamsView
+        android:id="@+id/vtf"
+        android:layout_width="253dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="2dp"
+        app:label="Tidal Volume"
+        app:layout_constraintBottom_toTopOf="@id/rate"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/peep"
+        app:unit="(ml)"
+        app:value="0" />
+
+    <com.dvbinventek.dvbapp.customViews.MainParamsView
+        android:id="@+id/rate"
+        android:layout_width="253dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="2dp"
+        app:label="Rate"
+        app:layout_constraintBottom_toTopOf="@id/fio2"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vtf"
+        app:unit="(b/min)"
+        app:value="0" />
+
+    <com.dvbinventek.dvbapp.customViews.MainParamsView
+        android:id="@+id/fio2"
+        android:layout_width="253dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="2dp"
+        app:label="FiO2"
+        app:layout_constraintBottom_toTopOf="@id/snooze"
+        app:layout_constraintEnd_toStartOf="@id/charts"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rate"
+        app:unit="(%)"
+        app:value="0" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/snooze"
+        android:layout_width="250dp"
+        android:layout_height="84dp"
+        android:layout_marginStart="3dp"
+        android:backgroundTint="@color/colorAccent"
+        android:drawableTint="#000000"
+        android:hapticFeedbackEnabled="true"
+        android:text="@string/silence_alarm"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        app:icon="@drawable/ic_silence_alarm"
+        app:iconGravity="start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tabWrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/charts" />
+
+    <TextView
+        android:id="@+id/mainInspExp"
+        android:layout_width="50dp"
+        android:layout_height="28dp"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginEnd="200dp"
+        android:padding="0dp"
+        android:text="@string/insp"
+        android:textAllCaps="true"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/mainSigh"
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toStartOf="@id/charts"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/mainSigh"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="10dp"
+        android:gravity="center_vertical"
+        android:minHeight="0dp"
+        android:padding="0dp"
+        android:text="@string/sigh"
+        android:textAllCaps="true"
+        android:textColor="@color/yellow"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/ac"
+        app:layout_constraintStart_toEndOf="@id/mainInspExp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="#33AAAAAA" />
+
+    <TextView
+        android:id="@+id/ac"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:minHeight="0dp"
+        android:text="@string/ac"
+        android:textColor="@color/green"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/chargingBoltIcon"
+        app:layout_constraintStart_toEndOf="@id/mainSigh"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="#33AAAAAA" />
+
+    <ImageView
+        android:id="@+id/chargingBoltIcon"
+        android:layout_width="20dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/bolt"
+        android:rotation="90"
+        android:scaleY="-0.6"
+        android:src="@drawable/ic_charging_bolt"
+        android:tint="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/batteryPercent"
+        app:layout_constraintStart_toEndOf="@id/ac"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/batteryPercent"
+        android:layout_width="27dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:text="@string/_19"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/batteryProgressBar"
+        app:layout_constraintStart_toEndOf="@id/chargingBoltIcon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sasank.roundedhorizontalprogress.RoundedHorizontalProgressBar
+        android:id="@+id/batteryProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/rounded_corner_white_battery"
+        android:maxHeight="20dp"
+        android:minHeight="20dp"
+        android:progress="10"
+        app:isRounded="false"
+        app:layout_constraintBottom_toTopOf="@id/charts"
+        app:layout_constraintEnd_toEndOf="@id/charts"
+        app:layout_constraintStart_toEndOf="@id/batteryPercent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:progressColor="#ff0000" />
+
+    <FrameLayout
+        android:id="@+id/batteryTip"
+        android:layout_width="6dp"
+        android:layout_height="8dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/rounded_corner_battery_head"
+        app:layout_constraintBottom_toBottomOf="@id/batteryProgressBar"
+        app:layout_constraintStart_toEndOf="@id/batteryProgressBar"
+        app:layout_constraintTop_toTopOf="@id/batteryProgressBar" />
+
+    <LinearLayout
+        android:id="@+id/charts"
+        android:layout_width="665dp"
+        android:layout_height="690dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/tabWrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/peep"
+        app:layout_constraintTop_toBottomOf="@id/batteryProgressBar">
+
+        <LinearLayout
+            android:id="@+id/mainChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:orientation="vertical"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/standby"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/yellow"
+            android:gravity="center|top"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ventilation_stopped"
+                android:textColor="#000000"
+                android:textSize="72sp" />
+
+            <TextView
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="150dp"
+                android:text="@string/press_button_to_initiate_ventilation_start"
+                android:textColor="#000000"
+                android:textSize="30sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/startVentilation"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_margin="20dp"
+                android:background="@drawable/round_button_green"
+                android:foreground="@drawable/play_arrow"
+                android:foregroundTint="@color/white" />
+
+            <TextView
+                android:id="@+id/verify"
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/verify_all_controls_and_settings"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/pressAndHold"
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/press_and_hold_the_start_button_for_5_seconds"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/FPChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/FVChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/PVChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/tabWrapper"
+        android:layout_width="1020dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/snooze"
+        app:layout_constraintTop_toBottomOf="@+id/charts">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:backgroundTint="#FF424242"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="#ff0000"
+            app:tabIndicatorHeight="4dp"
+            app:tabSelectedTextColor="#ff0000" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/viewPagerll"
+        android:layout_width="352dp"
+        android:layout_height="720dp"
+        android:layout_gravity="start"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/rounded_corners_holder"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/charts"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
