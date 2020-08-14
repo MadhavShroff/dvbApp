@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="3dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginTop="3dp"
         android:height="155dp"
         android:background="@drawable/rouded_corner_mode_box"
@@ -48,6 +49,7 @@
         android:layout_width="253dp"
         android:layout_height="110dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
         app:label="P Insp"
         app:layout_constraintBottom_toTopOf="@id/peep"
         app:layout_constraintEnd_toStartOf="@id/charts"
@@ -61,6 +63,7 @@
         android:layout_width="253dp"
         android:layout_height="110dp"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
         app:label="@string/PEEP"
         app:layout_constraintBottom_toTopOf="@id/vtf"
         app:layout_constraintEnd_toStartOf="@id/charts"
@@ -74,6 +77,7 @@
         android:layout_width="253dp"
         android:layout_height="110dp"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
         app:label="Tidal Volume"
         app:layout_constraintBottom_toTopOf="@id/rate"
         app:layout_constraintEnd_toStartOf="@id/charts"
@@ -87,6 +91,7 @@
         android:layout_width="253dp"
         android:layout_height="110dp"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
         app:label="Rate"
         app:layout_constraintBottom_toTopOf="@id/fio2"
         app:layout_constraintEnd_toStartOf="@id/charts"
@@ -100,6 +105,7 @@
         android:layout_width="253dp"
         android:layout_height="110dp"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
         app:label="FiO2"
         app:layout_constraintBottom_toTopOf="@id/snooze"
         app:layout_constraintEnd_toStartOf="@id/charts"
@@ -235,20 +241,19 @@
 
     <LinearLayout
         android:id="@+id/charts"
-        android:layout_width="665dp"
         android:layout_height="690dp"
         android:layout_marginBottom="4dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/tabWrapper"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/peep"
+        android:layout_width="0dp"
+        app:layout_constraintEnd_toStartOf="@id/viewPagerll"
+        app:layout_constraintStart_toStartOf="@id/tabWrapper"
         app:layout_constraintTop_toBottomOf="@id/batteryProgressBar">
 
         <LinearLayout
             android:id="@+id/mainChart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
             android:orientation="vertical"
             android:visibility="visible" />
 
@@ -307,7 +312,6 @@
                 android:textColor="#000000"
                 android:textSize="30sp"
                 android:visibility="gone" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -330,6 +334,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="gone" />
+
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -361,11 +366,9 @@
         android:layout_marginStart="5dp"
         android:background="@drawable/rounded_corners_holder"
         android:orientation="vertical"
-        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/charts"
         app:layout_constraintTop_toTopOf="parent">
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
             android:layout_width="match_parent"

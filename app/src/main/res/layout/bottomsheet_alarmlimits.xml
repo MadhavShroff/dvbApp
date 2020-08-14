@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/albs_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="Set Alarm Limits"
+        android:textColor="#000000"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toTopOf="@id/albs_subheading"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/albs_subheading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/arimo"
+        android:textColor="#000000"
+        android:textSize="25sp" />
+
+    <LinearLayout
+        android:id="@+id/maxMinContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/albs_max"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:text="@string/max"
+                android:textColor="#000000"
+                android:textSize="35sp"
+                app:layout_constraintBottom_toBottomOf="@id/albs_maxet"
+                app:layout_constraintRight_toLeftOf="@id/albs_maxet"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/albs_maxet" />
+
+            <EditText
+                android:id="@+id/albs_maxet"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_corner_white"
+                android:focusable="false"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textColorHint="#a1a1a1"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toTopOf="@id/albs_minet"
+                app:layout_constraintLeft_toRightOf="@id/albs_max"
+                app:layout_constraintRight_toLeftOf="@id/albs_done"
+                app:layout_constraintTop_toBottomOf="@id/albs_heading" />
+
+            <TextView
+                android:id="@+id/subTextMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/arimo"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/albs_min"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:text="@string/min"
+                android:textColor="#000000"
+                android:textSize="35sp"
+                app:layout_constraintBottom_toBottomOf="@id/albs_minet"
+                app:layout_constraintRight_toLeftOf="@id/albs_minet"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/albs_minet" />
+
+            <EditText
+                android:id="@+id/albs_minet"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_corner_white"
+                android:focusable="false"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textColorHint="#a1a1a1"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/albs_min"
+                app:layout_constraintRight_toLeftOf="@id/albs_cancel"
+                app:layout_constraintTop_toBottomOf="@+id/albs_maxet" />
+
+            <TextView
+                android:id="@+id/subTextMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:fontFamily="@font/arimo"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/albs_cancel"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="100dp"
+            android:background="@drawable/rounded_corner_white_keyboard"
+            android:elevation="8dp"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/cancel"
+            android:textColor="#000000"
+            android:tint="@color/Red1" />
+
+        <ImageButton
+            android:id="@+id/albs_done"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_white_keyboard"
+            android:elevation="8dp"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/check"
+            android:textColor="#000000"
+            android:tint="@color/blue" />
+    </LinearLayout>
+
+    <com.dvbinventek.dvbapp.customViews.CustomKeyboardView
+        android:id="@+id/cbs_keyboard"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:layout_margin="10dp" />
+
+</LinearLayout>

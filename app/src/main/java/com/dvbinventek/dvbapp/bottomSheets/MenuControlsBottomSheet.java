@@ -30,7 +30,6 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
 
     public MenuControlsBottomSheet(@NonNull Activity hostActivity) {
         this(hostActivity, new Config.Builder(hostActivity).build());
-
         vccmv.setOnClickListener(new ControlsChangeOnClickListener());
         pccmv.setOnClickListener(new ControlsChangeOnClickListener());
         vcsimv.setOnClickListener(new ControlsChangeOnClickListener());
@@ -77,6 +76,8 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
             case 16:
                 bpap.performClick();
                 break;
+            default:
+                b.setAlpha(0.3f);
         }
     }
 
@@ -91,9 +92,6 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
     }
 
     class ControlsChangeOnClickListener implements View.OnClickListener {
-        ControlsChangeOnClickListener() {
-        }
-
         @Override
         public void onClick(View v) {
             if (b == null) b = v;

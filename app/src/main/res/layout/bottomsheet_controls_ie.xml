@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/cbs_heading"
+        android:layout_width="500dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="@string/set_i_e_ratio"
+        android:textColor="#000000"
+        android:textSize="40sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:columnCount="2"
+        android:rowCount="3">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingEnd="50dp">
+
+            <TextView
+                android:id="@+id/cbs_insp"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:text="@string/i"
+                android:textColor="#000000"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toTopOf="@id/cbs_exp"
+                app:layout_constraintRight_toLeftOf="@id/cbs_inspet"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbs_heading" />
+
+            <EditText
+                android:id="@+id/cbs_inspet"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_corner_white"
+                android:focusable="false"
+                android:focusableInTouchMode="true"
+                android:focusedByDefault="true"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textColorHint="#a1a1a1"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toTopOf="@id/cbs_expet"
+                app:layout_constraintLeft_toRightOf="@id/cbs_insp"
+                app:layout_constraintRight_toLeftOf="@id/cbs_done"
+                app:layout_constraintTop_toBottomOf="@id/cbs_heading" />
+
+            <TextView
+                android:id="@+id/i_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|top"
+                android:text="@string/_1_to_4"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="50dp">
+
+            <TextView
+                android:id="@+id/cbs_exp"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:text="@string/e"
+                android:textColor="#000000"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/cbs_expet"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cbs_insp" />
+
+            <EditText
+                android:id="@+id/cbs_expet"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_corner_white"
+                android:focusable="false"
+                android:focusableInTouchMode="true"
+                android:focusedByDefault="true"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:textColor="#000000"
+                android:textColorHint="#a1a1a1"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/cbs_exp"
+                app:layout_constraintRight_toLeftOf="@id/cbs_cancel"
+                app:layout_constraintTop_toBottomOf="@+id/cbs_inspet" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/_1_to_4"
+                android:textColor="#000000"
+                android:textSize="25sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/cbs_cancel"
+            android:layout_width="150dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="100dp"
+            android:background="@drawable/rounded_corner_white_keyboard"
+            android:elevation="8dp"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/cancel"
+            android:textColor="#000000"
+            android:tint="@color/Red1" />
+
+        <ImageButton
+            android:id="@+id/cbs_done"
+            android:layout_width="150dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_white_keyboard"
+            android:elevation="8dp"
+            android:hapticFeedbackEnabled="true"
+            android:src="@drawable/check"
+            android:textColor="#000000"
+            android:tint="@color/blue" />
+    </LinearLayout>
+
+    <com.dvbinventek.dvbapp.customViews.CustomKeyboardView
+        android:id="@+id/cbs_keyboard"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:layout_margin="10dp" />
+
+
+</LinearLayout>

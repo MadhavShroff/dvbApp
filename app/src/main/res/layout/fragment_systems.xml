@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/rounded_corner_heading"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="@string/system"
+        android:textAllCaps="true"
+        android:textColor="#ffffff"
+        android:textSize="35sp" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:outlineAmbientShadowColor="@color/colorAccent"
+        app:checkedButton="@id/cmH20"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <Button
+            android:id="@+id/hPa"
+            style="@style/OutlinedButton"
+            android:layout_width="125dp"
+            android:layout_height="80dp"
+            android:text="@string/hpa"
+            android:textAllCaps="false"
+            android:textSize="21sp" />
+
+        <Button
+            android:id="@+id/cmH20"
+            style="@style/OutlinedButton"
+            android:layout_width="125dp"
+            android:layout_height="80dp"
+            android:text="@string/cm_h2o"
+            android:textAllCaps="false"
+            android:textSize="21sp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <Button
+        android:id="@+id/shutdown"
+        android:layout_width="250dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="#2f2f2f"
+        android:enabled="false"
+        android:text="@string/shutdown"
+        android:textColor="#515151"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/calibration"
+        android:layout_width="250dp"
+        android:layout_height="80dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="@string/self_test"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/maintainance"
+        android:layout_width="250dp"
+        android:layout_height="80dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="@string/maintainance"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:cardBackgroundColor="?attr/colorPrimaryDark"
+        app:cardCornerRadius="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:padding="5dp"
+                android:text="@string/usage"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="#000000"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Machine Hours"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="@string/_00000_hrs"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|bottom"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Patient Hours"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="@string/_00000_hrs"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d0d0d0" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2">
+
+                <TextView
+                    android:layout_width="110dp"
+                    android:layout_height="53dp"
+                    android:layout_gravity="start|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Last Service"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="?attr/colorPrimaryDark"
+                        android:gravity="end"
+                        android:text="Jul 29 2020"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|end"
+                        android:background="?attr/colorPrimaryDark"
+                        android:text="200 hrs"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="110dp"
+                    android:layout_height="53dp"
+                    android:layout_gravity="start|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Next Service"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="?attr/colorPrimaryDark"
+                        android:gravity="end"
+                        android:text="Sept 29 2020"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|end"
+                        android:background="?attr/colorPrimaryDark"
+                        android:text="800 hrs"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+                </LinearLayout>
+            </GridLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d0d0d0" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/systemVersionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="@string/system_version"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/systemVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|top"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="1.4.7"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constraintBottom_toTopOf="@id/displayVersion"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/displayVersionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|bottom"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="@string/display_version"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/displayVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:background="?attr/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="1.2.2"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/systemVersion" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

@@ -19,6 +19,13 @@
         <attr name="unit" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="MonitoringTextView" parent="Theme.MaterialComponents.NoActionBar">
+        <attr name="monitValue" format="string" />
+        <attr name="monitName" format="string" />
+        <attr name="monitUnit" format="string" />
+        <attr name="removeLower" format="boolean" />
+    </declare-styleable>
+
     <declare-styleable name="ControlRow" parent="Theme.MaterialComponents.NoActionBar">
         <attr name="controlLabel" format="string" />
         <attr name="controlUnit" format="string" />

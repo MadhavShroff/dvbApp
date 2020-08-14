@@ -77,7 +77,7 @@
     <string name="vc_cmv">VC-CMV</string>
     <string name="name">Name:</string>
     <string name="age">Age:</string>
-    <string name="weight_kg">Weight: (kg)</string>
+    <string name="weight_kg">IBW: (kg)</string>
     <string name="height_cm">Height: (cm)</string>
     <string name="save_logs">Save Logs</string>
     <string name="show_historic_data">Show Historic data</string>
@@ -177,4 +177,6 @@
     <string name="edit_button">edit button</string>
     <string name="rtotal">Rtotal</string>
     <string name="_19">19%</string>
+    <string name="room">Room:</string>
+    <string name="bed">Bed:</string>
 </resources>

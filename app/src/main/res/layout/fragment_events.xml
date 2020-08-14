@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/rounded_corner_heading"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="@string/events_log"
+        android:textAllCaps="true"
+        android:textColor="#ffffff"
+        android:textSize="35sp" />
+
+    <EditText
+        android:id="@+id/limitsText"
+        android:layout_width="330dp"
+        android:layout_height="450dp"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:background="@drawable/rounded_corner_white"
+        android:clickable="false"
+        android:focusable="false"
+        android:nestedScrollingEnabled="true"
+        android:padding="15dp"
+        android:textColor="#000000"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:padding="5dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/save_logs" />
+
+        <FrameLayout
+            android:id="@+id/frame"
+            android:layout_width="80dp"
+            android:layout_height="match_parent" />
+
+        <cdflynn.android.library.checkview.CheckView
+            android:id="@+id/check"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            app:checkView_strokeColor="@color/green"
+            app:checkView_strokeWidth="5dp" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/logs_display_button"
+        android:layout_width="250dp"
+        android:layout_height="84dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:text="@string/show_historic_data"
+        android:textSize="22sp" />
+</LinearLayout>

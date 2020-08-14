@@ -6,15 +6,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import java.util.ArrayList;
-
 public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
-
-    private ArrayList<Fragment> arrayList = new ArrayList<>();
 
     public ViewPagerFragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         super(fragmentManager, lifecycle);
-        arrayList.add(new ControlsFragment());
     }
 
     @NonNull
@@ -23,12 +18,24 @@ public class ViewPagerFragmentAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0:
                 return new ControlsFragment();
+            case 1:
+                return new MonitoringFragment();
+            case 2:
+                return new AlarmsFragment();
+            case 3:
+                return new ToolsFragment();
+            case 4:
+                return new PatientFragment();
+            case 5:
+                return new EventsFragment();
+            case 6:
+                return new SystemsFragment();
         }
         return null;
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        return 7;
     }
 }

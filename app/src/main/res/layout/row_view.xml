@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#DAE8FC"
+    android:orientation="vertical"
+    android:padding="5dp"
+    android:textAlignment="center">
+
+    <TextView
+        android:id="@+id/log_date"
+        android:layout_width="172dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/date"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_pinsp"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/p_insp"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_peep"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/peep"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_ppeak"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/ppeak"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_pmean"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/pmean"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_vt"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/vt"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_rate"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/rate"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_rspont"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/rspont"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_mvtotal"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/minvol"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_mvspont"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/mvspont"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_fio2"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/fio2"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_ieMeasured"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/i_e"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_cstat"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/cstat"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/log_alarms"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="@string/alarms1"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+</TableRow>

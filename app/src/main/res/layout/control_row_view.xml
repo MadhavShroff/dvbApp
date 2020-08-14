@@ -22,6 +22,7 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:text="@string/cm_h2o"
         android:textColor="@color/white"
         android:textSize="20sp" />
@@ -29,8 +30,9 @@
     <TextView
         android:id="@+id/control_current"
         android:layout_width="70dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:gravity="center"
         android:textColor="@color/white"
         android:textSize="20sp" />
 

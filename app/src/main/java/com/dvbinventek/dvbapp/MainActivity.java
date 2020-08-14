@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.PorterDuff;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,8 +32,12 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.dvbinventek.dvbapp.customViews.MainParamsView;
 import com.dvbinventek.dvbapp.graphing.DimTracePaletteProvider;
 import com.dvbinventek.dvbapp.graphing.RightAlignedOuterVerticallyStackedYAxisLayoutStrategy;
+import com.dvbinventek.dvbapp.viewPager.MonitoringFragment;
+import com.dvbinventek.dvbapp.viewPager.ToolsFragment;
 import com.dvbinventek.dvbapp.viewPager.ViewPagerFragmentAdapter;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.scichart.charting.layoutManagers.DefaultLayoutManager;
 import com.scichart.charting.model.dataSeries.IDataSeries;
 import com.scichart.charting.model.dataSeries.XyDataSeries;
@@ -53,20 +58,30 @@ import com.scichart.drawing.utility.ColorUtil;
 import com.scichart.extensions.builders.SciChartBuilder;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int PACKET_LENGTH = 224;
-    public static final PublishSubject<byte[]> packetSubject = PublishSubject.create();
-    private static final int FIFO_CAPACITY = 40;
-    public static UsbService usbService;
+    //Tab Layout vars
+    public static final int chartWidth = 665;
+    public static final int viewPagerWidth = 352;
+    public static final int PACKET_LENGTH = 250;
+
     //ViewPager vars
     public static ViewPager2 viewPager;
     static int ui_flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
@@ -75,6 +90,37 @@ public class MainActivity extends AppCompatActivity {
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+    public static final PublishSubject<byte[]> packetSubject = PublishSubject.create();
+    public static final String dashes = "--";
+    private static final int FIFO_CAPACITY = 40;
+    public static boolean isSidebarShown = false;
+    public static CompositeDisposable disposables = new CompositeDisposable();
+    public static UsbService usbService;
+    //Observe standby button in controls for a click
+    public static Observer<View> standbyClickObserver = new Observer<View>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            disposables.add(d);
+        }
+
+        @Override
+        public void onNext(View v) {
+            Log.d("MSG", "Clicked Standby");
+            //TODO: Click Standby Logic
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+        }
+
+        @Override
+        public void onComplete() {
+        }
+    };
+    public static int callNumber = 0;
+    static boolean mainActivityActive = false;
+    //chart vars
+    public SciChartBuilder sciChartBuilder;
     public final XyDataSeries<Double, Double> pressureDataSeries = newDataSeries(FIFO_CAPACITY);
     public final XyDataSeries<Double, Double> pressureSweepDataSeries = newDataSeries(FIFO_CAPACITY);
     public final XyDataSeries<Double, Double> flowDataSeries = newDataSeries(FIFO_CAPACITY);
@@ -84,6 +130,13 @@ public class MainActivity extends AppCompatActivity {
     public final XyDataSeries<Double, Double> lastPressureSweepDataSeries = newDataSeries(1);
     public final XyDataSeries<Double, Double> lastFlowDataSeries = newDataSeries(1);
     public final XyDataSeries<Double, Double> lastVolumeDataSeries = newDataSeries(1);
+    public ISciChartSurface chart;
+    public LinearLayout charts;
+    public MaterialButton silence;
+    public byte[] packet = {};
+    //UsbService setup and vars
+    public UsbHandler mHandler = new UsbHandler(this);
+    public boolean usbConnected = false;
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -106,45 +159,58 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    public UsbHandler mHandler = new UsbHandler(this);
     public final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
             usbService.setHandler(mHandler);
-//            StaticStore.service = usbService;
-//            connected = true;
+            StaticStore.service = new WeakReference<>(usbService);
+            usbConnected = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             usbService = null;
-//            connected = false;
+            usbConnected = false;
         }
     };
-    //chart vars
-    public SciChartBuilder sciChartBuilder;
-    public ISciChartSurface chart;
-    public LinearLayout charts;
-    public MaterialButton silence;
-    public String packet = "";
-    private CompositeDisposable disposables = new CompositeDisposable();
     //LockTask mode vars
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponentName;
+
+    public static String getIE(int ie) {
+        String s = "";
+        int i = ie / 1000;
+        int id = (ie / 100) % 10;
+        int e = (ie / 10) % 10;
+        int ed = ie % 10;
+        if (id == 0 && ed == 0) {
+            s = i + ":" + e;
+        } else if (id == 0 && ed != 0) {
+            s = i + ":" + e + "." + ed;
+        } else if (id != 0 && ed == 0) {
+            s = i + "." + id + ":" + e;
+        } else {
+            s = i + "." + id + ":" + e + "." + ed;
+        }
+        return s;
+    }
+
+    public void setSubscriptTextMainParams() {
+        MainParamsView mpv = findViewById(R.id.pinsp);
+        mpv.setPeepPip(); //Set first CustomTextView's MIN and MAX as Pinsp and Peep
+        mpv.setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
+        mpv = findViewById(R.id.rate);
+        mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
+        mpv = findViewById(R.id.fio2);
+        mpv.setLabel(Html.fromHtml("FiO<small><sub>2</sub></small>"));
+    }
 
     private static DoubleRange getMinMaxRange(DoubleValues values) {
         final DoubleRange range = new DoubleRange();
         SciListUtil.instance().minMax(values.getItemsArray(), 0, values.size(), range);
         range.growBy(0.1, 0.1);
         return range;
-    }
-
-    private XyDataSeries<Double, Double> newDataSeries(int fifoCapacity) {
-        final XyDataSeries<Double, Double> ds = new XyDataSeries<>(Double.class, Double.class);
-        ds.setFifoCapacity(fifoCapacity);
-        ds.setAcceptsUnsortedData(false);
-        return ds;
     }
 
     @Override
@@ -166,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         setupUsbDataReceiver();
 
         //Set default handler for crashes/force close
-        Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler(this));
+//        Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler(this));
 
         //Setup COSU policies
         setupCOSU();
@@ -179,25 +245,113 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup ViewPager with listeners, referances, number of pages to bind (all 7)
         setupViewPager();
+
+        //Setup ProcessPacket Referances
+        configureProcessPacketReferances();
+
+        //Setup DataSnapshots at 3s intervals
+        setupDataLogger();
     }
 
-    public void setSubscriptTextMainParams() {
-        MainParamsView mpv = findViewById(R.id.pinsp);
-        mpv.setPeepPip(); //Set first CustomTextView's MIN and MAX as Pinsp and Peep
-        mpv.setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
-        mpv = findViewById(R.id.rate);
-        mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
-        mpv = findViewById(R.id.fio2);
-        mpv.setLabel(Html.fromHtml("FiO<small><sub>2</sub></small>"));
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mainActivityActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mainActivityActive = false;
+    }
+
+    public void configureProcessPacketReferances() {
+//        ProcessPacketAsyncTask.list = new XyDataSeries<Double, Double>[8];
+        ProcessPacketAsyncTask.pressureDataSeries = pressureDataSeries;
+        ProcessPacketAsyncTask.pressureSweepDataSeries = pressureSweepDataSeries;
+        ProcessPacketAsyncTask.flowDataSeries = flowDataSeries;
+        ProcessPacketAsyncTask.flowSweepDataSeries = flowSweepDataSeries;
+        ProcessPacketAsyncTask.volumeDataSeries = volumeDataSeries;
+        ProcessPacketAsyncTask.volumeSweepDataSeries = volumeSweepDataSeries;
+        ProcessPacketAsyncTask.lastPressureSweepDataSeries = lastPressureSweepDataSeries;
+        ProcessPacketAsyncTask.lastFlowDataSeries = lastFlowDataSeries;
+        ProcessPacketAsyncTask.lastVolumeDataSeries = lastVolumeDataSeries;
+        ProcessPacketAsyncTask.chart = new WeakReference<>(chart);
+        ProcessPacketAsyncTask.tv1 = new WeakReference<>(findViewById(R.id.pinsp));
+        ProcessPacketAsyncTask.tv2 = new WeakReference<>(findViewById(R.id.peep));
+        ProcessPacketAsyncTask.tv3 = new WeakReference<>(findViewById(R.id.vtf));
+        ProcessPacketAsyncTask.tv4 = new WeakReference<>(findViewById(R.id.rate));
+        ProcessPacketAsyncTask.tv5 = new WeakReference<>(findViewById(R.id.fio2));
+        ProcessPacketAsyncTask.alarm = new WeakReference<>(findViewById(R.id.alarm));
+        ProcessPacketAsyncTask.modeBox = new WeakReference<>(findViewById(R.id.modeBox));
+        ProcessPacketAsyncTask.inspExp = new WeakReference<>(findViewById(R.id.mainInspExp));
     }
 
     public void setupViewPager() {
-        //ViewPager
+        //ViewPager setup
         viewPager = findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(6);
         viewPager.setAdapter(new ViewPagerFragmentAdapter(getSupportFragmentManager(), getLifecycle()));
-//        viewPager.setAdapter(new ViewPagerAdapter(this, usbService, MainActivity.this, getSupportFragmentManager(), onStandbyClick));
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1) {
+                    MonitoringFragment.startObserving();
+                } else if (position == 3) {
+                    ToolsFragment.startObserving();
+                } else {
+                    MonitoringFragment.stopObserving();
+                    ToolsFragment.stopObserving();
+                }
+            }
+        });
+
+        // Tab Layout: TabSelectedListener and Mediator for attaching ViewPager2 to TabLayout
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.setBackgroundColor(getColor(R.color.gray1));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                showSidebar();
+                tab.getIcon().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_IN);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tab.getIcon().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_IN);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (isSidebarShown) hideSidebar();
+                else showSidebar();
+            }
+        });
+        TabLayoutMediator tm = new TabLayoutMediator(tabLayout, viewPager, true, true, new TabLayoutMediator.TabConfigurationStrategy() {
+            int[] icons = {R.drawable.controls_icon, R.drawable.ic_monitoring, R.drawable.ic_alarm, R.drawable.ic_tools, R.drawable.ic_patient, R.drawable.ic_events, R.drawable.ic_controls};
+            String[] texts = {"Controls", "Monitoring", "Alarms", "Tools", "Patient", "Events", "System"};
+
+            @Override
+            public void onConfigureTab(@androidx.annotation.NonNull TabLayout.Tab tab, int position) {
+                tab.setIcon(icons[position]);
+                tab.setText(texts[position]);
+            }
+        });
+        tm.attach();
     }
+
+    public void hideSidebar() {// Hides sidebar, expands chart to cover screen
+        LinearLayout viewPagerHolder = findViewById(R.id.viewPagerll);
+        viewPagerHolder.setVisibility(View.GONE);
+        isSidebarShown = false;
+    }
+
+    public void showSidebar() {
+        LinearLayout viewPagerHolder = findViewById(R.id.viewPagerll);
+        viewPagerHolder.setVisibility(View.VISIBLE);
+        isSidebarShown = true;
+    }
+
 
     public void setScreenFlags() {
         View decorView = getWindow().getDecorView();
@@ -209,27 +363,121 @@ public class MainActivity extends AppCompatActivity {
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
+    public void setupDataLogger() {
+        Observable.interval(3, 3, TimeUnit.SECONDS)
+                .observeOn(Schedulers.newThread())
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        disposables.add(d);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Long aLong) {
+                        boolean isWarningString = false;
+                        String warning = "";
+                        callNumber++;
+                        if (StaticStore.Warnings.currentWarnings.size() > 0) {
+                            isWarningString = true;
+                            boolean x = true;
+                            synchronized (StaticStore.Warnings.currentWarnings) {
+                                for (String s : StaticStore.Warnings.currentWarnings) {
+                                    if (x) {
+                                        warning += s;
+                                        x = false;
+                                    } else warning += ", " + s;
+                                }
+                            }
+                        } else {
+                            warning = dashes;
+                        }
+
+                        if (callNumber <= 20) { // 3s call
+                            if (!isWarningString)
+                                return;            //return if there is no warning, called every 3 seconds
+                        } else callNumber = 0;
+
+                        if (StaticStore.Data.size() > 3000) {
+                            StaticStore.Data.remove(0);
+                        }
+                        HashMap<String, String> t = new HashMap<>();
+                        t.put("date", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+                        t.put("pinsp", String.valueOf(StaticStore.Values.pMax));
+                        t.put("set-pinsp", String.valueOf(StaticStore.packet_pinsp));
+                        t.put("peep", String.valueOf(StaticStore.Values.pMin));
+                        t.put("set-peep", String.valueOf(StaticStore.packet_peep));
+                        t.put("ppeak", String.valueOf(StaticStore.Values.pp));
+                        t.put("pmean", String.valueOf(StaticStore.Monitoring.pMean));
+                        t.put("vt", String.valueOf(StaticStore.Values.vTidalFlow));
+                        t.put("set-vt", String.valueOf(StaticStore.packet_vt));
+                        t.put("rtotal", String.valueOf(StaticStore.Values.bpmMeasured));
+                        t.put("set-rtotal", String.valueOf(StaticStore.packet_rtotal));
+                        t.put("rspont", String.valueOf(StaticStore.Values.rSpont));
+                        t.put("mvTotal", String.valueOf(StaticStore.Values.expMinVolMeasured));
+                        t.put("mvSpont", String.valueOf(StaticStore.Monitoring.mvSpont));
+                        t.put("fio2", String.valueOf(StaticStore.Values.fio2));
+                        t.put("set-fio2", String.valueOf(StaticStore.packet_fio2));
+                        t.put("ie", getIE(StaticStore.Monitoring.ie));
+                        t.put("set-ie", getIE(StaticStore.packet_ie));
+                        t.put("cStat", String.valueOf(StaticStore.Monitoring.cStat));
+                        t.put("warning", warning);
+                        StaticStore.Data.add(t);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("INCONSISTENCY", "DataSnapshot Observable called onComplete(). Data Snapshots store for Log data not being stored");
+                    }
+                });
+    }
+
     public void setSharefPrefs() {
         //Set controls info on app launch from memory
         SharedPreferences sharedPref = this.getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE);
         StaticStore.modeSelected = sharedPref.getString("mode_selected", "-");
         StaticStore.packet_fio2 = Short.parseShort(sharedPref.getString("packet_fio2", "0"));
         StaticStore.packet_vt = Short.parseShort(sharedPref.getString("packet_vt", "0"));
-        StaticStore.packet_vtrig = Float.parseFloat(sharedPref.getString("packet_vtrig", "0"));
-        StaticStore.packet_pip = Float.parseFloat(sharedPref.getString("packet_pip", "0"));
-        StaticStore.packet_cpap = Float.parseFloat(sharedPref.getString("packet_cpap", "0"));
-        StaticStore.packet_ratef = Float.parseFloat(sharedPref.getString("packet_ratef", "0"));
-        StaticStore.packet_tinsp = Float.parseFloat(sharedPref.getString("packet_tinsp", "0"));
+        StaticStore.packet_vtrig = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_vtrig", "0")));
+        StaticStore.packet_pinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pip", "0")));
+        StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_cpap", "0")));
+        StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", "0")));
+        StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", "0")));
         StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "0"));
         StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", "0"));
-        StaticStore.packet_pmax = Float.parseFloat(sharedPref.getString("packet_pmax", "0"));
-        StaticStore.packet_delps = Float.parseFloat(sharedPref.getString("packet_delps", "0"));
+        StaticStore.packet_plimit = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", "0")));
+        StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_delps", "0")));
+
+        StaticStore.AlarmLimits.minVolMax = Short.parseShort(sharedPref.getString("limits_minVolMax", "0"));
+        StaticStore.AlarmLimits.minVolMin = Short.parseShort(sharedPref.getString("limits_minVolMin", "0"));
+        StaticStore.AlarmLimits.fTotalMax = Short.parseShort(sharedPref.getString("limits_fTotalMax", "0"));
+        StaticStore.AlarmLimits.fTotalMin = Short.parseShort(sharedPref.getString("limits_fTotalMin", "0"));
+        StaticStore.AlarmLimits.vtMax = Short.parseShort(sharedPref.getString("limits_vtMax", "0"));
+        StaticStore.AlarmLimits.vtMin = Short.parseShort(sharedPref.getString("limits_vtMi", "0"));
+        StaticStore.AlarmLimits.pMax = Short.parseShort(sharedPref.getString("limits_pMax", "0"));
+        StaticStore.AlarmLimits.pMin = Short.parseShort(sharedPref.getString("limits_pMin", "0"));
+        StaticStore.AlarmLimits.apnea = Short.parseShort(sharedPref.getString("limits_apnea", "0"));
     }
 
+    //Create subscription to packetSubject(PublishSubject) to handle incoming data from packet
     public void setupUsbDataReceiver() {
-        //Create subscription to packetSubject(PublishSubject) to handle incoming data from packet
         disposables.add(packetSubject.subscribe(bytes -> {
-            Log.d("PACKET_MAIN", Arrays.toString(bytes));
+            if (packet.length == 0) {
+                packet = Arrays.copyOf(bytes, bytes.length);
+            } else if (packet.length < PACKET_LENGTH) {
+                packet = joinArrays(packet, bytes);
+            } else if (packet.length == PACKET_LENGTH) {
+                Log.d("PACKET_MAIN", Arrays.toString(packet));
+                new ProcessPacketAsyncTask(packet);
+                packet = new byte[]{};
+            } else {
+                packet = new byte[]{};
+                Log.d("MSG", "DROPPED");
+            }
             //TODO: add handleData logic
         }));
     }
@@ -252,7 +500,6 @@ public class MainActivity extends AppCompatActivity {
         // Start listening notifications from UsbService
         // Start UsbService(if it was not started before) and Bind it
         startService(UsbService.class, usbConnection, null);
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
         getWindow().getDecorView().setSystemUiVisibility(ui_flags);
@@ -272,6 +519,25 @@ public class MainActivity extends AppCompatActivity {
         unbindService(usbConnection);
     }
 
+    public byte[] joinArrays(byte[] array1, byte[] array2) {
+        int aLen = array1.length;
+        int bLen = array2.length;
+        byte[] result = new byte[aLen + bLen];
+        System.arraycopy(array1, 0, result, 0, aLen);
+        System.arraycopy(array2, 0, result, aLen, bLen);
+        return result;
+    }
+
+    public void setFilters() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
+        filter.addAction(UsbService.ACTION_NO_USB);
+        filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
+        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
+        registerReceiver(mUsbReceiver, filter);
+    }
+
     public void startService(Class<?> service, ServiceConnection serviceConnection, Bundle extras) {
         if (!UsbService.SERVICE_CONNECTED) {
             Intent startService = new Intent(this, service);
@@ -286,115 +552,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-//        StaticStore.service = usbService;
-    }
-
-    public void setFilters() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED);
-        filter.addAction(UsbService.ACTION_NO_USB);
-        filter.addAction(UsbService.ACTION_USB_DISCONNECTED);
-        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED);
-        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
-        registerReceiver(mUsbReceiver, filter);
-    }
-
-    public void handleData(String d) {
-        if (packet.length() == 0) {
-            packet = d;
-        } else if (packet.length() < PACKET_LENGTH) {
-            packet = packet + d;
-        } else if (packet.length() == PACKET_LENGTH) {
-            Log.d("PACKET_MAIN", packet);
-//            new ProcessPacketAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, packet);
-            packet = "";
-        } else {
-            packet = "";
-            Log.d("MSG", "DROPPED");
-        }
-    }
-
-    private void setUpMainChart() {
-        try {
-            SciChartSurface.setRuntimeLicenseKey("wtAosuCtN2onfU1Vva1WXGY8EJhcn2VvVs/K3fHohGNHodDaqXV3bXqI3k1n010ZtFZE5m4ogLrpOgJp7dGQyzmfzcLVSn+FY9cxDWkzbvxi5xeSAM1PfvqV8n6/u18LvcqWyOvmiDQ6pTjRWKRRH+BMcVgzrelrOTdGC7n4xhMvr2NCMLhnDO+mbT5oc06MvFtamLBV3oHjL+IZBJeoY0S1oed/2sV2gRpmLqysnrqVnKH1G0gnluuxtZsGXW+jG05K1Byh+5h/8eMd/JfJj216aCAZY1uEqDMv/g339IEylLuXkPVJYUMsChRl7GnLb7JX5xl3pIYhocxG+wfzdM05mwDErA5AAWV54NEJUBTWy4morZWwrpVYgQKA1SfUCYxaZvLUkojmR2BsitmrTolhbUwUkgn+7CWXUXWROHhZ+H7++zb015Wj5HkKc6P3/1A/3Nayh8Pno4Uft79pcLyLJakJ7dSXpQlO4Nsb3INwjT29M6iwK2eJClgC8U94mFulNwIJqvh30zgut+g3UdbW8kl5M1pyMr+Xto4OhNjd0HETlLr1o+h/AuJpQzSB+Q/GrAdVRUM=");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        final String pressureId = "pressureId";
-        final String flowId = "flowId";
-        final String volumeId = "volumeId";
-        SciChartBuilder.init(this);
-        sciChartBuilder = SciChartBuilder.instance();
-        chart = new SciChartSurface(this);
-        LinearLayout chartLayout = findViewById(R.id.mainChart);
-        chartLayout.addView((View) chart, 0);
-
-        final NumericAxis xAxis = sciChartBuilder.newNumericAxis()
-                .withVisibleRange(0, 10)
-                .withAutoRangeMode(AutoRange.Never)
-                .withAxisBandsFill(5)
-                .withDrawMajorBands(true)
-                .withAxisId("XAxis")
-                .build();
-
-        DoubleValues pressureRange = new DoubleValues();
-        pressureRange.add(-10);
-        pressureRange.add(65);
-        DoubleValues flowRange = new DoubleValues();
-        flowRange.add(-150);
-        flowRange.add(+150);
-        DoubleValues volumeRange = new DoubleValues();
-        volumeRange.add(-500);
-        volumeRange.add(1200);
-
-        final NumericAxis yAxisPressure = generateYAxis(pressureId, getMinMaxRange(pressureRange));
-        final NumericAxis yAxisFlow = generateYAxis(flowId, getMinMaxRange(flowRange));
-        final NumericAxis yAxisVolume = generateYAxis(volumeId, getMinMaxRange(volumeRange));
-
-        UpdateSuspender.using(chart, () -> {
-            Collections.addAll(chart.getAnnotations(),
-                    sciChartBuilder.newTextAnnotation()
-                            .withXAxisId("XAxis")
-                            .withYAxisId(pressureId)
-                            .withY1(0d)
-                            .withText(" Pressure (cm H2O)")
-                            .withFontStyle(18, ColorUtil.White)
-                            .build(),
-                    generateBaseLines(pressureId),
-                    sciChartBuilder.newTextAnnotation()
-                            .withXAxisId("XAxis")
-                            .withYAxisId(flowId)
-                            .withY1(0d)
-                            .withFontStyle(18, ColorUtil.White)
-                            .withText(" Flow (lpm)")
-                            .build(),
-                    generateBaseLines(flowId),
-                    sciChartBuilder.newTextAnnotation()
-                            .withXAxisId("XAxis")
-                            .withYAxisId(volumeId)
-                            .withY1(0d)
-                            .withFontStyle(18, ColorUtil.White)
-                            .withText(" Volume (ml)")
-                            .build(),
-                    generateBaseLines(volumeId)
-            );
-            Collections.addAll(chart.getXAxes(), xAxis);
-            Collections.addAll(chart.getYAxes(), yAxisPressure, yAxisFlow, yAxisVolume);
-            Collections.addAll(chart.getRenderableSeries(),
-                    MainActivity.this.generateLineSeries(pressureId, pressureDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateLineSeries(pressureId, pressureSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateScatterForLastAppendedPoint(pressureId, lastPressureSweepDataSeries),
-
-                    MainActivity.this.generateLineSeries(flowId, flowDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateLineSeries(flowId, flowSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateScatterForLastAppendedPoint(flowId, lastFlowDataSeries),
-
-                    MainActivity.this.generateLineSeries(volumeId, volumeDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateLineSeries(volumeId, volumeSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
-                    MainActivity.this.generateScatterForLastAppendedPoint(volumeId, lastVolumeDataSeries)
-            );
-            chart.setLayoutManager(new DefaultLayoutManager.Builder().setRightOuterAxesLayoutStrategy(new RightAlignedOuterVerticallyStackedYAxisLayoutStrategy()).build());
-        });
+        StaticStore.service = new WeakReference<>(usbService);
     }
 
     private HorizontalLineAnnotation generateBaseLines(String yAxisId) {
@@ -533,5 +691,95 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    private void setUpMainChart() {
+        try {
+            SciChartSurface.setRuntimeLicenseKey("nEBMHOM4a26Hy6fzTkNJ6ipJK9qQVAhEKsDo5KZ/+1C5Ukv3Bf9g/19wdOlk5TxKTyp8sIm5nYrN+hrqBoqzqwEK/1f+DjPALfxWNkUClVOWlFatlnFP2lUDabIf3pSLoAsHvgjp7V7+G68cryTZ+QGP9GZVNrrPqb50oX/gcJfk3kDkWDD11becrNfp6bRjexgKUikrrm75nWLrwHck3N4AGhV+PV3pTIcvM7wCSTF6QrJLaqM13jy7N+AHA0+rt1tlpm51M8qVXqe3r/Lzx7+/EydTVzfDTiS76FJap6IvHzPf0RjaVw+pnCfbEP2oRydaN0/7iBQMm8pkUyl0ok/p3o3pTgqjwl1tyg6QrgIwe1n35DXlm4JGzLMFE3x/548rIOvdFEntTl6HvLBbe4PbYweqMhn9pxYcjbddyJDPfCoHx0+V1YZjF1wdEazXhcT3khA8oxxiwbqS3d9BlwrcugcaGVuRdM44t80uKJkVPOteZYsjUwqikohV67smb+BYtWNYj9UPK7CIFgzDd1gvHW+Bh+NSYyPf6+jyW6E0QczwD6+hP4VgYUS4yGii4i2Lrzs=");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        final String pressureId = "pressureId";
+        final String flowId = "flowId";
+        final String volumeId = "volumeId";
+        SciChartBuilder.init(this);
+        sciChartBuilder = SciChartBuilder.instance();
+        chart = new SciChartSurface(this);
+        LinearLayout chartLayout = findViewById(R.id.mainChart);
+        chartLayout.addView((View) chart, 0);
+
+        final NumericAxis xAxis = sciChartBuilder.newNumericAxis()
+                .withVisibleRange(0, 10)
+                .withAutoRangeMode(AutoRange.Never)
+                .withAxisBandsFill(5)
+                .withDrawMajorBands(true)
+                .withAxisId("XAxis")
+                .build();
+
+        DoubleValues pressureRange = new DoubleValues();
+        pressureRange.add(-10);
+        pressureRange.add(65);
+        DoubleValues flowRange = new DoubleValues();
+        flowRange.add(-150);
+        flowRange.add(+150);
+        DoubleValues volumeRange = new DoubleValues();
+        volumeRange.add(-500);
+        volumeRange.add(1200);
+
+        final NumericAxis yAxisPressure = generateYAxis(pressureId, getMinMaxRange(pressureRange));
+        final NumericAxis yAxisFlow = generateYAxis(flowId, getMinMaxRange(flowRange));
+        final NumericAxis yAxisVolume = generateYAxis(volumeId, getMinMaxRange(volumeRange));
+
+        UpdateSuspender.using(chart, () -> {
+            Collections.addAll(chart.getAnnotations(),
+                    sciChartBuilder.newTextAnnotation()
+                            .withXAxisId("XAxis")
+                            .withYAxisId(pressureId)
+                            .withY1(0d)
+                            .withText(" Pressure (cm H2O)")
+                            .withFontStyle(18, ColorUtil.White)
+                            .build(),
+                    generateBaseLines(pressureId),
+                    sciChartBuilder.newTextAnnotation()
+                            .withXAxisId("XAxis")
+                            .withYAxisId(flowId)
+                            .withY1(0d)
+                            .withFontStyle(18, ColorUtil.White)
+                            .withText(" Flow (lpm)")
+                            .build(),
+                    generateBaseLines(flowId),
+                    sciChartBuilder.newTextAnnotation()
+                            .withXAxisId("XAxis")
+                            .withYAxisId(volumeId)
+                            .withY1(0d)
+                            .withFontStyle(18, ColorUtil.White)
+                            .withText(" Volume (ml)")
+                            .build(),
+                    generateBaseLines(volumeId)
+            );
+            Collections.addAll(chart.getXAxes(), xAxis);
+            Collections.addAll(chart.getYAxes(), yAxisPressure, yAxisFlow, yAxisVolume);
+            Collections.addAll(chart.getRenderableSeries(),
+                    MainActivity.this.generateLineSeries(pressureId, pressureDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateLineSeries(pressureId, pressureSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateScatterForLastAppendedPoint(pressureId, lastPressureSweepDataSeries),
+
+                    MainActivity.this.generateLineSeries(flowId, flowDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateLineSeries(flowId, flowSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateScatterForLastAppendedPoint(flowId, lastFlowDataSeries),
+
+                    MainActivity.this.generateLineSeries(volumeId, volumeDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateLineSeries(volumeId, volumeSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
+                    MainActivity.this.generateScatterForLastAppendedPoint(volumeId, lastVolumeDataSeries)
+            );
+            chart.setLayoutManager(new DefaultLayoutManager.Builder().setRightOuterAxesLayoutStrategy(new RightAlignedOuterVerticallyStackedYAxisLayoutStrategy()).build());
+        });
+    }
+
+    private XyDataSeries<Double, Double> newDataSeries(int fifoCapacity) {
+        final XyDataSeries<Double, Double> ds = new XyDataSeries<>(Double.class, Double.class);
+        ds.setFifoCapacity(fifoCapacity);
+        ds.setAcceptsUnsortedData(false);
+        return ds;
     }
 }

@@ -10,4 +10,17 @@
         <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
+    <style name="KeyboardNumberKeys">
+        <item name="android:fontFamily">sans-serif-thin</item>
+        <item name="background">@drawable/rounded_corner</item>
+        <item name="android:gravity">center</item>w
+    </style>
+
+    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="strokeColor">@color/colorAccent</item>
+        <item name="strokeWidth">3dp</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style>
 </resources>

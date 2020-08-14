@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|top"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/rounded_corner_heading"
+        android:fontFamily="@font/arimo"
+        android:gravity="center"
+        android:text="@string/monitoring"
+        android:textAllCaps="true"
+        android:textColor="#ffffff"
+        android:textSize="35sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarAlwaysDrawVerticalTrack="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_mvTotal"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="MVtotal"
+                app:monitUnit="l" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_mvSpont"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="MVspont"
+                app:monitUnit="l" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_Rspont"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Rspont"
+                app:monitUnit="b/min" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_ie"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="I:E"
+                app:monitUnit="ratio" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_ti"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Ti"
+                app:monitUnit="s" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_te"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Te"
+                app:monitUnit="s" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_phase"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Resp Phase"
+                app:monitUnit="Insp/Exp" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_leakVol"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Leak Vol"
+                app:monitUnit="ml" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_leakPercent"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Leak "
+                app:monitUnit="%" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_cStat"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="Cstat"
+                app:monitUnit="ml/cmH2O" />
+
+            <com.dvbinventek.dvbapp.customViews.MonitoringTextView
+                android:id="@+id/monit_flowPeak"
+                android:layout_width="334dp"
+                android:layout_height="60dp"
+                app:monitName="FlowPeak"
+                app:monitUnit="lpm" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

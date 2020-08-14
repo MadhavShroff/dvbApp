@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    tools:context=".LogDisplay">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:text="@string/historic_data"
+        android:textSize="50sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="70dp">
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/yellow"
+            android:fontFamily="@font/arimo"
+            android:gravity="center"
+            android:letterSpacing="0"
+            android:text="home"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:padding="5dp">
+
+            <Button
+                android:id="@+id/saveData"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:backgroundTint="@color/yellow"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:letterSpacing="0"
+                android:text="Save Data"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:id="@+id/frame"
+                android:layout_width="72dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center" />
+
+            <cdflynn.android.library.checkview.CheckView
+                android:id="@+id/check"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end|center"
+                app:checkView_strokeColor="@color/green"
+                app:checkView_strokeWidth="5dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TableRow
+            android:background="#0079D6"
+            android:padding="3dp"
+            android:textAlignment="center">
+
+            <TextView
+                android:id="@+id/log_date"
+                android:layout_width="172dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/date"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_pinsp"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/p_insp"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_peep"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/peep"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_ppeak"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/ppeak"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_pmean"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/pmean"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_vt"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/vt"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_rate"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/rate"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_rspont"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/rspont"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_mvtotal"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/minvol"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_mvspont"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/mvspont"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_fio2"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/fio2"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_ieMeasured"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/i_e"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_cstat"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/cstat"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/log_alarms"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@string/alarms1"
+                android:textAlignment="center" />
+        </TableRow>
+    </TableLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"></TableLayout>
+    </ScrollView>
+</LinearLayout>

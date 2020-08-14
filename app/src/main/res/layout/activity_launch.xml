@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow"
+    android:orientation="horizontal"
+    tools:context=".LaunchActivity">
+
+    <LinearLayout
+        android:layout_width="800dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="600dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp"
+            android:backgroundTint="@color/yellow"
+            android:backgroundTintMode="src_over"
+            android:contentDescription="@string/logo"
+            android:src="@drawable/logo" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:padding="5dp"
+            android:src="@drawable/refer_manual" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/arimo"
+            android:gravity="center"
+            android:text="Self-Test"
+            android:textAllCaps="true"
+            android:textColor="#000000"
+            android:textSize="42sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/arimo"
+            android:gravity="center"
+            android:text="@string/please_connect_quot_to_patient_quot_port_to_quot_from_patient_quot_port_directly_without_filters"
+            android:textColor="#000000"
+            android:textSize="30sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_warning" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/arimo"
+                android:gravity="center"
+                android:text="@string/warning"
+                android:textColor="#000000"
+                android:textSize="42sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/arimo"
+            android:text="@string/to_ensure_safe_operation_always_run_auto_calibration_nbefore_using_ventilator_on_a_patient"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rounded_corners_launch"
+        android:orientation="vertical"
+        android:paddingTop="100dp"
+
+        android:translationZ="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/selftestText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|start"
+                android:layout_marginStart="20dp"
+                android:fontFamily="@font/arimo"
+                android:text="@string/click_quot_start_quot_to_initiate_auto_calibration"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toTopOf="@id/start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/start"
+                android:layout_width="180dp"
+                android:layout_height="80dp"
+                android:backgroundTint="@color/yellow"
+                android:fontFamily="@font/arimo"
+                android:letterSpacing="0"
+                android:text="@string/start"
+                android:textColor="#000000"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/selftestText"
+                app:layout_constraintStart_toStartOf="@id/selftestText"
+                app:layout_constraintTop_toBottomOf="@id/selftestText" />
+
+            <TextView
+                android:id="@+id/progressIndicatorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo"
+                android:padding="10dp"
+                android:text="72%"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@id/progressIndicator"
+                app:layout_constraintEnd_toEndOf="@id/progressIndicator"
+                app:layout_constraintStart_toStartOf="@id/progressIndicator"
+                app:layout_constraintTop_toTopOf="@id/progressIndicator" />
+
+            <com.google.android.material.progressindicator.ProgressIndicator
+                android:id="@+id/progressIndicator"
+                style="@style/Widget.MaterialComponents.ProgressIndicator.Circular.Determinate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+                android:progress="72"
+                app:circularInset="10dp"
+                app:circularRadius="35dp"
+                app:indicatorColor="@color/green"
+                app:indicatorWidth="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:trackColor="#afafaf" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="Pressure Sensors"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check1"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar1"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="Flow Sensors"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="Oxygen Sensors"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check3"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar3"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="Tightness"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check4"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar4"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="Battery Module"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check5"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar5"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:layout_marginStart="100dp"
+                    android:fontFamily="@font/arimo"
+                    android:text="System Functions"
+                    android:textColor="#000000"
+                    android:textSize="22sp" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check6"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar6"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/countdown"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:fontFamily="@font/arimo"
+                android:textColor="#a2a2a2"
+                android:textSize="22sp" />
+
+            <Button
+                android:id="@+id/skip"
+                android:layout_width="180dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:fontFamily="@font/arimo"
+                android:text="@string/skip"
+                android:textColor="#000000"
+                android:textSize="40sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
