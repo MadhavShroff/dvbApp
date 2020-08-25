@@ -2,6 +2,7 @@ package com.dvbinventek.dvbapp.viewPager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import com.dvbinventek.dvbapp.MainActivity;
 import com.dvbinventek.dvbapp.R;
 import com.dvbinventek.dvbapp.SendPacket;
+import com.dvbinventek.dvbapp.StandbyFragment;
 import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.bottomSheets.ControlsBottomSheet;
 import com.dvbinventek.dvbapp.bottomSheets.IEControlsBottomSheet;
@@ -63,19 +64,22 @@ public class ControlsFragment extends Fragment {
     int countdown = 30;
     //TODO: Optimize lookups
     WeakReference<View> controlsView;
+    public static WeakReference<Button> stopVentilation;
     WeakReference<ControlRow> fio2, vt, pinsp, plimit, peep, ps, vtrig, tinsp, ie, rtotal;
     WeakReference<MenuControlsBottomSheet> modeBottomSheet;
     Observable<Long> observable = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).take(60);
-    Observer<Long> observer = new Observer<Long>() {
+    public static Observer<View> revertStandbyClickObserver;
+    public static Observer<String> hpaObserver;
+    Observer<Long> confirmCountdownObserver = new Observer<Long>() {
         @Override
         public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
             disposable = d;
-            setText(R.id.highlight_text, controlsView.get().getResources().getString(R.string.warning_text, 30));
+            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm_, 30));
         }
 
         @Override
         public void onNext(@io.reactivex.rxjava3.annotations.NonNull Long aLong) {
-            setText(R.id.highlight_text, controlsView.get().getResources().getString(R.string.warning_text, 30 - aLong));
+            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm_, 30 - aLong));
         }
 
         @Override
@@ -87,6 +91,7 @@ public class ControlsFragment extends Fragment {
         public void onComplete() {
             resetChanges();
             countdownStarted = false;
+            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm));
         }
     };
 
@@ -125,7 +130,6 @@ public class ControlsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_controls, container, false);
         mp = MediaPlayer.create(getContext(), R.raw.button_press);
-        Log.d("MSG", "ControlsFragment::onCreateView called");
         controlsView = new WeakReference<>(view);
         fio2 = new WeakReference<>(view.findViewById(R.id.controls_fio2));
         vt = new WeakReference<>(view.findViewById(R.id.controls_vt));
@@ -175,6 +179,45 @@ public class ControlsFragment extends Fragment {
         cbs_pmax = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set P<small><sub>limit</sub></small> (cm H<small><sub>2</sub></small>O)"), "pmax");
         cbs_pmax.setSubText(Html.fromHtml("PEEP+1 to 60"));
 
+        //setup hpa unit change listener
+        hpaObserver = new Observer<String>() {
+            @Override
+            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
+                if (s.equals("hpa")) {
+                    plimit.get().setUnit("hPa");
+                    pinsp.get().setUnit("hPa");
+                    ps.get().setUnit("hPa");
+                    peep.get().setUnit("hPa");
+                    cbs_pmax.setHeading(Html.fromHtml("Set P<small><sub>limit</sub></small> (hPa)"));
+                    cbs_pip.setHeading(Html.fromHtml("Set P<small><sub>insp</sub></small> (hPa)"));
+                    cbs_delps.setHeading(Html.fromHtml("Set PS (hPa)"));
+                    cbs_cpap.setHeading(Html.fromHtml("Set PEEP (hPa)"));
+                } else {
+                    plimit.get().setUnit(Html.fromHtml("cm H<small><sub>2</sub></small>O"));
+                    pinsp.get().setUnit(Html.fromHtml("cm H<small><sub>2</sub></small>O"));
+                    ps.get().setUnit(Html.fromHtml("cm H<small><sub>2</sub></small>O"));
+                    peep.get().setUnit(Html.fromHtml("cm H<small><sub>2</sub></small>O"));
+                    cbs_pmax.setHeading(Html.fromHtml("Set P<small><sub>limit</sub></small> (cm H<small><sub>2</sub></small>O)"));
+                    cbs_pip.setHeading(Html.fromHtml("Set P<small><sub>insp</sub></small> (cm H<small><sub>2</sub></small>O)"));
+                    cbs_delps.setHeading(Html.fromHtml("Set PS (cm H<small><sub>2</sub></small>O)"));
+                    cbs_cpap.setHeading(Html.fromHtml("Set PEEP (cm H<small><sub>2</sub></small>O)"));
+                }
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+
     }
 
     // Sets the behavior of how controls behave with one another,
@@ -182,11 +225,13 @@ public class ControlsFragment extends Fragment {
         //Send button onClickListener
         Button send = controlsView.get().findViewById(R.id.send);
         send.setOnClickListener(v -> {
+            Observable.just(1L).subscribe(StandbyFragment.confirmButtonClickObserver);
+            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm));
             StaticStore.packet_fio2 = StaticStore.new_packet_fio2;
             StaticStore.packet_vt = StaticStore.new_packet_vt;
             StaticStore.packet_ie = StaticStore.new_packet_ie;
             StaticStore.packet_pinsp = StaticStore.new_packet_pinsp;
-            StaticStore.packet_vtrig = StaticStore.new_packet_vtrig;
+            StaticStore.packet_flowTrig = StaticStore.new_packet_flowTrig;
             StaticStore.packet_peep = StaticStore.new_packet_peep;
             StaticStore.packet_ps = StaticStore.new_packet_ps;
             StaticStore.packet_rtotal = StaticStore.new_packet_rtotal;
@@ -194,35 +239,17 @@ public class ControlsFragment extends Fragment {
             StaticStore.packet_plimit = StaticStore.new_packet_plimit;
             new_mode = StaticStore.modeSelectedShort;
             new_modeString = StaticStore.modeSelected;
-            SendPacket sp = new SendPacket();
-            sp.writeInfo((short) (StaticStore.packet_fio2 * 100), 17);
-            sp.writeInfo(StaticStore.modeSelectedShort, 1);
-            sp.writeInfo(StaticStore.packet_vt, 5);
-            sp.writeInfo((short) (StaticStore.packet_vtrig * 100), 10);
-            sp.writeInfo((short) (StaticStore.packet_peep * 100), 4);
-            sp.writeInfo((short) (StaticStore.packet_pinsp * 100), 3);
-            sp.writeInfo((short) (StaticStore.packet_ps * 100), 2);
-            sp.writeInfo((short) (StaticStore.packet_rtotal * 100f), 6);
-            sp.writeInfo(StaticStore.packet_ie, 7);
-            //TODO: REMOVE
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.apnea * 1000), 39);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.minVolMin * 100), 40);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.minVolMax * 100), 41);
-            sp.writeInfo(StaticStore.AlarmLimits.vtMin, 42);
-            sp.writeInfo(StaticStore.AlarmLimits.vtMax, 43);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.pMin * 100), 44);
-            if (StaticStore.modeSelectedShort == 19) // in PRVC mode, send entered value, in all other modes, send value from alarm limits
-                sp.writeInfo((short) ((int) StaticStore.packet_plimit * 100), 45);
-            else
-                sp.writeInfo((short) ((int) StaticStore.AlarmLimits.pMax * 100), 45);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.fTotalMin * 100), 46);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.fTotalMax * 100), 47);
 
+            SendPacket sp = new SendPacket();
+            //write all values from StaticStore
+            sp.writeDefaultSTRTPacketValues();
+            // send constructed packet to device
+            sp.sendToDevice();
             // add committed values to SharedPreferances, to use at startup
             SharedPreferences.Editor editor = Objects.requireNonNull(getContext()).getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE).edit();
             editor.putString("packet_fio2", "" + StaticStore.packet_fio2);
             editor.putString("packet_vt", "" + StaticStore.packet_vt);
-            editor.putString("packet_vtrig", "" + StaticStore.packet_vtrig);
+            editor.putString("packet_vtrig", "" + StaticStore.packet_flowTrig);
             editor.putString("packet_peep", "" + StaticStore.packet_peep);
             editor.putString("packet_pip", "" + StaticStore.packet_pinsp);
             editor.putString("packet_ps", "" + StaticStore.packet_ps);
@@ -232,8 +259,6 @@ public class ControlsFragment extends Fragment {
             editor.putString("packet_pmax", "" + StaticStore.packet_plimit);
             editor.putString("mode_selected", StaticStore.modeSelected);
             editor.putString("mode_selected_short", Short.toString(StaticStore.modeSelectedShort));
-            // send constructed packet to device
-            sp.sendToDevice();
             // play sound and vibration
             mp.start();
             Vibrator myVib = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
@@ -244,29 +269,28 @@ public class ControlsFragment extends Fragment {
             countdownStarted = false;
         });
 
-        WeakReference<MenuControlsBottomSheet> modeBottomSheet = new WeakReference<>(new MenuControlsBottomSheet(Objects.requireNonNull(getActivity())));
         //Mode button onClickListener
-        ImageButton mode = controlsView.get().findViewById(R.id.controls_mode_change);
-        mode.setOnClickListener(v -> {
-            if (modeBottomSheet.get() == null) return;
-            modeBottomSheet.get().show(true);
-            modeBottomSheet.get().setOnDismissListener(bottomSheet1 -> {
-                if (StaticStore.modeSelectedShort != new_mode) {
-                    highlight(R.id.controls_mode, true);
-                    resetList.add("mode");
-                    setText(R.id.controls_mode_current, StaticStore.modeSelected);
-                } else {
-                    revertRowColor(R.id.controls_mode);
-                    tryToDispose(disposable);
-                    setText(R.id.highlight_text, "");
-                    StaticStore.modeSelected = this.new_modeString;
-                    StaticStore.modeSelectedShort = this.new_mode;
-                    setText(R.id.controls_mode_current, StaticStore.modeSelected);
-                    countdownStarted = false;
-                }
-                setControlsForMode();
-            });
+        MenuControlsBottomSheet modeSheet = new MenuControlsBottomSheet(getActivity());
+        modeBottomSheet = new WeakReference<>(modeSheet);
+        modeBottomSheet.get().setOnDismissListener(bottomSheet1 -> {
+            if (StaticStore.modeSelectedShort != new_mode) {
+                highlight(R.id.controls_mode, true);
+                resetList.add("mode");
+                setText(R.id.controls_mode_current, StaticStore.modeSelected);
+            } else {
+                revertRowColor(R.id.controls_mode);
+                tryToDispose(disposable);
+                setText(R.id.highlight_text, "");
+                StaticStore.modeSelected = this.new_modeString;
+                StaticStore.modeSelectedShort = this.new_mode;
+                setText(R.id.controls_mode_current, StaticStore.modeSelected);
+                countdownStarted = false;
+            }
+            setControlsForMode();
         });
+
+        controlsView.get().findViewById(R.id.controls_mode_change).setOnClickListener(v -> modeSheet.show(true));
+
         fio2.get().setButtonClickListener(v -> {
             cbs_fio2.show(true);
             cbs_fio2.clearValue();
@@ -357,8 +381,8 @@ public class ControlsFragment extends Fragment {
             cbs_pmax.setOnDismissListener(bottomSheet -> {
                 if (cbs_pmax.canceled) return;
                 String s = cbs_pmax.getValue();
-                float sh;
-                sh = Float.parseFloat(s);
+                byte sh;
+                sh = Byte.parseByte(s);
                 if (StaticStore.packet_plimit != sh) {
                     highlight(R.id.controls_plimit, true);
                     resetList.add("pmax");
@@ -418,7 +442,7 @@ public class ControlsFragment extends Fragment {
                     if (StaticStore.new_packet_rtotal != r) {
                         highlight(R.id.controls_rtotal, true);
                         resetList.add("ratef");
-                        StaticStore.new_packet_rtotal = (float) r;
+                        StaticStore.new_packet_rtotal = r;
                         rtotal.get().setCurrent(String.valueOf(r));
                     } else {
                         Log.d("MSG", "packet value equals entered value");
@@ -514,36 +538,56 @@ public class ControlsFragment extends Fragment {
                 if (cbs_vtrig.canceled) return;
                 String s = cbs_vtrig.getValue();
                 float sh = Float.parseFloat(s);
-                if (StaticStore.new_packet_vtrig != sh) {
+                if (StaticStore.new_packet_flowTrig != sh) {
                     highlight(R.id.controls_vtrig, true);
                     resetList.add("vtrig");
                     vtrig.get().setCurrent(s);
-                    StaticStore.new_packet_vtrig = sh;
+                    StaticStore.new_packet_flowTrig = sh;
                 } else {
                     Log.d("MSG", "vtrig packet value equals entered value");
                 }
             });
         });
 
-        Button stopVentilation = controlsView.get().findViewById(R.id.stopVentilation);
-        stopVentilation.setOnClickListener(v -> {
-            Observable.just(v).subscribe(MainActivity.standbyClickObserver);
-        });
+        stopVentilation = new WeakReference<>(controlsView.get().findViewById(R.id.stopVentilation));
+        stopVentilation.get().setOnClickListener(v -> Observable.just(v).subscribe(MainActivity.standbyClickObserver));
         ShapeableImageView up = controlsView.get().findViewById(R.id.swipeup);
         up.setOnClickListener(v -> {
             ScrollView sv = controlsView.get().findViewById(R.id.controls_scrollable);
             sv.smoothScrollTo(0, 500);
         });
+        revertStandbyClickObserver = new Observer<View>() {
+            @Override
+            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull View view) {
+                controlsView.get().findViewById(R.id.stopVentilation).setEnabled(true);
+                controlsView.get().findViewById(R.id.stopVentilation).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#ffffff")));
+                ((Button) controlsView.get().findViewById(R.id.stopVentilation)).setTextColor(Color.parseColor("#000000"));
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
     }
 
     public void setSubscriptAndPastSessionValues() {
+
         //Set subscript text for units and control labels and Default Controls
         //Set Static Store temp values to most recently comitted values
         StaticStore.new_packet_fio2 = StaticStore.packet_fio2;
         StaticStore.new_packet_vt = StaticStore.packet_vt;
         StaticStore.new_packet_ie = StaticStore.packet_ie;
         StaticStore.new_packet_pinsp = StaticStore.packet_pinsp;
-        StaticStore.new_packet_vtrig = StaticStore.packet_vtrig;
+        StaticStore.new_packet_flowTrig = StaticStore.packet_flowTrig;
         StaticStore.new_packet_peep = StaticStore.packet_peep;
         StaticStore.new_packet_ps = StaticStore.packet_ps;
         StaticStore.new_packet_rtotal = StaticStore.packet_rtotal;
@@ -565,7 +609,7 @@ public class ControlsFragment extends Fragment {
         tv.setText(StaticStore.modeSelected == null ? "-" : StaticStore.modeSelected);
         fio2.get().setCurrent(String.valueOf(StaticStore.packet_fio2 == 0 ? "0" : StaticStore.packet_fio2));
         vt.get().setCurrent(String.valueOf(StaticStore.packet_vt == 0 ? "0" : StaticStore.packet_vt));
-        vtrig.get().setCurrent(String.valueOf(StaticStore.packet_vtrig == 0 ? "0" : StaticStore.packet_vtrig));
+        vtrig.get().setCurrent(String.valueOf(StaticStore.packet_flowTrig == 0 ? "0" : StaticStore.packet_flowTrig));
         pinsp.get().setCurrent(String.valueOf(StaticStore.packet_pinsp == 0 ? "0" : StaticStore.packet_pinsp));
         peep.get().setCurrent(String.valueOf(StaticStore.packet_peep == 0 ? "0" : StaticStore.packet_peep));
         ps.get().setCurrent(String.valueOf(StaticStore.packet_ps == 0 ? "0" : StaticStore.packet_ps));
@@ -665,10 +709,7 @@ public class ControlsFragment extends Fragment {
 
     public void resetChanges() {
         Log.d("MSG", "resetChanges() called");
-        setText(R.id.highlight_text, "");
-        for (int id : highlightedList) {
-            revertRowColor(id);
-        }
+        for (int id : highlightedList) revertRowColor(id);
         highlightedList.clear();
         resetValues();
     }
@@ -679,7 +720,7 @@ public class ControlsFragment extends Fragment {
             makeRowYellow(id);
             highlightedList.add(id);
             if (countdownStarted) tryToDispose(disposable);
-            observable.take(30).subscribe(observer);
+            observable.take(30).subscribe(confirmCountdownObserver);
             countdownStarted = true;
         }
     }
@@ -754,8 +795,8 @@ public class ControlsFragment extends Fragment {
                     vt.get().setCurrent(String.valueOf(StaticStore.packet_vt));
                     break;
                 case "vtrig":
-                    StaticStore.new_packet_vtrig = StaticStore.packet_vtrig;
-                    vtrig.get().setCurrent(String.valueOf(cleanNumber(StaticStore.packet_vtrig)));
+                    StaticStore.new_packet_flowTrig = StaticStore.packet_flowTrig;
+                    vtrig.get().setCurrent(String.valueOf(cleanNumber(StaticStore.packet_flowTrig)));
                     break;
                 case "mode":
                     StaticStore.modeSelected = this.new_modeString;

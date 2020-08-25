@@ -1,15 +1,13 @@
 package com.dvbinventek.dvbapp.viewPager;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,21 +17,27 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.dvbinventek.dvbapp.R;
+import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.dialogs.DialogViewPatientDetails;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 public class PatientFragment extends Fragment {
 
+    //TODO: add switch for kg to
+
     static int ui_flags =
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
     WeakReference<View> patientView;
+    String weightUnitString = "kg";
+    String heightUnitString = "cm";
 
     @Nullable
     @Override
@@ -44,7 +48,6 @@ public class PatientFragment extends Fragment {
         ImageView femaleAdult = patientView.get().findViewById(R.id.femaleAdult);
         ImageView maleChild = patientView.get().findViewById(R.id.maleChild);
         ImageView femaleChild = patientView.get().findViewById(R.id.femaleChild);
-        Button change = patientView.get().findViewById(R.id.change);
         View.OnClickListener clickListener = (v) -> {
             setAllUnselected();
             setSelected(v);
@@ -53,44 +56,51 @@ public class PatientFragment extends Fragment {
         femaleAdult.setOnClickListener(clickListener);
         maleChild.setOnClickListener(clickListener);
         femaleChild.setOnClickListener(clickListener);
+        ((TextView) patientView.get().findViewById(R.id.patient_view_name)).setText(StaticStore.PatientDetails.name);
+        ((TextView) patientView.get().findViewById(R.id.patient_view_age)).setText(StaticStore.PatientDetails.age);
+        ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(StaticStore.PatientDetails.height);
+        ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(StaticStore.PatientDetails.ibw);
+        ((TextView) patientView.get().findViewById(R.id.roomNumber)).setText(StaticStore.PatientDetails.room);
+        ((TextView) patientView.get().findViewById(R.id.bedNumber)).setText(StaticStore.PatientDetails.bed);
 
-
+        Button change = patientView.get().findViewById(R.id.change);
         change.setOnClickListener(v -> {
-            final DialogViewPatientDetails pd = new DialogViewPatientDetails(getContext());
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext()).setCancelable(true).setTitle("Set Patient Details").setView(pd).setPositiveButton("Done", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    EditText name = pd.findViewById(R.id.patient_name);
-                    EditText age = pd.findViewById(R.id.patient_age);
-                    EditText weight = pd.findViewById(R.id.patient_weight);
-                    EditText height = pd.findViewById(R.id.patient_height);
-                    EditText room = pd.findViewById(R.id.patient_room);
-                    EditText bed = pd.findViewById(R.id.patient_bed);
-
-                    TextView namet = patientView.get().findViewById(R.id.patient_view_name);
-                    TextView aget = patientView.get().findViewById(R.id.patient_view_age);
-                    TextView weightt = patientView.get().findViewById(R.id.patient_view_weight);
-                    TextView heightt = patientView.get().findViewById(R.id.patient_view_height);
-                    TextView roomt = patientView.get().findViewById(R.id.roomNumber);
-                    TextView bedt = patientView.get().findViewById(R.id.bedNumber);
-
-                    if (!name.getText().toString().isEmpty()) namet.setText(name.getText());
-                    if (!age.getText().toString().isEmpty()) aget.setText(age.getText());
-                    if (!weight.getText().toString().isEmpty())
-                        weightt.setText(weight.getText() + " kg");
-                    if (!height.getText().toString().isEmpty())
-                        heightt.setText(height.getText() + " cm");
-                    if (!room.getText().toString().isEmpty()) roomt.setText(room.getText());
-                    if (!bed.getText().toString().isEmpty()) bedt.setText(bed.getText());
-                }
-            });
+            DialogViewPatientDetails pd = new DialogViewPatientDetails(getContext());
+            pd.setVals(
+                    StaticStore.PatientDetails.name,
+                    StaticStore.PatientDetails.age,
+                    StaticStore.PatientDetails.height,
+                    StaticStore.PatientDetails.ibw,
+                    StaticStore.PatientDetails.room,
+                    StaticStore.PatientDetails.bed
+            );
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext()).setCancelable(true).setView(pd);
             AlertDialog alert = builder.create();
-            alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            alert.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-            alert.getWindow().getDecorView().setSystemUiVisibility(ui_flags);
             alert.show();
+            pd.findViewById(R.id.dismissButton).setOnClickListener((vi) -> alert.dismiss());
             openKeyboard();
-            alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            alert.setOnDismissListener(dialog -> {
+                Log.d("DIALOG", "onDismiss");
+                getActivity().getWindow().getDecorView().setSystemUiVisibility(ui_flags);
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_name)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_name)).setText(((TextInputEditText) pd.findViewById(R.id.patient_name)).getText());
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_age)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_age)).setText(((TextInputEditText) pd.findViewById(R.id.patient_age)).getText());
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText() + " " + weightUnitString);
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_height)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(((TextInputEditText) pd.findViewById(R.id.patient_height)).getText() + " " + heightUnitString);
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_room)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.roomNumber)).setText(((TextInputEditText) pd.findViewById(R.id.patient_room)).getText());
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.bedNumber)).setText(((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText());
+                StaticStore.PatientDetails.name = ((TextInputEditText) pd.findViewById(R.id.patient_name)).getText().toString();
+                StaticStore.PatientDetails.age = ((TextInputEditText) pd.findViewById(R.id.patient_age)).getText().toString();
+                StaticStore.PatientDetails.height = ((TextInputEditText) pd.findViewById(R.id.patient_height)).getText().toString();
+                StaticStore.PatientDetails.ibw = ((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText().toString();
+                StaticStore.PatientDetails.room = ((TextInputEditText) pd.findViewById(R.id.patient_room)).getText().toString();
+                StaticStore.PatientDetails.bed = ((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText().toString();
+            });
         });
         return view;
     }

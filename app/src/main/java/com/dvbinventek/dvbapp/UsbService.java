@@ -144,6 +144,32 @@ public class UsbService extends Service {
         setFilter();
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         findSerialPortDevice();
+//        Observable.interval(1000, 100, TimeUnit.MILLISECONDS)
+//                .subscribeOn(Schedulers.newThread())
+//        .subscribe(new Observer<Long>() {
+//            byte[] bytes = new byte[300];
+//            @Override
+//            public void onSubscribe(@NonNull Disposable d) {
+//            }
+//            @Override
+//            public void onNext(@NonNull Long aLong) {
+//                serialPort.syncOpen();
+//                int gotBytes = serialPort.syncRead(bytes,1);
+//                Log.d("MSG", "bytes received:" + gotBytes);
+//                try {
+//                    if (mHandler != null)
+//                            mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, bytes).sendToTarget();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                serialPort.syncClose();
+//            }
+//            @Override
+//            public void onError(@NonNull Throwable e) { e.printStackTrace(); }
+//            @Override
+//            public void onComplete() {
+//            }
+//        });
     }
 
     /* MUST READ about services
@@ -270,7 +296,6 @@ public class UsbService extends Service {
                     serialPort.getCTS(ctsCallback);
                     serialPort.getDSR(dsrCallback);
 
-                    //
                     // Some Arduinos would need some sleep because firmware wait some time to know whether a new sketch is going
                     // to be uploaded or not
                     //Thread.sleep(2000); // sleep some. YMMV with different chips.

@@ -1,6 +1,7 @@
 package com.dvbinventek.dvbapp.viewPager;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class MonitoringFragment extends Fragment {
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread());
     WeakReference<View> monitoringView;
+    public static Observer<String> hpaObserver;
 
     public static void startObserving() {
         observable.subscribe(observer);
@@ -81,7 +83,28 @@ public class MonitoringFragment extends Fragment {
         ti.setSubText("T<sub><small>insp</small></sub>");
         te.setSubText("T<sub><small>exp</small></sub>");
         cStat.setSubText("C<sub><small>stat</small></sub>");
+        cStat.setUnit(Html.fromHtml("ml/cm H<sub><small>2</small></sub>O"));
         flowPeak.setSubText("Flow<sub><small>peak</small></sub>");
+        hpaObserver = new Observer<String>() {
+            @Override
+            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
+                if (s.equals("hpa")) cStat.setUnit("ml/hPa");
+                else cStat.setUnit(Html.fromHtml("ml/cm H<sub><small>2</small></sub>O"));
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
 
         observer = new Observer<Long>() {
             @Override
@@ -100,7 +123,7 @@ public class MonitoringFragment extends Fragment {
                 ti.setValue(StaticStore.Monitoring.ti, 2);
                 te.setValue(StaticStore.Monitoring.te, 2);
                 flowPeak.setValue(StaticStore.Monitoring.flowPeak, 1);
-                mvTotal.setValue(StaticStore.Values.expMinVolMeasured, 1);
+                mvTotal.setValue(StaticStore.Monitoring.mvTotal, 1);
                 Rspont.setValue(StaticStore.Values.rSpont, 0);
             }
 

@@ -1,187 +1,9 @@
 package com.dvbinventek.dvbapp;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class ReceivePacket {
-
-//    short[] packet;
-//    short com_start; 				// COM_START                    0
-//    short currentMode; 				// current 	mode of operation   1
-//    // short reserved1;                                             2
-//    short fio2; 			// 	oxygen mask flow or fio2            3 // Previously oxygenMaskFlow
-//    short pp; 						// barometric pressure          4
-//    short pi; 						// inspiratory pressure         5
-//    short pe;  						// expiratory pressure          6
-//    short pb; 						// blower pressure              7
-//    short pev;  					// 	exhalation valve pressure   8
-//    short vi;  						// inspiratory airflow          9
-//    short ve;						// expiratory airflow           10
-//    short vo;						// oxygen airflow               11
-//    short vTidalFlow;  				// tidal airflow                12
-//    short viMean; 					// inspiratory airflow mean     13
-//    short veMean; 					// 	inspiratory airflow mean    14
-//    short vFlow;					// measured 	leak in system  15
-//    short ti; 						// inspiratory time             16
-//    short te; 						//expiratory Time               17
-//    short ts;    //Auto Machine Breathing start 	time in ms      18
-//    short reserved2;                                             19
-//    short reserved3;                                                 20
-//    short reserved4;                                                 21
-//    short warningMode;                           //                 22
-//    short ~temperatureInspiratory~; -> Rspont 	//int with resolution 	of 0.1  23
-//    short humidity; 				//int with resolution 	of 0.1  24
-//    short breathingType; // 1 for human breathing, 0 for machine breathing   25
-//    short breathingPhase; 			// 1 for inhalation, -1 for exhalation and 0 	for not breathing   26
-//    short viTotal; 					// total volume 	during inspiratory phase    27
-//    short veTotal;  				// total volume 	during expiratory phase     28
-//    short reserved6 ;               //                              29
-//    short reserved7 ;                               //              30
-//    short bpmMeasured;  		// measured bpm                     31
-//    short expMinVolMeasured; 	// 	minute volume measured          32
-//    short pPeak;                                   //               33
-//    short pMin;                                             //      34
-//    short pMax;                  //                                 35
-//    short emvMin;                //                                 36
-//    short emvMax;                //                                 37
-//    short vtMin;                //                                  38
-//    short vtMax;                //                                  39
-//    short fMin;                //                                   40
-//    short fMax;                //                                   41
-//    short fio2Min;                //                                42
-//    short fio2Max;                //                                43
-//    short inspExpSighHold;        //                                44
-//    short pPlat;            //                                      45
-//    short pMean;            //                                      46
-//    short autoPeep;             //                                  47
-//    short emvSpont;               //                                48
-//    short ieMeasured;           //                                  49
-//    short leakVolume;           //                                  50
-//    short leakPercentage;       //                                  51
-//    short rInsp;                //                                  52
-//    short cStat;                //                                  53
-//    short flowPeak;             //                                  54
-//    short com_stop; 				// COM_STOP                     55
-
-//    char[4] comStart;		// 0
-//    byte mode;		// 4
-//    float graphPressure;		// 5
-//    float graphFlow;		// 9
-//    short graphVolume;		// 13
-//    float pInsp;		// 15
-//    float pPeak;		// 19
-//    float pMean;		// 23
-//    float peep;		// 27
-//    float peepMax;		// 31
-//    float peepMin;		// 35
-//    short vt;		// 39
-//    short vtMax;		// 41
-//    short vtMin;		// 43
-//    float rateTotal;		// 45
-//    float rateTotalMax;		// 49
-//    float rateTotalMin;		// 53
-//    byte fio2;		// 57
-//    byte fio2Max;		// 58
-//    byte fio2Min;		// 59
-//    short vti;		// 60
-//    short vte;		// 62
-//    float rateSpont;		// 64
-//    float mvTotal;		// 68
-//    float mvSpont;		// 72
-//    float tInsp;		// 76
-//    float tExp;		// 80
-//    float I;		// 84
-//    float E;		// 88
-//    short leakVolume;		// 92
-//    byte leakPercentage;		// 94
-//    float cStat;		// 95
-//    byte flowPeak;		// 99
-//    float pPlat;		// 100
-//    float autoPeep;		// 104
-//    byte breathingType;		// 108
-//    byte breathingPhase;		// 109
-//    byte[20] reserved;		// 110
-//    float calibrationStatus;		// 130
-//    float calibrationError;		// 134
-//    float warningHigh;		// 138
-//    float warningMedium;		// 142
-//    float warningLow;		// 146
-//    byte sighHold;		// 150
-//    byte warningSilence;		// 151
-//    byte warningSync;		// 152
-//    byte batteryStatus;		// 153
-//    byte batteryPower;		// 154
-//    byte powerOffRequest;		// 155
-//    byte[24] maintenenceDisplay;		// 156
-//    byte[20] versionDisplay;		// 180
-//    short ts;		// 200
-//    short pi;		// 202
-//    short pe;		// 204
-//    short pb;		// 206
-//    short pev;		// 208
-//    short fi;		// 210
-//    short fe;		// 212
-//    short fo;		// 214
-//    short fTidal;		// 216
-//    short pwmWidthBlower;		// 218
-//    short pwmWidthInspiratoryValve;		// 220
-//    short pwmWidthInspiratoryValveExhale;		// 222
-//    short pwmWidthexhalationValve;		// 224
-//    short pwmWidthexhalationValveExhale;		// 226
-//    byte[18] reservedDebug;		// 228
-//    char[4] comStop			// 246
-
-
-//    public void init(short[] packet) {
-//        if(packet.length == 0) return;
-////        com_start = packet[0];
-//        StaticStore.Values.pPeak = Short.reverseBytes(packet[33])/100.0f;
-//        StaticStore.Values.pp = Short.reverseBytes(packet[4])/100.0f;
-//        StaticStore.Values.pMax = Short.reverseBytes(packet[35])/100.0f;
-//        StaticStore.Values.pMin = Short.reverseBytes(packet[34])/100.0f;
-//        StaticStore.Values.expMinVolMeasured = Short.reverseBytes(packet[32])/100.0f;
-//        StaticStore.Values.vTidalFlow = Short.reverseBytes(packet[12]);
-//        StaticStore.Values.emvMax = Short.reverseBytes(packet[37])/100.0f;
-//        StaticStore.Values.emvMin = Short.reverseBytes(packet[36])/100.0f;
-//        StaticStore.Values.vtMax = Short.reverseBytes(packet[39]);
-//        StaticStore.Values.vtMin = Short.reverseBytes(packet[38]);
-//        StaticStore.Values.bpmMeasured = Short.reverseBytes(packet[31])/100.0f;
-//        StaticStore.Values.fMax = Short.reverseBytes(packet[41])/100.0f;
-//        StaticStore.Values.fMin = Short.reverseBytes(packet[40])/100.0f;
-//        StaticStore.Values.fio2 = (Short.reverseBytes(packet[3]))/100.0f;
-//        StaticStore.Values.fio2Max = Short.reverseBytes(packet[43])/100.0f;
-//        StaticStore.Values.fio2Min = Short.reverseBytes(packet[42])/100.0f;
-//        StaticStore.Values.vFlow = Short.reverseBytes(packet[15])/100.0f;
-//        StaticStore.Values.veTotal = Short.reverseBytes(packet[28]);
-//        StaticStore.Values.viTotal = Short.reverseBytes(packet[27]);
-//        StaticStore.Values.rSpont = (short) (Short.reverseBytes(packet[23])/100);
-//        StaticStore.Values.mode = getMode(Short.reverseBytes(packet[1]));
-//
-//        //Set Warnings
-//        StaticStore.Warnings.warningMode = Short.reverseBytes(packet[22]);
-////        StaticStore.Warnings.warningMode = a;
-//        getWarningModeString(StaticStore.Warnings.warningMode); // set current warnings
-//
-//        //Set Monitoring values
-//        StaticStore.Monitoring.pPlat = Short.reverseBytes(packet[45])/100f;
-//        StaticStore.Monitoring.pMean = Short.reverseBytes(packet[46])/100f;
-//        StaticStore.Monitoring.autoPeep = Short.reverseBytes(packet[47])/100f;
-//        StaticStore.Monitoring.vte = StaticStore.Values.vTidalFlow;
-//        StaticStore.Monitoring.mvSpont = Short.reverseBytes(packet[48])/1000f;
-//        StaticStore.Monitoring.ie = Short.reverseBytes(packet[49]);
-//        if(Short.reverseBytes(packet[26]) == 1) {
-//            StaticStore.Monitoring.phase = "Insp";
-//            StaticStore.Monitoring.phaseColor = R.color.blue;
-//        } else {
-//            StaticStore.Monitoring.phase = "Exp";
-//            StaticStore.Monitoring.phaseColor = R.color.Red1;
-//        }
-//        StaticStore.Monitoring.leakVol = Short.reverseBytes(packet[50]);
-//        StaticStore.Monitoring.leakPercent = Short.reverseBytes(packet[51]);
-//        StaticStore.Monitoring.rInsp = Short.reverseBytes(packet[52]);
-//        StaticStore.Monitoring.cStat = Short.reverseBytes(packet[53]);
-//        StaticStore.Monitoring.ti = Short.reverseBytes(packet[16])/1000.0f;
-//        StaticStore.Monitoring.te = Short.reverseBytes(packet[17])/1000.0f;
-//        StaticStore.Monitoring.flowPeak = Short.reverseBytes(packet[54])/100.0f;
 //
 //        //Test info
 ////        StaticStore.Values.pPeak = 51.7f;
@@ -206,11 +28,18 @@ public class ReceivePacket {
 ////        StaticStore.packet_fio2 = 21;
 ////        StaticStore.Values.mode = getMode((short) 17);
 ////        StaticStore.Warnings.warningMode = a;
-//    }
 
     ReceivePacket(byte[] s) {
         try {
-            init(ByteBuffer.wrap(s));
+            init(ByteBuffer.wrap(s).order(ByteOrder.LITTLE_ENDIAN));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    ReceivePacket(byte[] s, boolean isLaunch) {
+        try {
+            initLaunch(ByteBuffer.wrap(s).order(ByteOrder.LITTLE_ENDIAN));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -243,82 +72,120 @@ public class ReceivePacket {
 
     public void init(ByteBuffer byteBuffer) {
         if (byteBuffer.limit() == 0) return;
+        StaticStore.Values.packetType = getType((char) byteBuffer.get(0), (char) byteBuffer.get(1), (char) byteBuffer.get(2), (char) byteBuffer.get(3));
+        StaticStore.Values.mode = getMode(byteBuffer.get(4));
+        StaticStore.Values.graphPressure = byteBuffer.getFloat(8);
+        StaticStore.Values.graphFlow = byteBuffer.getFloat(12);
+        StaticStore.Values.graphVolume = byteBuffer.getShort(16);
+        StaticStore.Values.pInsp = byteBuffer.getFloat(20);
+        StaticStore.Values.pPeak = byteBuffer.getFloat(24);
+        StaticStore.Values.pMean = byteBuffer.getFloat(28);
+        StaticStore.Values.peep = byteBuffer.getFloat(32);
+        StaticStore.Values.peepMax = byteBuffer.getFloat(36);
+        StaticStore.Values.peepMin = byteBuffer.getFloat(40);
+        StaticStore.Values.vt = byteBuffer.getShort(44);
+        StaticStore.Values.vtMax = byteBuffer.getShort(46);
+        StaticStore.Values.vtMin = byteBuffer.getShort(48);
+        StaticStore.Values.rateMeasured = byteBuffer.getFloat(52);
+        StaticStore.Values.rateMax = byteBuffer.getFloat(56);
+        StaticStore.Values.rateMin = byteBuffer.getFloat(60);
+        StaticStore.Values.fio2 = byteBuffer.get(64);
+        StaticStore.Values.fio2Max = byteBuffer.get(65);
+        StaticStore.Values.fio2Min = byteBuffer.get(66);
+        StaticStore.MainActivityValues.sighHold = byteBuffer.get(164);
+        StaticStore.MainActivityValues.warningSilence = byteBuffer.get(165);
+        StaticStore.Warnings.warningSync = byteBuffer.get(166);
+        StaticStore.Monitoring.mvTotal = byteBuffer.getFloat(76);
+        StaticStore.Monitoring.mvSpont = byteBuffer.getFloat(80);
+        StaticStore.Values.rSpont = byteBuffer.getFloat(72);
+        StaticStore.Values.breathingType = byteBuffer.get(120);
+        StaticStore.Values.shutdownPress = byteBuffer.get(169);
+        StaticStore.Monitoring.ie = concatIE(byteBuffer.getFloat(92), byteBuffer.getFloat(96));
+        StaticStore.Monitoring.ti = byteBuffer.getFloat(84);
+        StaticStore.Monitoring.te = byteBuffer.getFloat(88);
+        if (byteBuffer.get(121) == 1) {
+            StaticStore.Monitoring.phase = "Insp";
+            StaticStore.Monitoring.phaseColor = R.color.insp;
+        } else {
+            StaticStore.Monitoring.phase = "Exp";
+            StaticStore.Monitoring.phaseColor = R.color.exp;
+        }
+        StaticStore.Monitoring.leakVol = byteBuffer.getShort(100);
+        StaticStore.Monitoring.leakPercent = byteBuffer.get(102);
+        StaticStore.Monitoring.cStat = byteBuffer.getFloat(104);
+        StaticStore.Monitoring.flowPeak = Byte.toUnsignedInt(byteBuffer.get(108));
+        StaticStore.Monitoring.pPlat = byteBuffer.getFloat(112);
+        StaticStore.Monitoring.autoPeep = byteBuffer.getFloat(116);
 
-
-        //TODO: populate values from byte buffer
-//        com_start = packet[0];
-
-//        StaticStore.Values.pPeak = Short.reverseBytes(packet[33])/100.0f;
-//        StaticStore.Values.pp = Short.reverseBytes(packet[4])/100.0f;
-//        StaticStore.Values.pMax = Short.reverseBytes(packet[35])/100.0f;
-//        StaticStore.Values.pMin = Short.reverseBytes(packet[34])/100.0f;
-//        StaticStore.Values.expMinVolMeasured = Short.reverseBytes(packet[32])/100.0f;
-//        StaticStore.Values.vTidalFlow = Short.reverseBytes(packet[12]);
-//        StaticStore.Values.emvMax = Short.reverseBytes(packet[37])/100.0f;
-//        StaticStore.Values.emvMin = Short.reverseBytes(packet[36])/100.0f;
-//        StaticStore.Values.vtMax = Short.reverseBytes(packet[39]);
-//        StaticStore.Values.vtMin = Short.reverseBytes(packet[38]);
-//        StaticStore.Values.bpmMeasured = Short.reverseBytes(packet[31])/100.0f;
-//        StaticStore.Values.fMax = Short.reverseBytes(packet[41])/100.0f;
-//        StaticStore.Values.fMin = Short.reverseBytes(packet[40])/100.0f;
-//        StaticStore.Values.fio2 = (Short.reverseBytes(packet[3]))/100.0f;
-//        StaticStore.Values.fio2Max = Short.reverseBytes(packet[43])/100.0f;
-//        StaticStore.Values.fio2Min = Short.reverseBytes(packet[42])/100.0f;
-//        StaticStore.Values.vFlow = Short.reverseBytes(packet[15])/100.0f;
-//        StaticStore.Values.veTotal = Short.reverseBytes(packet[28]);
-//        StaticStore.Values.viTotal = Short.reverseBytes(packet[27]);
-//        StaticStore.Values.rSpont = (short) (Short.reverseBytes(packet[23])/100);
-//        StaticStore.Values.mode = getMode(Short.reverseBytes(packet[1]));
-//
-//        //Set Warnings
-//        StaticStore.Warnings.warningMode = Short.reverseBytes(packet[22]);
-////        StaticStore.Warnings.warningMode = a;
-//        getWarningModeString(StaticStore.Warnings.warningMode); // set current warnings
-//
-//        //Set Monitoring values
-//        StaticStore.Monitoring.pPlat = Short.reverseBytes(packet[45])/100f;
-//        StaticStore.Monitoring.pMean = Short.reverseBytes(packet[46])/100f;
-//        StaticStore.Monitoring.autoPeep = Short.reverseBytes(packet[47])/100f;
-//        StaticStore.Monitoring.vte = StaticStore.Values.vTidalFlow;
-//        StaticStore.Monitoring.mvSpont = Short.reverseBytes(packet[48])/1000f;
-//        StaticStore.Monitoring.ie = Short.reverseBytes(packet[49]);
-//        if(Short.reverseBytes(packet[26]) == 1) {
-//            StaticStore.Monitoring.phase = "Insp";
-//            StaticStore.Monitoring.phaseColor = R.color.blue;
-//        } else {
-//            StaticStore.Monitoring.phase = "Exp";
-//            StaticStore.Monitoring.phaseColor = R.color.Red1;
-//        }
-//        StaticStore.Monitoring.leakVol = Short.reverseBytes(packet[50]);
-//        StaticStore.Monitoring.leakPercent = Short.reverseBytes(packet[51]);
-//        StaticStore.Monitoring.rInsp = Short.reverseBytes(packet[52]);
-//        StaticStore.Monitoring.cStat = Short.reverseBytes(packet[53]);
-//        StaticStore.Monitoring.ti = Short.reverseBytes(packet[16])/1000.0f;
-//        StaticStore.Monitoring.te = Short.reverseBytes(packet[17])/1000.0f;
-//        StaticStore.Monitoring.flowPeak = Short.reverseBytes(packet[54])/100.0f;
+        //Set Warnings
+        StaticStore.Warnings.warningHigh = byteBuffer.getInt(152);
+        StaticStore.Warnings.warningMed = byteBuffer.getInt(156);
+        StaticStore.Warnings.warningLow = byteBuffer.getInt(160);
+        getWarningModeString(StaticStore.Warnings.warningHigh, StaticStore.Warnings.warningMed, StaticStore.Warnings.warningLow); // set current warnings
+        //Set Monitoring values
     }
-//
-//    ReceivePacket(String s) {
-//        short[] packet = new short[s.length()/4];
-//        try {
-//            byte[] bytes = Hex.decodeHex(s.toCharArray());
-//            ByteBuffer.wrap(bytes).asShortBuffer().get(packet);
-//        } catch (DecoderException e) {
-//            e.printStackTrace();
-//        }
-//        init(packet);
-//    }
 
-    public void getWarningModeString(short c) {
+    public void initLaunch(ByteBuffer byteBuffer) {
+        if (byteBuffer.limit() == 0) return;
+        StaticStore.LaunchVars.calibrationStatus = byteBuffer.getInt(144);
+        StaticStore.LaunchVars.calibrationError = byteBuffer.getInt(148);
+    }
+
+    public int getType(char c1, char c2, char c3, char c4) {
+        char[] c = {c1, c2, c3, c4};
+        String s = String.valueOf(c);
+        switch (s) {
+            case SendPacket.STR_STRT:
+                return SendPacket.TYPE_STRT;
+            case SendPacket.STR_STOP:
+                return SendPacket.TYPE_STOP;
+            case SendPacket.STR_STBY:
+                return SendPacket.TYPE_STBY;
+            case SendPacket.STR_SLFT:
+                return SendPacket.TYPE_SLFT;
+            case SendPacket.STR_CLBF:
+                return SendPacket.TYPE_CLBF;
+            case SendPacket.STR_RNTM:
+                return SendPacket.TYPE_RNTM;
+            case SendPacket.STR_ALRM:
+                return SendPacket.TYPE_ALRM;
+            default:
+                return -1;
+        }
+    }
+
+    public int concatIE(float i, float e) {
+        int i_ = (int) i * 10;
+        int e_ = (int) e * 10;
+        return i_ * 100 + e_;
+    }
+
+    public void getWarningModeString(int c1, int c2, int c3) {
         StaticStore.Warnings.top2warnings[0] = "";
         StaticStore.Warnings.top2warnings[1] = "";
         StaticStore.Warnings.currentWarnings.clear();
         int num = 0;
         String ithWarning;
-        for (int i = 0; i < StaticStore.Warnings.warningTypeCount; ++i) {
-            if (((c & 1 << i) >> i) == 1) { //i the ith bit of the short is set
+        for (int i = 0; i < StaticStore.Warnings.warningHighCount; ++i) {
+            if (((c1 & 1 << i) >> i) == 1) { //i the ith bit of the short is set
                 StaticStore.Warnings.currentWarningsLength++;
-                ithWarning = StaticStore.Warnings.warnings[i];
+                ithWarning = StaticStore.Warnings.warningsHigh[i];
+                StaticStore.Warnings.currentWarnings.add(ithWarning);
+                if (num++ < 2) StaticStore.Warnings.top2warnings[num - 1] = ithWarning;
+            }
+        }
+        for (int i = 0; i < StaticStore.Warnings.warningMedCount; ++i) {
+            if (((c2 & 1 << i) >> i) == 1) { //i the ith bit of the short is set
+                StaticStore.Warnings.currentWarningsLength++;
+                ithWarning = StaticStore.Warnings.warningsMedium[i];
+                StaticStore.Warnings.currentWarnings.add(ithWarning);
+                if (num++ < 2) StaticStore.Warnings.top2warnings[num - 1] = ithWarning;
+            }
+        }
+        for (int i = 0; i < StaticStore.Warnings.warningLowCount; ++i) {
+            if (((c3 & 1 << i) >> i) == 1) { //i the ith bit of the short is set
+                StaticStore.Warnings.currentWarningsLength++;
+                ithWarning = StaticStore.Warnings.warningsLow[i];
                 StaticStore.Warnings.currentWarnings.add(ithWarning);
                 if (num++ < 2) StaticStore.Warnings.top2warnings[num - 1] = ithWarning;
             }

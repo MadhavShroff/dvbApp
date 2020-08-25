@@ -3,6 +3,7 @@ package com.dvbinventek.dvbapp.customViews;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,14 +14,17 @@ import com.dvbinventek.dvbapp.R;
 
 
 public class MonitoringTextView extends LinearLayout {
-
-    TextView Name, Unit, Value;
-    String name, unit, value;
-    boolean removeBottom;
-
     public MonitoringTextView(Context context) {
         super(context);
         init(null);
+    }
+
+    public void setUnit(String s) {
+        setText(R.id.unit, s);
+    }
+
+    public void setUnit(Spanned s) {
+        setText(R.id.unit, s);
     }
 
     public MonitoringTextView(Context context, @Nullable AttributeSet attrs) {
@@ -40,13 +44,14 @@ public class MonitoringTextView extends LinearLayout {
 
     void init(@Nullable AttributeSet set) {
         inflate(getContext(), R.layout.monitoring_text_view, this);
-
-        Name = findViewById(R.id.name);
-        Value = findViewById(R.id.value);
-        Unit = findViewById(R.id.unit);
+        boolean removeBottom;
+        TextView Name = findViewById(R.id.name);
+        TextView Value = findViewById(R.id.value);
+        TextView Unit = findViewById(R.id.unit);
 
         if (set == null) return;
 
+        String value, name, unit;
         TypedArray typedArray = getContext().obtainStyledAttributes(set, R.styleable.MonitoringTextView);
         try {
             //            min = typedArray.getString(R.styleable.CustomTextView_minValue);
@@ -68,8 +73,16 @@ public class MonitoringTextView extends LinearLayout {
         Unit.setText(unit);
     }
 
+    public void setText(int id, Spanned s) {
+        ((TextView) findViewById(id)).setText(s);
+    }
+
+    public void setText(int id, String s) {
+        ((TextView) findViewById(id)).setText(s);
+    }
+
     public void setSubText(String htmlSource) {
-        Name.setText(Html.fromHtml(htmlSource));
+        setText(R.id.name, Html.fromHtml(htmlSource));
     }
 
     public double round1(float x) {
@@ -83,25 +96,25 @@ public class MonitoringTextView extends LinearLayout {
     public void setValue(float s, int decimalPrecision) {
         switch (decimalPrecision) {
             case 0:
-                Value.setText(Integer.toString((int) s));
+                setText(R.id.value, Integer.toString((int) s));
                 break;
             case 1:
-                Value.setText(Double.toString(round1(s)));
+                setText(R.id.value, Double.toString(round1(s)));
                 break;
             case 2:
-                Value.setText(Double.toString(round2(s)));
+                setText(R.id.value, Double.toString(round2(s)));
                 break;
             default:
-                Value.setText(Float.toString(s));
+                setText(R.id.value, Float.toString(s));
                 break;
         }
     }
 
     public void setValue(String s) {
-        Value.setText(s);
+        setText(R.id.value, s);
     }
 
     public void setValue(int s) {
-        Value.setText(Integer.toString(s));
+        setText(R.id.value, Integer.toString(s));
     }
 }

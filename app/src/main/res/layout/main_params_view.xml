@@ -1,8 +1,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="250dp"
-    android:layout_height="110dp"
-    android:layout_marginStart="3dp">
+    android:layout_height="110dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constLayout"
@@ -14,8 +13,10 @@
         <TextView
             android:id="@+id/max"
             android:layout_width="60dp"
-            android:layout_height="32dp"
+            android:layout_height="30dp"
+            android:ellipsize="none"
             android:background="@color/green2"
+            android:text="50.1"
             android:gravity="center"
             android:paddingStart="3dp"
             android:paddingEnd="3dp"
@@ -30,7 +31,7 @@
         <TextView
             android:id="@+id/maxText"
             android:layout_width="60dp"
-            android:layout_height="23dp"
+            android:layout_height="25dp"
             android:background="@color/green2"
             android:gravity="top|center"
             android:text="@string/max"
@@ -44,10 +45,11 @@
         <TextView
             android:id="@+id/min"
             android:layout_width="60dp"
-            android:layout_height="32dp"
+            android:layout_height="30dp"
             android:background="@color/green3"
             android:gravity="center"
             android:paddingStart="3dp"
+            android:ellipsize="none"
             android:paddingEnd="3dp"
             android:singleLine="true"
             android:textColor="@color/mainParamsTextBottom"
@@ -60,7 +62,7 @@
         <TextView
             android:id="@+id/minText"
             android:layout_width="60dp"
-            android:layout_height="23dp"
+            android:layout_height="25dp"
             android:background="@color/green3"
             android:gravity="center|top"
             android:text="@string/min"
@@ -87,7 +89,7 @@
         <TextView
             android:id="@+id/value"
             android:layout_width="190dp"
-            android:layout_height="60dp"
+            android:layout_height="65dp"
             android:gravity="center"
             android:scaleX="1.5"
             android:scaleY="1.5"
@@ -96,13 +98,14 @@
             android:textSize="45sp"
             app:layout_constraintBottom_toTopOf="@id/label"
             app:layout_constraintRight_toRightOf="parent"
+            android:ellipsize="none"
             app:layout_constraintStart_toEndOf="@id/maxText"
             app:layout_constraintTop_toBottomOf="@id/setValue" />
 
         <TextView
             android:id="@+id/label"
             android:layout_width="120dp"
-            android:layout_height="30dp"
+            android:layout_height="25dp"
             android:layout_gravity="end|bottom"
             android:layout_marginStart="5dp"
             android:textColor="@color/mainParamsTextRight"
@@ -115,7 +118,7 @@
         <TextView
             android:id="@+id/unit"
             android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_height="25dp"
             android:layout_gravity="end|bottom"
             android:layout_marginEnd="5dp"
             android:textAlignment="textEnd"

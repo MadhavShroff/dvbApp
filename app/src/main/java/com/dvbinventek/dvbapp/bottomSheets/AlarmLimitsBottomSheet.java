@@ -87,6 +87,16 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
         Log.d("MSG", "Negative Listener");
     };
 
+    public void setSubHeading(String s) {
+        TextView tv = findViewById(R.id.albs_subheading);
+        tv.setText(s);
+    }
+
+    public void setSubHeading(Spanned s) {
+        TextView tv = findViewById(R.id.albs_subheading);
+        tv.setText(s);
+    }
+
     public AlarmLimitsBottomSheet(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
         super(hostActivity, config);
     }
@@ -150,10 +160,22 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
     public boolean isInRange() {
         String s = value.getText().toString();
         if (s.equals(".")) return false;
-        short sh = Short.parseShort(s);
-        switch (this.type) {
-
+        try {
+            Float.parseFloat(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
+//        switch (this.type) {
+//            case "minvol":
+//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2));
+//            case "rate":
+//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
+//            case "vt":
+//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
+//            case "p":
+//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
+//        }
         //TODO:
         return true;
     }
@@ -187,9 +209,9 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
 
     public void setHint() {
         if (!max.getText().toString().isEmpty()) max.setHint(max.getText());
-        else max.setText("");
+        max.setText("");
         if (!min.getText().toString().isEmpty()) min.setHint(min.getText());
-        else min.setText("");
+        min.setText("");
     }
 
     @Override

@@ -23,15 +23,9 @@ import com.dvbinventek.dvbapp.R;
 import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.customViews.CustomKeyboardView;
 
-import java.lang.ref.WeakReference;
-
 public class ControlsBottomSheet extends BaseBottomSheet {
 
     public boolean canceled = true;
-    ImageButton done, cancel;
-    EditText value;
-    TextView tv;
-    WeakReference<Activity> activity;
     String type;
     OnClickListener positiveListener = v -> {
         canceled = false;
@@ -47,16 +41,15 @@ public class ControlsBottomSheet extends BaseBottomSheet {
 
     public ControlsBottomSheet(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
         super(hostActivity, config);
-        this.activity = new WeakReference<>(hostActivity);
     }
 
     public ControlsBottomSheet(@NonNull Activity hostActivity, Spanned s, String type) {
         this(hostActivity, new Config.Builder(hostActivity).build());
         this.type = type;
-        done = findViewById(R.id.cbs_done);
-        value = findViewById(R.id.cbs_editText);
-        cancel = findViewById(R.id.cbs_cancel);
-        tv = findViewById(R.id.cbs_heading);
+        ImageButton done = findViewById(R.id.cbs_done);
+        EditText value = findViewById(R.id.cbs_editText);
+        ImageButton cancel = findViewById(R.id.cbs_cancel);
+        TextView tv = findViewById(R.id.cbs_heading);
         tv.setText(s);
         done.setImageTintList(ColorStateList.valueOf(Color.parseColor("#afafaf")));
         done.setOnClickListener(positiveListener);
@@ -79,29 +72,45 @@ public class ControlsBottomSheet extends BaseBottomSheet {
     }
 
     public void clearValue() {
-        value.setText("");
+        setText(R.id.cbs_editText, "");
         onNumberChanged();
     }
 
     public void setSubText(String s) {
-        tv = findViewById(R.id.subText);
+        TextView tv = findViewById(R.id.subText);
         tv.setText(s);
     }
 
     public void setSubText(Spanned s) {
-        tv = findViewById(R.id.subText);
+        TextView tv = findViewById(R.id.subText);
+        tv.setText(s);
+    }
+
+    public void setText(int id, String s) {
+        TextView tv = findViewById(id);
+        tv.setText(s);
+    }
+
+    public void setHeading(String s) {
+        TextView tv = findViewById(R.id.cbs_heading);
+        tv.setText(s);
+    }
+
+    public void setHeading(Spanned s) {
+        TextView tv = findViewById(R.id.cbs_heading);
         tv.setText(s);
     }
 
     public void backspace() {
-        String str = value.getText().toString();
+        String str = ((EditText) findViewById(R.id.cbs_editText)).getText().toString();
         if (str.length() <= 0) return;
         str = str.substring(0, str.length() - 1);
-        value.setText(str);
+        ((EditText) findViewById(R.id.cbs_editText)).setText(str);
     }
 
     private void onNumberChanged() {
-        if (value.getText().length() != 0 && isInRange()) {
+        ImageButton done = findViewById(R.id.cbs_done);
+        if (((EditText) findViewById(R.id.cbs_editText)).getText().length() != 0 && isInRange()) {
             done.setOnClickListener(positiveListener);
             done.setEnabled(true);
             done.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue)));
@@ -113,8 +122,9 @@ public class ControlsBottomSheet extends BaseBottomSheet {
     }
 
     public boolean isInRange() {
-        if (value.getText().toString().equals(".")) return false;
-        float f = Float.parseFloat(value.getText().toString());
+        if (((EditText) findViewById(R.id.cbs_editText)).getText().toString().equals("."))
+            return false;
+        float f = Float.parseFloat(((EditText) findViewById(R.id.cbs_editText)).getText().toString());
         switch (this.type) {
             case "fio2":
                 return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
@@ -139,13 +149,14 @@ public class ControlsBottomSheet extends BaseBottomSheet {
     }
 
     public void setHint() {
-        if (!value.getText().toString().isEmpty()) value.setHint(value.getText());
-        else value.setText("");
+        if (!((EditText) findViewById(R.id.cbs_editText)).getText().toString().isEmpty())
+            ((EditText) findViewById(R.id.cbs_editText)).setHint(((EditText) findViewById(R.id.cbs_editText)).getText());
+        else ((EditText) findViewById(R.id.cbs_editText)).setText("");
     }
 
     @Override
     public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
-        value.requestFocus();
+        findViewById(R.id.cbs_editText).requestFocus();
         return true;
     }
 
@@ -155,7 +166,7 @@ public class ControlsBottomSheet extends BaseBottomSheet {
     }
 
     public String getValue() {
-        return String.valueOf(value.getText());
+        return String.valueOf(((EditText) findViewById(R.id.cbs_editText)).getText());
     }
 
     @NonNull

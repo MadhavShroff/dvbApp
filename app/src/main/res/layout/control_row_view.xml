@@ -6,7 +6,6 @@
     android:layout_gravity="center|top"
     android:gravity="center"
     android:orientation="horizontal">
-
     <TextView
         android:id="@+id/control_label"
         android:layout_width="100dp"

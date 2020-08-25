@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#00b686</color>
 
     <color name="greenButton">#00b686</color>
     <color name="green">#1aab00</color>
@@ -18,15 +18,17 @@
     <color name="white">#ffffff</color>
     <color name="HospitalRed">#b00020</color>
     <color name="Red1">#f05545</color>
+    <color name="exp">#f05545</color>
     <color name="Red2">#7f0000</color>
     <color name="gray1">#62727b</color>
     <color name="blueGray">#1c313a</color>
     <color name="lightBlue">#bbdefb</color>
     <color name="blue">#4688f1</color>
+    <color name="insp">#4688f1</color>
     <color name="yellow1">#ffea00</color>
     <color name="yellow2">#ffff56</color>
     <color name="yellow3">#c7b800</color>
     <color name="yellow">#FCDD03</color>
-
+    <color name="orange">#ff5722</color>
 
 </resources>

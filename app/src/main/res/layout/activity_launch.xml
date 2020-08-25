@@ -94,9 +94,19 @@
         android:layout_height="match_parent"
         android:background="@drawable/rounded_corners_launch"
         android:orientation="vertical"
-        android:paddingTop="100dp"
-
+        android:paddingTop="20dp"
         android:translationZ="5dp">
+
+        <TextView
+            android:id="@+id/selftestText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|start"
+            android:layout_marginStart="20dp"
+            android:fontFamily="@font/arimo"
+            android:text="@string/click_quot_start_quot_to_initiate_auto_calibration"
+            android:textColor="#000000"
+            android:textSize="22sp" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -104,34 +114,21 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/selftestText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|start"
-                android:layout_marginStart="20dp"
-                android:fontFamily="@font/arimo"
-                android:text="@string/click_quot_start_quot_to_initiate_auto_calibration"
-                android:textColor="#000000"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toTopOf="@id/start"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/start"
-                android:layout_width="180dp"
-                android:layout_height="80dp"
+                android:layout_width="200dp"
+                android:layout_height="84dp"
                 android:backgroundTint="@color/yellow"
-                android:fontFamily="@font/arimo"
-                android:letterSpacing="0"
+                android:layout_marginStart="20dp"
+                android:drawableTint="#000000"
                 android:text="@string/start"
                 android:textColor="#000000"
-                android:textSize="40sp"
+                android:hapticFeedbackEnabled="true"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/selftestText"
-                app:layout_constraintStart_toStartOf="@id/selftestText"
-                app:layout_constraintTop_toBottomOf="@id/selftestText" />
+                android:textSize="36sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/progressIndicatorText"
@@ -167,28 +164,71 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="100dp"
+            android:layout_height="520dp"
+            android:layout_marginBottom="40dp"
             android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
-                    android:fontFamily="@font/arimo"
-                    android:text="Pressure Sensors"
-                    android:textColor="#000000"
-                    android:textSize="22sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:fontFamily="@font/arimo"
+                        android:text="@string/pressure_sensors"
+                        android:textColor="#000000"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/turbine_pressure_sensor_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/inspiratory_pressure_sensor_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/expiratory_pressure_sensor_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x8"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/o2_pressure_sensor_failed_or_o2_not_connected"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+                </LinearLayout>
 
                 <cdflynn.android.library.checkview.CheckView
                     android:id="@+id/check1"
                     android:layout_width="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center|end"
                     app:checkView_strokeColor="@color/green"
@@ -198,28 +238,76 @@
                     android:id="@+id/progress_bar1"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_gravity="center|end" />
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp" />
+
+                <ImageView
+                    android:id="@+id/cross1"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
+
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
-                    android:fontFamily="@font/arimo"
-                    android:text="Flow Sensors"
-                    android:textColor="#000000"
-                    android:textSize="22sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:fontFamily="@font/arimo"
+                        android:text="@string/flow_sensors"
+                        android:textColor="#000000"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/inspiratory_flow_sensor_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x20"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/expiratory_flow_sensor_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x40"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/oxygen_flow_sensor_failed_or_o2_not_connected"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
 
                 <cdflynn.android.library.checkview.CheckView
                     android:id="@+id/check2"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end"
                     app:checkView_strokeColor="@color/green"
                     app:checkView_strokeWidth="5dp" />
@@ -228,29 +316,57 @@
                     android:id="@+id/progress_bar2"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end" />
+
+                <ImageView
+                    android:id="@+id/cross2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
-                    android:fontFamily="@font/arimo"
-                    android:text="Oxygen Sensors"
-                    android:textColor="#000000"
-                    android:textSize="22sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:fontFamily="@font/arimo"
+                        android:text="@string/oxygen_sensors"
+                        android:textColor="#000000"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x100"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/oxygen_sensor_failed_or_o2_not_connected"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
 
                 <cdflynn.android.library.checkview.CheckView
                     android:id="@+id/check3"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
                     app:checkView_strokeColor="@color/green"
                     app:checkView_strokeWidth="5dp" />
 
@@ -258,28 +374,56 @@
                     android:id="@+id/progress_bar3"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end" />
+
+                <ImageView
+                    android:id="@+id/cross3"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
-                    android:fontFamily="@font/arimo"
-                    android:text="Tightness"
-                    android:textColor="#000000"
-                    android:textSize="22sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:fontFamily="@font/arimo"
+                        android:text="@string/tightness"
+                        android:textColor="#000000"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x1000"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tightness_failed"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
 
                 <cdflynn.android.library.checkview.CheckView
                     android:id="@+id/check4"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end"
                     app:checkView_strokeColor="@color/green"
                     app:checkView_strokeWidth="5dp" />
@@ -288,21 +432,32 @@
                     android:id="@+id/progress_bar4"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end" />
+
+                <ImageView
+                    android:id="@+id/cross4"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
+                    android:layout_gravity="start|top"
+                    android:layout_marginStart="20dp"
                     android:fontFamily="@font/arimo"
-                    android:text="Battery Module"
+                    android:text="@string/battery_module"
                     android:textColor="#000000"
                     android:textSize="22sp" />
 
@@ -310,6 +465,7 @@
                     android:id="@+id/check5"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end"
                     app:checkView_strokeColor="@color/green"
                     app:checkView_strokeWidth="5dp" />
@@ -317,29 +473,66 @@
                 <ProgressBar
                     android:id="@+id/progress_bar5"
                     android:layout_width="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center|end" />
+
+                <ImageView
+                    android:id="@+id/cross5"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingEnd="40dp">
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center"
-                    android:layout_marginStart="100dp"
-                    android:fontFamily="@font/arimo"
-                    android:text="System Functions"
-                    android:textColor="#000000"
-                    android:textSize="22sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center"
+                        android:fontFamily="@font/arimo"
+                        android:text="@string/system_functions"
+                        android:textColor="#000000"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x100000"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/unable_to_read_calibration_data"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/sft_error0x200000"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/system_processing_slow"
+                        android:textColor="@color/HospitalRed"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
 
                 <cdflynn.android.library.checkview.CheckView
                     android:id="@+id/check6"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_gravity="center|end"
                     app:checkView_strokeColor="@color/green"
                     app:checkView_strokeWidth="5dp" />
@@ -347,15 +540,25 @@
                 <ProgressBar
                     android:id="@+id/progress_bar6"
                     android:layout_width="50dp"
+                    android:layout_marginEnd="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center|end" />
+
+                <ImageView
+                    android:id="@+id/cross6"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center|end"
+                    android:layout_marginEnd="40dp"
+                    android:src="@drawable/cancel"
+                    android:visibility="gone"
+                    app:tint="@color/HospitalRed" />
             </FrameLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-
             <TextView
                 android:id="@+id/countdown"
                 android:layout_width="250dp"
@@ -366,15 +569,18 @@
                 android:textColor="#a2a2a2"
                 android:textSize="22sp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/skip"
-                android:layout_width="180dp"
-                android:layout_height="80dp"
-                android:layout_gravity="center"
-                android:fontFamily="@font/arimo"
+                android:layout_width="200dp"
+                android:layout_height="84dp"
+                android:backgroundTint="@color/gray1"
+                android:hapticFeedbackEnabled="true"
                 android:text="@string/skip"
-                android:textColor="#000000"
-                android:textSize="40sp" />
+                android:textSize="36sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/selftestText"
+                app:layout_constraintStart_toStartOf="@id/selftestText"
+                app:layout_constraintTop_toBottomOf="@id/selftestText" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

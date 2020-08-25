@@ -11,8 +11,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dvbinventek.dvbapp.LaunchActivity;
+import com.dvbinventek.dvbapp.MainActivity;
 import com.dvbinventek.dvbapp.R;
+import com.dvbinventek.dvbapp.SendPacket;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+
+import io.reactivex.rxjava3.core.Observable;
 
 public class SystemsFragment extends Fragment {
 
@@ -28,7 +32,23 @@ public class SystemsFragment extends Fragment {
             startActivity(new Intent(v.getContext(), LaunchActivity.class));
         });
         ((MaterialButtonToggleGroup) view.findViewById(R.id.toggleGroup)).addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            //TODO: Implement logic to perform system wide conversion from hPa to cm H2O
+            SendPacket sp = new SendPacket();
+            sp.writeInfo(SendPacket.RNTM, 0);
+            sp.writeInfo(SendPacket.RNTM, 276);
+            String s;
+            if (checkedId == R.id.hPa) {
+                s = "hpa";
+                sp.writeInfo(2, 59);
+            } else {
+                s = "cmh2o";
+                sp.writeInfo(1, 59);
+            }
+            sp.sendToDevice();
+            Observable.just(s).subscribe(ToolsFragment.hpaObserver);
+            Observable.just(s).subscribe(AlarmsFragment.hpaObserver);
+            Observable.just(s).subscribe(MonitoringFragment.hpaObserver);
+            Observable.just(s).subscribe(ControlsFragment.hpaObserver);
+            Observable.just(s).subscribe(MainActivity.hpaObserver);
         });
         return view;
     }

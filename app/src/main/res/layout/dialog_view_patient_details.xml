@@ -1,109 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:columnCount="2"
+    android:background="@drawable/rounded_corner"
     android:rowCount="4">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_margin="10dp"
         android:text="@string/name"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_name"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:gravity="center">
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
 
-        <requestFocus />
-    </EditText>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_name"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="@string/age"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_age"
-        android:layout_width="100dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:focusable="true"
-        android:gravity="center"
-        android:inputType="numberDecimal"></EditText>
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_age"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="@string/weight_kg"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_weight"
-        android:layout_width="100dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:focusable="true"
-        android:gravity="center"
-        android:inputType="numberDecimal"></EditText>
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_weight"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="@string/height_cm"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_height"
-        android:layout_width="100dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:focusable="true"
-        android:gravity="center"
-        android:inputType="numberDecimal"></EditText>
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_height"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="@string/room"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_room"
-        android:layout_width="100dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:focusable="true"
-        android:gravity="center"
-        android:inputType="numberDecimal"></EditText>
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_room"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="@string/bed"
         android:textSize="25sp" />
 
-    <EditText
-        android:id="@+id/patient_bed"
-        android:layout_width="100dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_white_yellow_border_patient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/patient_bed"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:outlineProvider="paddedBounds"
+            android:padding="5dp"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:fontFamily="@font/arimo"
         android:layout_gravity="center"
-        android:focusable="true"
-        android:gravity="center"
-        android:inputType="numberDecimal"></EditText>
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/dismissButton"
+        android:layout_width="150dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:text="@string/ok"
+        android:textColor="@color/black"
+        android:textSize="22sp" />
 </GridLayout>

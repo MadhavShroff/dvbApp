@@ -34,6 +34,16 @@ public class MainParamsView extends LinearLayout {
         init(null);
     }
 
+    public void setUnit(String s) {
+        TextView tv = findViewById(R.id.unit);
+        tv.setText(s);
+    }
+
+    public void setUnit(Spanned s) {
+        TextView tv = findViewById(R.id.unit);
+        tv.setText(s);
+    }
+
     public MainParamsView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(attrs);
@@ -171,8 +181,8 @@ public class MainParamsView extends LinearLayout {
     public void setPeepPip() {
         minText.setText(Html.fromHtml("P<sub>mean</sub>"));
         maxText.setText(Html.fromHtml("P<sub>peak</sub>"));
-        maxText.setTextSize(12);
-        minText.setTextSize(12);
+        maxText.setTextSize(15);
+        minText.setTextSize(15);
     }
 
     public void setAlarmColors(int color1, int color2, int color3, int color) {

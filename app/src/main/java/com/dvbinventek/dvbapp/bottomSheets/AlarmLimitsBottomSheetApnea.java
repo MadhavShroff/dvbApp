@@ -113,9 +113,8 @@ public class AlarmLimitsBottomSheetApnea extends BaseBottomSheet {
 
     public void setHint() {
         if (!value.getText().toString().isEmpty()) value.setHint(value.getText());
-        else value.setText("");
+        value.setText("");
     }
-
 
     @Override
     public boolean requestFocus(int direction, Rect previouslyFocusedRect) {

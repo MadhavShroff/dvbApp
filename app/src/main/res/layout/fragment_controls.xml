@@ -25,27 +25,22 @@
         android:id="@+id/controls_scrollable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|top"
             android:gravity="center"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="510dp"
                 android:gravity="center|top"
                 android:orientation="vertical">
-
                 <LinearLayout
                     android:id="@+id/controls_mode"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:gravity="center"
                     android:orientation="horizontal">
-
                     <TextView
                         android:layout_width="140dp"
                         android:layout_height="match_parent"
@@ -73,7 +68,6 @@
                         android:src="@drawable/ic_action_name"
                         android:text="@string/edit" />
                 </LinearLayout>
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_fio2"
                     android:layout_width="match_parent"
@@ -81,7 +75,6 @@
                     app:controlLabel="@string/fio2"
                     app:controlUnit="@string/percent"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_vt"
                     android:layout_width="match_parent"
@@ -105,7 +98,6 @@
                     app:controlLabel="@string/p_limit"
                     app:controlUnit="@string/cm_h2o"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_peep"
                     android:layout_width="match_parent"
@@ -113,7 +105,6 @@
                     app:controlLabel="@string/peep"
                     app:controlUnit="@string/cm_h2o"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_ps"
                     android:layout_width="match_parent"
@@ -121,7 +112,6 @@
                     app:controlLabel="@string/ps"
                     app:controlUnit="@string/cm_h2o"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_vtrig"
                     android:layout_width="match_parent"
@@ -129,7 +119,6 @@
                     app:controlLabel="@string/vtrig"
                     app:controlUnit="@string/lpm"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_rtotal"
                     android:layout_width="match_parent"
@@ -137,7 +126,6 @@
                     app:controlLabel="@string/rtotal"
                     app:controlUnit="@string/b_min"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_tinsp"
                     android:layout_width="match_parent"
@@ -145,7 +133,6 @@
                     app:controlLabel="@string/t_insp"
                     app:controlUnit="@string/s"
                     app:current="" />
-
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_ie"
                     android:layout_width="match_parent"
@@ -153,37 +140,35 @@
                     app:controlLabel="@string/i_e"
                     app:controlUnit=""
                     app:current="" />
-
                 <TextView
                     android:id="@+id/highlight_text"
                     android:layout_width="300dp"
                     android:layout_height="60dp"
                     android:gravity="center"
                     android:text=""
+                    android:visibility="gone"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
             </LinearLayout>
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/send"
                 android:layout_width="250dp"
                 android:layout_height="84dp"
                 android:backgroundTint="@color/colorAccent"
                 android:drawableTint="#000000"
+                android:gravity="center"
                 android:hapticFeedbackEnabled="true"
-                android:paddingBottom="0dp"
                 android:text="@string/confirm"
                 android:textColor="#000000"
                 android:textSize="22sp" />
-
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/swipeup"
                 android:layout_width="50dp"
                 android:layout_height="40dp"
+                android:elevation="100dp"
                 android:rotation="180"
                 android:src="@drawable/scroll_down_icon"
                 android:tint="#a1a1a1" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/stopVentilation"
                 android:layout_width="250dp"

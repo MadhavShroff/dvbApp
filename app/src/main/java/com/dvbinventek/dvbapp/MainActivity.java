@@ -1,5 +1,7 @@
 package com.dvbinventek.dvbapp;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -9,12 +11,13 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.UserManager;
 import android.provider.Settings;
 import android.text.Html;
@@ -23,15 +26,21 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.dvbinventek.dvbapp.customViews.MainParamsView;
 import com.dvbinventek.dvbapp.graphing.DimTracePaletteProvider;
 import com.dvbinventek.dvbapp.graphing.RightAlignedOuterVerticallyStackedYAxisLayoutStrategy;
+import com.dvbinventek.dvbapp.viewPager.ControlsFragment;
 import com.dvbinventek.dvbapp.viewPager.MonitoringFragment;
 import com.dvbinventek.dvbapp.viewPager.ToolsFragment;
 import com.dvbinventek.dvbapp.viewPager.ViewPagerFragmentAdapter;
@@ -67,6 +76,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
@@ -77,13 +87,19 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
 
+    //TODO: Make row list in historic data a recycler view
+    //TODO: patient details - switch between inches and cm, kg and pounds,
+    // callbacks to controls and alarms to set the values as per IBW and all
+    //TODO:isInRange() in alarm limits
+    //TODO: default mode
+    //TODO: get values from excel sheet
+
     //Tab Layout vars
     public static final int chartWidth = 665;
     public static final int viewPagerWidth = 352;
-    public static final int PACKET_LENGTH = 250;
+    public static final int PACKET_LENGTH = 300;
 
     //ViewPager vars
-    public static ViewPager2 viewPager;
     static int ui_flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
             View.SYSTEM_UI_FLAG_FULLSCREEN |
@@ -92,33 +108,19 @@ public class MainActivity extends AppCompatActivity {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
     public static final PublishSubject<byte[]> packetSubject = PublishSubject.create();
     public static final String dashes = "--";
-    private static final int FIFO_CAPACITY = 40;
+    private static final int FIFO_CAPACITY = 100;
     public static boolean isSidebarShown = false;
     public static CompositeDisposable disposables = new CompositeDisposable();
-    public static UsbService usbService;
     //Observe standby button in controls for a click
-    public static Observer<View> standbyClickObserver = new Observer<View>() {
-        @Override
-        public void onSubscribe(@NonNull Disposable d) {
-            disposables.add(d);
-        }
-
-        @Override
-        public void onNext(View v) {
-            Log.d("MSG", "Clicked Standby");
-            //TODO: Click Standby Logic
-        }
-
-        @Override
-        public void onError(@NonNull Throwable e) {
-        }
-
-        @Override
-        public void onComplete() {
-        }
-    };
+    public static Observer<View> standbyClickObserver;
+    //setup shutdown alarm trigger
+    public static Observer<Long> shutdownClickObserver;
     public static int callNumber = 0;
     static boolean mainActivityActive = false;
+    //setup observer for hPa unit change
+    public static Observer<String> hpaObserver;
+    public static byte[] packet = {};
+
     //chart vars
     public SciChartBuilder sciChartBuilder;
     public final XyDataSeries<Double, Double> pressureDataSeries = newDataSeries(FIFO_CAPACITY);
@@ -130,13 +132,11 @@ public class MainActivity extends AppCompatActivity {
     public final XyDataSeries<Double, Double> lastPressureSweepDataSeries = newDataSeries(1);
     public final XyDataSeries<Double, Double> lastFlowDataSeries = newDataSeries(1);
     public final XyDataSeries<Double, Double> lastVolumeDataSeries = newDataSeries(1);
-    public ISciChartSurface chart;
-    public LinearLayout charts;
-    public MaterialButton silence;
-    public byte[] packet = {};
-    //UsbService setup and vars
-    public UsbHandler mHandler = new UsbHandler(this);
-    public boolean usbConnected = false;
+    public static int graphShownRef = R.id.mainChart;
+    public static UsbService usbService;
+    public final XyDataSeries<Double, Double> FPDataSeries = newDataSeries(FIFO_CAPACITY / 2);
+    public final XyDataSeries<Double, Double> FVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
+    public final XyDataSeries<Double, Double> PVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -159,6 +159,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    //UsbService setup and vars
+    public UsbHandler mHandler = new UsbHandler(this);
+    public boolean usbConnected = false;
     public final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
@@ -174,9 +178,13 @@ public class MainActivity extends AppCompatActivity {
             usbConnected = false;
         }
     };
+
     //LockTask mode vars
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponentName;
+    //LockButton vars
+    public Disposable lockFlashDisposable;
+    public ISciChartSurface mainChart, FPchart, FVchart, PVchart;
 
     public static String getIE(int ie) {
         String s = "";
@@ -196,21 +204,35 @@ public class MainActivity extends AppCompatActivity {
         return s;
     }
 
-    public void setSubscriptTextMainParams() {
-        MainParamsView mpv = findViewById(R.id.pinsp);
-        mpv.setPeepPip(); //Set first CustomTextView's MIN and MAX as Pinsp and Peep
-        mpv.setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
-        mpv = findViewById(R.id.rate);
-        mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
-        mpv = findViewById(R.id.fio2);
-        mpv.setLabel(Html.fromHtml("FiO<small><sub>2</sub></small>"));
-    }
-
     private static DoubleRange getMinMaxRange(DoubleValues values) {
         final DoubleRange range = new DoubleRange();
         SciListUtil.instance().minMax(values.getItemsArray(), 0, values.size(), range);
         range.growBy(0.1, 0.1);
         return range;
+    }
+
+    public static void handleData(byte[] bytes) {
+        if (packet.length == 0)
+            packet = Arrays.copyOf(bytes, bytes.length);
+        else if (packet.length < PACKET_LENGTH)
+            packet = joinArrays(packet, bytes);
+        if (packet.length == PACKET_LENGTH) {
+            new ProcessPacket(packet);
+//            Log.d("PACKET_MAIN", Arrays.toString(packet));
+            packet = new byte[]{};
+        } else if (packet.length > PACKET_LENGTH) {
+            Log.d("PACKET_DROPPED", Arrays.toString(packet));
+            packet = new byte[]{};
+        }
+    }
+
+    public static byte[] joinArrays(byte[] array1, byte[] array2) {
+        int aLen = array1.length;
+        int bLen = array2.length;
+        byte[] result = new byte[aLen + bLen];
+        System.arraycopy(array1, 0, result, 0, aLen);
+        System.arraycopy(array2, 0, result, aLen, bLen);
+        return result;
     }
 
     @Override
@@ -246,11 +268,23 @@ public class MainActivity extends AppCompatActivity {
         //Setup ViewPager with listeners, referances, number of pages to bind (all 7)
         setupViewPager();
 
-        //Setup ProcessPacket Referances
-        configureProcessPacketReferances();
+        //Setup silence button logic
+        setupSilenceButton();
 
-        //Setup DataSnapshots at 3s intervals
+        //Setup ProcessPacket Referances
+        configureProcessPacketReferences();
+
+        //Setup DataSnapshots at 3s intervals`
         setupDataLogger();
+
+        //Setup standby fragment
+        setupStandby();
+
+        //Setup hPa Observer
+        setupHpa();
+
+        //Setup Lock screen
+        setupLockScreenButton();
     }
 
     @Override
@@ -265,31 +299,314 @@ public class MainActivity extends AppCompatActivity {
         mainActivityActive = false;
     }
 
-    public void configureProcessPacketReferances() {
+    @SuppressLint("ClickableViewAccessibility")
+    public void setupLockScreenButton() {
+        ImageButton lockButton = findViewById(R.id.lockScreen);
+        Button viewPagerCover = findViewById(R.id.viewPagerCover);
+        Button tabCover = findViewById(R.id.tabLayoutCover);
+        Button chartsCover = findViewById(R.id.chartsCover);
+        Button silenceCover = findViewById(R.id.silenceCover);
+        Button mainCover = findViewById(R.id.mainCover);
+        Observable<Long> flashLockButtonObservable = Observable.interval(500, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(5);
+        Observer<Long> flashLockButtonObserver = new Observer<Long>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                lockFlashDisposable = d;
+                lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
+            }
+
+            @Override
+            public void onNext(@NonNull Long aLong) {
+                if (aLong % 2 == 0)
+                    lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
+                else
+                    lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
+            }
+        };
+        View.OnClickListener flashButton = v -> {
+            tryToDispose(lockFlashDisposable);
+            flashLockButtonObservable.subscribe(flashLockButtonObserver);
+            Toast.makeText(this, "Screen Locked", Toast.LENGTH_LONG).show();
+        };
+        viewPagerCover.setOnClickListener(flashButton);
+        tabCover.setOnClickListener(flashButton);
+        chartsCover.setOnClickListener(flashButton);
+        silenceCover.setOnClickListener(flashButton);
+        mainCover.setOnClickListener(flashButton);
+        lockButton.setOnClickListener(v -> {
+            if (StaticStore.MainActivityValues.lockState == StaticStore.MainActivityValues.UNLOCKED) { // Lock Screen
+                tabCover.setVisibility(View.VISIBLE);
+                viewPagerCover.setVisibility(View.VISIBLE);
+                chartsCover.setVisibility(View.VISIBLE);
+                silenceCover.setVisibility(View.VISIBLE);
+                mainCover.setVisibility(View.VISIBLE);
+                lockButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.locked, null));
+                StaticStore.MainActivityValues.lockState = StaticStore.MainActivityValues.LOCKED;
+                Toast.makeText(this, "Screen Locked", Toast.LENGTH_LONG).show();
+            } else {                                                                                   // Unlock Screen
+                tabCover.setVisibility(View.GONE);
+                viewPagerCover.setVisibility(View.GONE);
+                chartsCover.setVisibility(View.GONE);
+                silenceCover.setVisibility(View.GONE);
+                mainCover.setVisibility(View.GONE);
+                lockButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.unlocked, null));
+                StaticStore.MainActivityValues.lockState = StaticStore.MainActivityValues.UNLOCKED;
+                Toast.makeText(this, "Screen Unlocked", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void tryToDispose(Disposable d) {
+        if (d != null) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
+    public void setupHpa() {
+        final String pressureId = "pressureId";
+        hpaObserver = new Observer<String>() {
+            @Override
+            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
+                if (s.equals("hpa")) {
+                    ((MainParamsView) findViewById(R.id.pinsp)).setUnit("(hPa)");
+                    UpdateSuspender.using(mainChart, () -> {
+                        Collections.replaceAll(mainChart.getAnnotations(),
+                                sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (cm H2O)").withFontStyle(18, ColorUtil.White).build(),
+                                sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (hPa)").withFontStyle(18, ColorUtil.White).build());
+                    });
+                } else {
+                    ((MainParamsView) findViewById(R.id.pinsp)).setUnit(Html.fromHtml("(cm H<small><sub>2</sub></small>O)"));
+                    UpdateSuspender.using(mainChart, () -> {
+                        Collections.replaceAll(mainChart.getAnnotations(),
+                                sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (hPa)").withFontStyle(18, ColorUtil.White).build(),
+                                sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (cm H2O)").withFontStyle(18, ColorUtil.White).build());
+                    });
+                }
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+    }
+
+    public void setupStandby() {
+        SendPacket sp = new SendPacket();
+        sp.writeInfo(SendPacket.STOP, 0);
+        sp.writeInfo(SendPacket.STOP, 276);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        standbyClickObserver = new Observer<View>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                disposables.add(d);
+            }
+
+            @Override
+            public void onNext(View v) {
+                Log.d("STANDBY", "Clicked Standby");
+                AlertDialog alertDialogInner = builder
+                        .setTitle("Are you REALLY sure you want to stop ventilation")
+                        .setMessage("This action will stop providing ventilation to the patient. Ensure ...")
+                        .setPositiveButton("Yes", (dialog, which1) -> {
+                            // send packets continously every 200ms and when received packet has a STRT header, stop sending, and make the change
+                            Observable.interval(200, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(10).subscribe(new Observer<Long>() {
+                                Disposable disposeAttempts;
+
+                                @Override
+                                public void onSubscribe(@NonNull Disposable d) {
+                                    sp.sendToDevice();
+                                    disposeAttempts = d;
+                                }
+
+                                @Override
+                                public void onNext(@NonNull Long aLong) {
+                                    if (StaticStore.Values.packetType != SendPacket.TYPE_STOP) {
+                                        Log.d("STANDBY", "trying again... " + StaticStore.Values.packetType);
+                                        sp.sendToDevice();
+                                    } else {
+                                        Log.d("STANDBY", "Got packet of type stop");
+                                        findViewById(R.id.mainChart).setVisibility(View.GONE);
+                                        findViewById(R.id.standbyFragmentContainer).setVisibility(View.VISIBLE);
+                                        StandbyFragment.setIsInView(true);
+                                        //restrict use of other buttons to send any packet to device
+                                        StaticStore.restrictedCommunicationDueToStandby = true;
+                                        //disable standby button
+                                        v.setEnabled(false);
+                                        v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2f2f2f")));
+                                        ((Button) v).setTextColor(Color.parseColor("#515151"));
+                                        disposeAttempts.dispose();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(@NonNull Throwable e) {
+                                    e.printStackTrace();
+                                }
+
+                                @Override
+                                public void onComplete() {
+                                    Toast.makeText(MainActivity.this, "ERR: Cannot communicate with device", Toast.LENGTH_SHORT).show();
+                                    disposeAttempts.dispose();
+                                }
+                            });
+                            SendPacket sp = new SendPacket();
+                            sp.writeInfo(SendPacket.STOP, 0);
+                            sp.writeInfo(SendPacket.STOP, 276);
+                            sp.sendToDevice();
+                        }).setNegativeButton("No", (dialog_, which_) -> {
+                            dialog_.dismiss();
+                        }).create();
+                AlertDialog alertDialog = builder
+                        .setTitle("Are you sure you want to stop ventilation")
+                        .setMessage("This action will stop providing ventilation to the patient")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            showDialogHideNav(alertDialogInner);
+                        }).setNegativeButton("No", (dialog_, which_) -> {
+                            dialog_.dismiss();
+                        }).create();
+                showDialogHideNav(alertDialog);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+        shutdownClickObserver = new Observer<Long>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                disposables.add(d);
+            }
+
+            @Override
+            public void onNext(@NonNull Long aLong) {
+                if (aLong == 1)
+                    Toast.makeText(getBaseContext(), "External Standby button pressed. Long press to initiate standby", Toast.LENGTH_LONG).show();
+                else if (aLong == 2)
+                    Observable.just(ControlsFragment.stopVentilation.get()).subscribe(standbyClickObserver);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+    }
+
+    public void showDialogHideNav(AlertDialog alert) {
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alert.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        alert.getWindow().getDecorView().setSystemUiVisibility(ui_flags);
+        alert.show();
+        alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    }
+
+    public void setupSilenceButton() {
+        MaterialButton silence = findViewById(R.id.snooze);
+        silence.setOnClickListener(v -> {
+            if (silence.getText().equals(getResources().getString(R.string.silence_alarm))) {
+                SendPacket sp = new SendPacket();
+                sp.writeInfo(SendPacket.RNTM, 0);
+                sp.writeInfo(SendPacket.RNTM, 276);
+                sp.writeInfo((byte) 2, 114);
+                sp.sendToDevice();
+            } else {
+                SendPacket sp = new SendPacket();
+                sp.writeInfo(SendPacket.RNTM, 0);
+                sp.writeInfo(SendPacket.RNTM, 276);
+                sp.writeInfo((byte) 1, 114);
+                sp.sendToDevice();
+            }
+        });
+    }
+
+    public void configureProcessPacketReferences() {
 //        ProcessPacketAsyncTask.list = new XyDataSeries<Double, Double>[8];
-        ProcessPacketAsyncTask.pressureDataSeries = pressureDataSeries;
-        ProcessPacketAsyncTask.pressureSweepDataSeries = pressureSweepDataSeries;
-        ProcessPacketAsyncTask.flowDataSeries = flowDataSeries;
-        ProcessPacketAsyncTask.flowSweepDataSeries = flowSweepDataSeries;
-        ProcessPacketAsyncTask.volumeDataSeries = volumeDataSeries;
-        ProcessPacketAsyncTask.volumeSweepDataSeries = volumeSweepDataSeries;
-        ProcessPacketAsyncTask.lastPressureSweepDataSeries = lastPressureSweepDataSeries;
-        ProcessPacketAsyncTask.lastFlowDataSeries = lastFlowDataSeries;
-        ProcessPacketAsyncTask.lastVolumeDataSeries = lastVolumeDataSeries;
-        ProcessPacketAsyncTask.chart = new WeakReference<>(chart);
-        ProcessPacketAsyncTask.tv1 = new WeakReference<>(findViewById(R.id.pinsp));
-        ProcessPacketAsyncTask.tv2 = new WeakReference<>(findViewById(R.id.peep));
-        ProcessPacketAsyncTask.tv3 = new WeakReference<>(findViewById(R.id.vtf));
-        ProcessPacketAsyncTask.tv4 = new WeakReference<>(findViewById(R.id.rate));
-        ProcessPacketAsyncTask.tv5 = new WeakReference<>(findViewById(R.id.fio2));
-        ProcessPacketAsyncTask.alarm = new WeakReference<>(findViewById(R.id.alarm));
-        ProcessPacketAsyncTask.modeBox = new WeakReference<>(findViewById(R.id.modeBox));
-        ProcessPacketAsyncTask.inspExp = new WeakReference<>(findViewById(R.id.mainInspExp));
+        ProcessPacket.pressureDataSeries = pressureDataSeries;
+        ProcessPacket.pressureSweepDataSeries = pressureSweepDataSeries;
+        ProcessPacket.flowDataSeries = flowDataSeries;
+        ProcessPacket.flowSweepDataSeries = flowSweepDataSeries;
+        ProcessPacket.volumeDataSeries = volumeDataSeries;
+        ProcessPacket.volumeSweepDataSeries = volumeSweepDataSeries;
+        ProcessPacket.lastPressureSweepDataSeries = lastPressureSweepDataSeries;
+        ProcessPacket.lastFlowDataSeries = lastFlowDataSeries;
+        ProcessPacket.lastVolumeDataSeries = lastVolumeDataSeries;
+        ProcessPacket.FPDataSeries = FPDataSeries;
+        ProcessPacket.FVDataSeries = FVDataSeries;
+        ProcessPacket.PVDataSeries = PVDataSeries;
+        ProcessPacket.chart = new WeakReference<>(mainChart);
+        ProcessPacket.FPchart = new WeakReference<>(FPchart);
+        ProcessPacket.FVchart = new WeakReference<>(FVchart);
+        ProcessPacket.PVchart = new WeakReference<>(PVchart);
+        ProcessPacket.tv1 = new WeakReference<>(findViewById(R.id.pinsp));
+        ProcessPacket.tv2 = new WeakReference<>(findViewById(R.id.peep));
+        ProcessPacket.tv3 = new WeakReference<>(findViewById(R.id.vtf));
+        ProcessPacket.tv4 = new WeakReference<>(findViewById(R.id.rate));
+        ProcessPacket.tv5 = new WeakReference<>(findViewById(R.id.fio2));
+        ProcessPacket.alarm = new WeakReference<>(findViewById(R.id.alarm));
+        ProcessPacket.modeBox = new WeakReference<>(findViewById(R.id.modeBox));
+        ProcessPacket.inspExp = new WeakReference<>(findViewById(R.id.mainInspExp));
+        ProcessPacket.sigh = new WeakReference<>(findViewById(R.id.mainSigh));
+        ProcessPacket.viewPagerHolder = new WeakReference<>(findViewById(R.id.viewPagerWrapper));
+        ProcessPacket.silenceAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silence_alarm);
+        ProcessPacket.silencedAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silenced);
+        ProcessPacket.RRRedAlarm = ContextCompat.getDrawable(this, R.drawable.rounded_corner_red);
+        ProcessPacket.RRRedMode = ContextCompat.getDrawable(this, R.drawable.rounded_corner_red);
+        ProcessPacket.RRHolderRed = ContextCompat.getDrawable(this, R.drawable.rounded_corners_holder_red);
+        ProcessPacket.RRYellowMode = ContextCompat.getDrawable(this, R.drawable.rounded_corner_yellow);
+        ProcessPacket.RRYellowAlarm = ContextCompat.getDrawable(this, R.drawable.rounded_corner_yellow);
+        ProcessPacket.RRHolderYellow = ContextCompat.getDrawable(this, R.drawable.rounded_corners_holder_yellow);
+        ProcessPacket.RRGreen = ContextCompat.getDrawable(this, R.drawable.rounded_corner_green);
+        ProcessPacket.blackColor = getColor(R.color.black);
+        ProcessPacket.whiteColor = getColor(R.color.white);
+        ProcessPacket.yellowColor = getColor(R.color.yellow);
+        ProcessPacket.silence = new WeakReference<>(findViewById(R.id.snooze));
+        ProcessPacket.spont = new WeakReference<>(findViewById(R.id.mainSpont));
+    }
+
+    public void setScreenFlags() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(ui_flags);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
     public void setupViewPager() {
         //ViewPager setup
-        viewPager = findViewById(R.id.view_pager);
+        ViewPager2 viewPager;
+        viewPager = findViewById(R.id.viewPager);
         viewPager.setOffscreenPageLimit(6);
         viewPager.setAdapter(new ViewPagerFragmentAdapter(getSupportFragmentManager(), getLifecycle()));
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -341,26 +658,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void hideSidebar() {// Hides sidebar, expands chart to cover screen
-        LinearLayout viewPagerHolder = findViewById(R.id.viewPagerll);
+        FrameLayout viewPagerHolder = findViewById(R.id.viewPagerWrapper);
         viewPagerHolder.setVisibility(View.GONE);
         isSidebarShown = false;
     }
 
+    public void setSubscriptTextMainParams() {
+        MainParamsView mpv = findViewById(R.id.pinsp);
+        mpv.setPeepPip(); //Set first CustomTextView's MIN and MAX as Pinsp and Peep
+        mpv.setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
+        mpv = findViewById(R.id.rate);
+        mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
+        mpv = findViewById(R.id.fio2);
+        mpv.setLabel(Html.fromHtml("FiO<small><sub>2</sub></small>"));
+    }
+
     public void showSidebar() {
-        LinearLayout viewPagerHolder = findViewById(R.id.viewPagerll);
+        FrameLayout viewPagerHolder = findViewById(R.id.viewPagerWrapper);
         viewPagerHolder.setVisibility(View.VISIBLE);
         isSidebarShown = true;
     }
 
-
-    public void setScreenFlags() {
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(ui_flags);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+    public void setupCOSU() {
+        mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+            setDefaultCosuPolicies(true);
+        } else {
+            Log.d("MSG", "Not Device owner, please set as owner via adb");
+        }
     }
 
     public void setupDataLogger() {
@@ -388,32 +715,27 @@ public class MainActivity extends AppCompatActivity {
                                     } else warning += ", " + s;
                                 }
                             }
-                        } else {
-                            warning = dashes;
-                        }
-
-                        if (callNumber <= 20) { // 3s call
+                        } else warning = dashes;
+                        if (callNumber <= 20) // 3s call
                             if (!isWarningString)
                                 return;            //return if there is no warning, called every 3 seconds
-                        } else callNumber = 0;
-
-                        if (StaticStore.Data.size() > 3000) {
+                            else callNumber = 0;
+                        if (StaticStore.Data.size() > 3000)
                             StaticStore.Data.remove(0);
-                        }
                         HashMap<String, String> t = new HashMap<>();
                         t.put("date", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-                        t.put("pinsp", String.valueOf(StaticStore.Values.pMax));
+                        t.put("pinsp", String.valueOf(StaticStore.Values.pInsp));
                         t.put("set-pinsp", String.valueOf(StaticStore.packet_pinsp));
-                        t.put("peep", String.valueOf(StaticStore.Values.pMin));
+                        t.put("peep", String.valueOf(StaticStore.Values.peep));
                         t.put("set-peep", String.valueOf(StaticStore.packet_peep));
-                        t.put("ppeak", String.valueOf(StaticStore.Values.pp));
-                        t.put("pmean", String.valueOf(StaticStore.Monitoring.pMean));
-                        t.put("vt", String.valueOf(StaticStore.Values.vTidalFlow));
+                        t.put("ppeak", String.valueOf(StaticStore.Values.graphPressure));
+                        t.put("pmean", String.valueOf(StaticStore.Values.pMean));
+                        t.put("vt", String.valueOf(StaticStore.Values.graphVolume));
                         t.put("set-vt", String.valueOf(StaticStore.packet_vt));
-                        t.put("rtotal", String.valueOf(StaticStore.Values.bpmMeasured));
+                        t.put("rtotal", String.valueOf(StaticStore.Values.rateMeasured));
                         t.put("set-rtotal", String.valueOf(StaticStore.packet_rtotal));
                         t.put("rspont", String.valueOf(StaticStore.Values.rSpont));
-                        t.put("mvTotal", String.valueOf(StaticStore.Values.expMinVolMeasured));
+                        t.put("mvTotal", String.valueOf(StaticStore.Monitoring.mvTotal));
                         t.put("mvSpont", String.valueOf(StaticStore.Monitoring.mvSpont));
                         t.put("fio2", String.valueOf(StaticStore.Values.fio2));
                         t.put("set-fio2", String.valueOf(StaticStore.packet_fio2));
@@ -431,79 +753,9 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        Log.d("INCONSISTENCY", "DataSnapshot Observable called onComplete(). Data Snapshots store for Log data not being stored");
+                        Log.d("INCONSISTENCY", "DataSnapshot Observable called onComplete(). Data Snapshots store for Log data not being stored Cannot be stopped");
                     }
                 });
-    }
-
-    public void setSharefPrefs() {
-        //Set controls info on app launch from memory
-        SharedPreferences sharedPref = this.getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE);
-        StaticStore.modeSelected = sharedPref.getString("mode_selected", "-");
-        StaticStore.packet_fio2 = Short.parseShort(sharedPref.getString("packet_fio2", "0"));
-        StaticStore.packet_vt = Short.parseShort(sharedPref.getString("packet_vt", "0"));
-        StaticStore.packet_vtrig = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_vtrig", "0")));
-        StaticStore.packet_pinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pip", "0")));
-        StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_cpap", "0")));
-        StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", "0")));
-        StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", "0")));
-        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "0"));
-        StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", "0"));
-        StaticStore.packet_plimit = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", "0")));
-        StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_delps", "0")));
-
-        StaticStore.AlarmLimits.minVolMax = Short.parseShort(sharedPref.getString("limits_minVolMax", "0"));
-        StaticStore.AlarmLimits.minVolMin = Short.parseShort(sharedPref.getString("limits_minVolMin", "0"));
-        StaticStore.AlarmLimits.fTotalMax = Short.parseShort(sharedPref.getString("limits_fTotalMax", "0"));
-        StaticStore.AlarmLimits.fTotalMin = Short.parseShort(sharedPref.getString("limits_fTotalMin", "0"));
-        StaticStore.AlarmLimits.vtMax = Short.parseShort(sharedPref.getString("limits_vtMax", "0"));
-        StaticStore.AlarmLimits.vtMin = Short.parseShort(sharedPref.getString("limits_vtMi", "0"));
-        StaticStore.AlarmLimits.pMax = Short.parseShort(sharedPref.getString("limits_pMax", "0"));
-        StaticStore.AlarmLimits.pMin = Short.parseShort(sharedPref.getString("limits_pMin", "0"));
-        StaticStore.AlarmLimits.apnea = Short.parseShort(sharedPref.getString("limits_apnea", "0"));
-    }
-
-    //Create subscription to packetSubject(PublishSubject) to handle incoming data from packet
-    public void setupUsbDataReceiver() {
-        disposables.add(packetSubject.subscribe(bytes -> {
-            if (packet.length == 0) {
-                packet = Arrays.copyOf(bytes, bytes.length);
-            } else if (packet.length < PACKET_LENGTH) {
-                packet = joinArrays(packet, bytes);
-            } else if (packet.length == PACKET_LENGTH) {
-                Log.d("PACKET_MAIN", Arrays.toString(packet));
-                new ProcessPacketAsyncTask(packet);
-                packet = new byte[]{};
-            } else {
-                packet = new byte[]{};
-                Log.d("MSG", "DROPPED");
-            }
-            //TODO: add handleData logic
-        }));
-    }
-
-    public void setupCOSU() {
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
-        mDevicePolicyManager = (DevicePolicyManager) getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
-            setDefaultCosuPolicies(true);
-        } else {
-            Log.d("MSG", "Not Device owner, please set as owner via adb");
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setFilters();
-        // Start listening notifications from UsbService
-        // Start UsbService(if it was not started before) and Bind it
-        startService(UsbService.class, usbConnection, null);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        getWindow().getDecorView().setSystemUiVisibility(ui_flags);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     @Override
@@ -519,13 +771,30 @@ public class MainActivity extends AppCompatActivity {
         unbindService(usbConnection);
     }
 
-    public byte[] joinArrays(byte[] array1, byte[] array2) {
-        int aLen = array1.length;
-        int bLen = array2.length;
-        byte[] result = new byte[aLen + bLen];
-        System.arraycopy(array1, 0, result, 0, aLen);
-        System.arraycopy(array2, 0, result, aLen, bLen);
-        return result;
+    public void setSharefPrefs() {
+        //Set controls info on app launch from memory
+        SharedPreferences sharedPref = this.getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE);
+        StaticStore.modeSelected = sharedPref.getString("mode_selected", "-");
+        StaticStore.packet_fio2 = Short.parseShort(sharedPref.getString("packet_fio2", "0"));
+        StaticStore.packet_vt = Short.parseShort(sharedPref.getString("packet_vt", "0"));
+        StaticStore.packet_flowTrig = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_vtrig", "0")));
+        StaticStore.packet_pinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pip", "0")));
+        StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_peep", "0")));
+        StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", "0")));
+        StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", "0")));
+        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "0"));
+        StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", "0"));
+        StaticStore.packet_plimit = (byte) Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", "0")));
+        StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ps", "0")));
+        StaticStore.AlarmLimits.minVolMax = Float.parseFloat(sharedPref.getString("limits_minVolMax", "0"));
+        StaticStore.AlarmLimits.minVolMin = Float.parseFloat(sharedPref.getString("limits_minVolMin", "0"));
+        StaticStore.AlarmLimits.rateMax = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMax", "0"));
+        StaticStore.AlarmLimits.rateMin = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMin", "0"));
+        StaticStore.AlarmLimits.vtMax = Short.parseShort(sharedPref.getString("limits_vtMax", "0"));
+        StaticStore.AlarmLimits.vtMin = Short.parseShort(sharedPref.getString("limits_vtMi", "0"));
+        StaticStore.AlarmLimits.pMax = Float.parseFloat(sharedPref.getString("limits_pMax", "0"));
+        StaticStore.AlarmLimits.pMin = Float.parseFloat(sharedPref.getString("limits_pMin", "0"));
+        StaticStore.AlarmLimits.apnea = Short.parseShort(sharedPref.getString("limits_apnea", "0"));
     }
 
     public void setFilters() {
@@ -553,6 +822,38 @@ public class MainActivity extends AppCompatActivity {
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         StaticStore.service = new WeakReference<>(usbService);
+    }
+
+    //Create subscription to packetSubject(PublishSubject) to handle incoming data from packet
+    public void setupUsbDataReceiver() {
+        disposables.add(packetSubject.subscribe(bytes -> {
+            Log.d("BYTES " + bytes.length, Arrays.toString(bytes));
+            if (packet.length == 0) {
+                packet = Arrays.copyOf(bytes, bytes.length);
+            } else if (packet.length < PACKET_LENGTH) {
+                packet = joinArrays(packet, bytes);
+            } else if (packet.length == PACKET_LENGTH) {
+                new ProcessPacket(packet);
+                Log.d("PACKET_MAIN", Arrays.toString(packet));
+                packet = new byte[]{};
+            } else {
+                Log.d("PACKET_DROPPED", Arrays.toString(packet));
+                packet = new byte[]{};
+            }
+        }));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setFilters();
+        // Start listening notifications from UsbService
+        // Start UsbService(if it was not started before) and Bind it
+        new Handler().postDelayed(() -> startService(UsbService.class, usbConnection, null), 1000);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        getWindow().getDecorView().setSystemUiVisibility(ui_flags);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     private HorizontalLineAnnotation generateBaseLines(String yAxisId) {
@@ -590,8 +891,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setDefaultCosuPolicies(boolean active) {
         // Set user restrictions
-        setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, active);
-        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
+//        setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, active);
+//        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
         setUserRestriction(UserManager.DISALLOW_ADD_USER, active);
         setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, active);
         setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, active);
@@ -602,19 +903,17 @@ public class MainActivity extends AppCompatActivity {
         setUserRestriction(UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT, active);
         setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
         setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
-        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
+//        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
         setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
-        setUserRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES, active);
-        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
+//        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
         setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
-        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);
-        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
+//        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);
         setUserRestriction(UserManager.DISALLOW_SMS, active);
-        setUserRestriction(UserManager.DISALLOW_NETWORK_RESET, active);
+//        setUserRestriction(UserManager.DISALLOW_NETWORK_RESET, active);
         setUserRestriction(UserManager.DISALLOW_USER_SWITCH, active);
         setUserRestriction(UserManager.DISALLOW_AMBIENT_DISPLAY, active);
-        setUserRestriction(UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS, active);
-        setUserRestriction(UserManager.DISALLOW_UNINSTALL_APPS, active);
+//        setUserRestriction(UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS, active);
+//        setUserRestriction(UserManager.DISALLOW_UNINSTALL_APPS, active);
 
         // Disable keyguard and status bar
         mDevicePolicyManager.setKeyguardDisabled(mAdminComponentName, active);
@@ -622,6 +921,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Enable STAY_ON_WHILE_PLUGGED_IN
         enableStayOnWhilePluggedIn(active);
+//        startLockTask();
 
         // set this Activity as a lock task package
         mDevicePolicyManager.setLockTaskPackages(mAdminComponentName,
@@ -670,29 +970,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class UsbHandler extends Handler {
-        public final WeakReference<MainActivity> mActivity;
-
-        public UsbHandler(MainActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case UsbService.MESSAGE_FROM_SERIAL_PORT:
-                    packetSubject.onNext((byte[]) msg.obj);
-                    break;
-                case UsbService.CTS_CHANGE:
-                    Toast.makeText(mActivity.get(), "CTS_CHANGE", Toast.LENGTH_LONG).show();
-                    break;
-                case UsbService.DSR_CHANGE:
-                    Toast.makeText(mActivity.get(), "DSR_CHANGE", Toast.LENGTH_LONG).show();
-                    break;
-            }
-        }
-    }
-
     private void setUpMainChart() {
         try {
             SciChartSurface.setRuntimeLicenseKey("nEBMHOM4a26Hy6fzTkNJ6ipJK9qQVAhEKsDo5KZ/+1C5Ukv3Bf9g/19wdOlk5TxKTyp8sIm5nYrN+hrqBoqzqwEK/1f+DjPALfxWNkUClVOWlFatlnFP2lUDabIf3pSLoAsHvgjp7V7+G68cryTZ+QGP9GZVNrrPqb50oX/gcJfk3kDkWDD11becrNfp6bRjexgKUikrrm75nWLrwHck3N4AGhV+PV3pTIcvM7wCSTF6QrJLaqM13jy7N+AHA0+rt1tlpm51M8qVXqe3r/Lzx7+/EydTVzfDTiS76FJap6IvHzPf0RjaVw+pnCfbEP2oRydaN0/7iBQMm8pkUyl0ok/p3o3pTgqjwl1tyg6QrgIwe1n35DXlm4JGzLMFE3x/548rIOvdFEntTl6HvLBbe4PbYweqMhn9pxYcjbddyJDPfCoHx0+V1YZjF1wdEazXhcT3khA8oxxiwbqS3d9BlwrcugcaGVuRdM44t80uKJkVPOteZYsjUwqikohV67smb+BYtWNYj9UPK7CIFgzDd1gvHW+Bh+NSYyPf6+jyW6E0QczwD6+hP4VgYUS4yGii4i2Lrzs=");
@@ -704,9 +981,9 @@ public class MainActivity extends AppCompatActivity {
         final String volumeId = "volumeId";
         SciChartBuilder.init(this);
         sciChartBuilder = SciChartBuilder.instance();
-        chart = new SciChartSurface(this);
+        mainChart = new SciChartSurface(this);
         LinearLayout chartLayout = findViewById(R.id.mainChart);
-        chartLayout.addView((View) chart, 0);
+        chartLayout.addView((View) mainChart, 0);
 
         final NumericAxis xAxis = sciChartBuilder.newNumericAxis()
                 .withVisibleRange(0, 10)
@@ -730,8 +1007,8 @@ public class MainActivity extends AppCompatActivity {
         final NumericAxis yAxisFlow = generateYAxis(flowId, getMinMaxRange(flowRange));
         final NumericAxis yAxisVolume = generateYAxis(volumeId, getMinMaxRange(volumeRange));
 
-        UpdateSuspender.using(chart, () -> {
-            Collections.addAll(chart.getAnnotations(),
+        UpdateSuspender.using(mainChart, () -> {
+            Collections.addAll(mainChart.getAnnotations(),
                     sciChartBuilder.newTextAnnotation()
                             .withXAxisId("XAxis")
                             .withYAxisId(pressureId)
@@ -757,23 +1034,130 @@ public class MainActivity extends AppCompatActivity {
                             .build(),
                     generateBaseLines(volumeId)
             );
-            Collections.addAll(chart.getXAxes(), xAxis);
-            Collections.addAll(chart.getYAxes(), yAxisPressure, yAxisFlow, yAxisVolume);
-            Collections.addAll(chart.getRenderableSeries(),
+            Collections.addAll(mainChart.getXAxes(), xAxis);
+            Collections.addAll(mainChart.getYAxes(), yAxisPressure, yAxisFlow, yAxisVolume);
+            Collections.addAll(mainChart.getRenderableSeries(),
                     MainActivity.this.generateLineSeries(pressureId, pressureDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateLineSeries(pressureId, pressureSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateScatterForLastAppendedPoint(pressureId, lastPressureSweepDataSeries),
-
                     MainActivity.this.generateLineSeries(flowId, flowDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateLineSeries(flowId, flowSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateScatterForLastAppendedPoint(flowId, lastFlowDataSeries),
-
                     MainActivity.this.generateLineSeries(volumeId, volumeDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateLineSeries(volumeId, volumeSweepDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build()),
                     MainActivity.this.generateScatterForLastAppendedPoint(volumeId, lastVolumeDataSeries)
             );
-            chart.setLayoutManager(new DefaultLayoutManager.Builder().setRightOuterAxesLayoutStrategy(new RightAlignedOuterVerticallyStackedYAxisLayoutStrategy()).build());
+            mainChart.setLayoutManager(new DefaultLayoutManager.Builder().setRightOuterAxesLayoutStrategy(new RightAlignedOuterVerticallyStackedYAxisLayoutStrategy()).build());
         });
+
+        FPchart = new SciChartSurface(this);
+        LinearLayout FP = findViewById(R.id.FPChart);
+        FP.addView((View) FPchart, 0);
+        UpdateSuspender.using(FPchart, () -> {
+            Collections.addAll(
+                    FPchart.getXAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withVisibleRange(-50, 50)
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withAxisBandsFill(5)
+                            .withDrawMajorBands(true)
+                            .withAxisId("XAxis")
+                            .build()
+            );
+            DoubleValues range = new DoubleValues();
+            range.add(-15);
+            range.add(15);
+            Collections.addAll(
+                    FPchart.getYAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withAxisId(pressureId)
+                            .withVisibleRange(-5, 20)
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withDrawMajorBands(false)
+                            .withDrawMinorGridLines(true)
+                            .withDrawMajorGridLines(true)
+                            .build()
+            );
+            Collections.addAll(FPchart.getRenderableSeries(),
+                    MainActivity.this.generateLineSeries(pressureId, FPDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0x00, 0xFF, 0x00)).withAntiAliasing(true).withThickness(1.5f).build())
+            );
+        });
+        PVchart = new SciChartSurface(this);
+        LinearLayout PV = findViewById(R.id.PVChart);
+        PV.addView((View) PVchart, 0);
+        UpdateSuspender.using(PVchart, () -> {
+            Collections.addAll(
+                    PVchart.getXAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withVisibleRange(-5, 20)
+                            .withAxisBandsFill(5)
+                            .withDrawMajorBands(true)
+                            .withAxisId("XAxis")
+                            .build()
+            );
+            DoubleValues range = new DoubleValues();
+            range.add(-100);
+            range.add(500);
+            Collections.addAll(
+                    PVchart.getYAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withAxisId(pressureId)
+                            .withVisibleRange(-100, 600)
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withDrawMajorBands(false)
+                            .withDrawMinorGridLines(true)
+                            .withDrawMajorGridLines(true)
+                            .build()
+            );
+            Collections.addAll(PVchart.getRenderableSeries(),
+                    MainActivity.this.generateLineSeries(pressureId, PVDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0xEA, 0x00)).withAntiAliasing(true).withThickness(1.5f).build())
+            );
+        });
+        FVchart = new SciChartSurface(this);
+        LinearLayout FV = findViewById(R.id.FVChart);
+        FV.addView((View) FVchart, 0);
+        UpdateSuspender.using(FVchart, () -> {
+            Collections.addAll(
+                    FVchart.getXAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withVisibleRange(-10, 10)
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withAxisBandsFill(5)
+                            .withDrawMajorBands(true)
+                            .withAxisId("XAxis")
+                            .build()
+            );
+            DoubleValues range = new DoubleValues();
+            range.add(-100);
+            range.add(500);
+            Collections.addAll(
+                    FVchart.getYAxes(),
+                    sciChartBuilder.newNumericAxis()
+                            .withAxisId(pressureId)
+                            .withVisibleRange(-200, 350)
+                            .withAutoRangeMode(AutoRange.Never)
+                            .withDrawMajorBands(false)
+                            .withDrawMinorGridLines(true)
+                            .withDrawMajorGridLines(true)
+                            .build()
+            );
+            Collections.addAll(FVchart.getRenderableSeries(),
+                    MainActivity.this.generateLineSeries(pressureId, FVDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build())
+            );
+        });
+
+
+//        MaterialButtonToggleGroup group = findViewById(R.id.toggleGroupMain);
+//        group.addOnButtonCheckedListener((group1, checkedId, isChecked) -> {
+//            findViewById(graphShownRef).setVisibility(View.GONE);
+//            switch(checkedId) {
+//                case R.id.FPbutton: findViewById(R.id.FPChart).setVisibility(View.VISIBLE); graphShownRef = R.id.FPChart; break;
+//                case R.id.FVbutton: findViewById(R.id.FVChart).setVisibility(View.VISIBLE); graphShownRef = R.id.FVChart; break;
+//                case R.id.PVbutton: findViewById(R.id.PVChart).setVisibility(View.VISIBLE); graphShownRef = R.id.PVChart; break;
+//                case R.id.mainGraphsButton: findViewById(R.id.mainChart).setVisibility(View.VISIBLE); graphShownRef = R.id.mainChart; break;
+//            }
+//        });
     }
 
     private XyDataSeries<Double, Double> newDataSeries(int fifoCapacity) {

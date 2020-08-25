@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.dvbinventek.dvbapp.R;
 import com.dvbinventek.dvbapp.SendPacket;
+import com.dvbinventek.dvbapp.StandbyFragment;
 import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.bottomSheets.AlarmLimitsBottomSheet;
 import com.dvbinventek.dvbapp.bottomSheets.AlarmLimitsBottomSheetApnea;
@@ -46,6 +48,8 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 public class AlarmsFragment extends Fragment {
 
+    //TODO: Do not permit Max value to be lower than min value
+
     public static Set<String> resetList = new HashSet<String>();
     public static List<Integer> highlightedList = new ArrayList<>();
     public static int countdown = 30;
@@ -59,9 +63,23 @@ public class AlarmsFragment extends Fragment {
     Observable<Long> observable = Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread());
+    public static Observer<String> hpaObserver;
+    public AlarmLimitsBottomSheet abs_p;
     Observer<Long> observer = new Observer<Long>() {
         @Override
-        public void onError(Throwable e) {
+        public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            disposable = d;
+            disposables.add(d);
+            setText(R.id.limits_saveChanges, alarmsView.get().getResources().getString(R.string.confirm_, 30));
+        }
+
+        @Override
+        public void onNext(@io.reactivex.rxjava3.annotations.NonNull Long aLong) {
+            setText(R.id.limits_saveChanges, alarmsView.get().getResources().getString(R.string.confirm_, 30 - aLong));
+        }
+
+        @Override
+        public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
             e.printStackTrace();
         }
 
@@ -69,17 +87,7 @@ public class AlarmsFragment extends Fragment {
         public void onComplete() {
             resetChanges();
             countdownStarted = false;
-        }
-
-        @Override
-        public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-            disposable = d;
-            disposables.add(d);
-        }
-
-        @Override
-        public void onNext(Long aLong) {
-            setText(R.id.highlight_text, getResources().getString(R.string.warning_text, 30 - aLong));
+            setText(R.id.limits_saveChanges, alarmsView.get().getResources().getString(R.string.confirm));
         }
     };
 
@@ -106,8 +114,8 @@ public class AlarmsFragment extends Fragment {
     public void setPastSessionValues() {
         StaticStore.AlarmLimits.new_minVolMax = StaticStore.AlarmLimits.minVolMax;
         StaticStore.AlarmLimits.new_minVolMin = StaticStore.AlarmLimits.minVolMin;
-        StaticStore.AlarmLimits.new_fTotalMax = StaticStore.AlarmLimits.fTotalMax;
-        StaticStore.AlarmLimits.new_fTotalMin = StaticStore.AlarmLimits.fTotalMin;
+        StaticStore.AlarmLimits.new_rateMax = StaticStore.AlarmLimits.rateMax;
+        StaticStore.AlarmLimits.new_rateMin = StaticStore.AlarmLimits.rateMin;
         StaticStore.AlarmLimits.new_vtMax = StaticStore.AlarmLimits.vtMax;
         StaticStore.AlarmLimits.new_vtMin = StaticStore.AlarmLimits.vtMin;
         StaticStore.AlarmLimits.new_pMax = StaticStore.AlarmLimits.pMax;
@@ -116,14 +124,40 @@ public class AlarmsFragment extends Fragment {
 
         setText(R.id.limits_minVolMax, String.valueOf(StaticStore.AlarmLimits.minVolMax == 0 ? "0" : StaticStore.AlarmLimits.minVolMax));
         setText(R.id.limits_minVolMin, String.valueOf(StaticStore.AlarmLimits.minVolMin == 0 ? "0" : StaticStore.AlarmLimits.minVolMin));
-        setText(R.id.limits_ftotalMax, String.valueOf(StaticStore.AlarmLimits.fTotalMax == 0 ? "0" : StaticStore.AlarmLimits.fTotalMax));
-        setText(R.id.limits_ftotalMin, String.valueOf(StaticStore.AlarmLimits.fTotalMin == 0 ? "0" : StaticStore.AlarmLimits.fTotalMin));
+        setText(R.id.limits_ftotalMax, String.valueOf(StaticStore.AlarmLimits.rateMax == 0 ? "0" : StaticStore.AlarmLimits.rateMax));
+        setText(R.id.limits_ftotalMin, String.valueOf(StaticStore.AlarmLimits.rateMin == 0 ? "0" : StaticStore.AlarmLimits.rateMin));
         setText(R.id.limits_vtMax, String.valueOf(StaticStore.AlarmLimits.vtMax == 0 ? "0" : StaticStore.AlarmLimits.vtMax));
         setText(R.id.limits_vtMin, String.valueOf(StaticStore.AlarmLimits.vtMin == 0 ? "0" : StaticStore.AlarmLimits.vtMin));
         setText(R.id.limits_pMax, String.valueOf(StaticStore.AlarmLimits.pMax == 0 ? "0" : StaticStore.AlarmLimits.pMax));
         setText(R.id.limits_pMin, String.valueOf(StaticStore.AlarmLimits.pMin == 0 ? "0" : StaticStore.AlarmLimits.pMin));
         setText(R.id.limits_apnea, String.valueOf(StaticStore.AlarmLimits.apnea == 0 ? "0" : StaticStore.AlarmLimits.apnea));
 
+        //setup hpa Unit change observer
+        hpaObserver = new Observer<String>() {
+            @Override
+            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+            }
+
+            @Override
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
+                if (s.equals("hpa")) {
+                    setText(R.id.limits_pText, "P (hPa)");
+                    abs_p.setSubHeading(Html.fromHtml("P (hPa)"));
+                } else {
+                    setText(R.id.limits_pText, Html.fromHtml("P (cm H<small><sub>2</sub></small>O)"));
+                    abs_p.setSubHeading(Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"));
+                }
+            }
+
+            @Override
+            public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
     }
 
     @Override
@@ -138,7 +172,7 @@ public class AlarmsFragment extends Fragment {
         AlarmLimitsBottomSheet abs_minVol = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("MV<sub><small>total</small></sub> (l)"), "minvol");
         AlarmLimitsBottomSheet abs_rate = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Rate (b/min)"), "rate");
         AlarmLimitsBottomSheet abs_vt = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Vt (ml)"), "vt");
-        AlarmLimitsBottomSheet abs_p = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"), "p");
+        abs_p = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"), "p");
         AlarmLimitsBottomSheetApnea abs_apnea = new AlarmLimitsBottomSheetApnea(getActivity(), Html.fromHtml("Apnea Time (s)"));
 
         ImageButton minVol = alarmsView.get().findViewById(R.id.limits_minvol_change);
@@ -170,9 +204,10 @@ public class AlarmsFragment extends Fragment {
             if ((min.equals("") && max.equals("")) || !abs_minVol.isDone) return;
             setText(R.id.limits_minVolMin, min);
             setText(R.id.limits_minVolMax, max);
-            short max_ = (short) (Integer.parseInt(max));
-            short min_ = (short) (Integer.parseInt(min));
+            float max_ = Float.parseFloat(max);
+            float min_ = Float.parseFloat(min);
             if (StaticStore.AlarmLimits.new_minVolMax != max_ || StaticStore.AlarmLimits.new_minVolMin != min_) {
+                abs_minVol.setHint();
                 highlight(R.id.limits_minvol, true);
                 resetList.add("minvol");
                 try { // commit alarm limits
@@ -193,16 +228,17 @@ public class AlarmsFragment extends Fragment {
             if ((min.equals("") && max.equals("")) || !abs_rate.isDone) return;
             setText(R.id.limits_ftotalMin, min);
             setText(R.id.limits_ftotalMax, max);
-            short max_ = (short) (Integer.parseInt(max));
-            short min_ = (short) (Integer.parseInt(min));
-            if (StaticStore.AlarmLimits.new_fTotalMax != max_ || StaticStore.AlarmLimits.new_fTotalMin != min_) {
+            byte max_ = Byte.parseByte(max);
+            byte min_ = Byte.parseByte(min);
+            if (StaticStore.AlarmLimits.new_rateMax != max_ || StaticStore.AlarmLimits.new_rateMin != min_) {
+                abs_rate.setHint();
                 highlight(R.id.limits_ftotal, true);
                 resetList.add("ftotal");
                 try { // commit alarm limits
-                    if (max.equals("-")) StaticStore.AlarmLimits.new_fTotalMax = 0;
-                    else StaticStore.AlarmLimits.new_fTotalMax = max_;
-                    if (min.equals("-")) StaticStore.AlarmLimits.new_fTotalMin = 0;
-                    else StaticStore.AlarmLimits.new_fTotalMin = min_;
+                    if (max.equals("-")) StaticStore.AlarmLimits.new_rateMax = 0;
+                    else StaticStore.AlarmLimits.new_rateMax = max_;
+                    if (min.equals("-")) StaticStore.AlarmLimits.new_rateMin = 0;
+                    else StaticStore.AlarmLimits.new_rateMin = min_;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -219,6 +255,7 @@ public class AlarmsFragment extends Fragment {
             short max_ = (short) (Integer.parseInt(max));
             short min_ = (short) (Integer.parseInt(min));
             if (StaticStore.AlarmLimits.new_vtMax != max_ || StaticStore.AlarmLimits.new_vtMin != min_) {
+                abs_vt.setHint();
                 highlight(R.id.limits_vt, true);
                 resetList.add("vt");
                 try {
@@ -239,9 +276,10 @@ public class AlarmsFragment extends Fragment {
             if ((min.equals("") && max.equals("")) || !abs_p.isDone) return;
             setText(R.id.limits_pMin, min);
             setText(R.id.limits_pMax, max);
-            short max_ = (short) (Integer.parseInt(max));
-            short min_ = (short) (Integer.parseInt(min));
+            float max_ = Float.parseFloat(max);
+            float min_ = Float.parseFloat(min);
             if (StaticStore.AlarmLimits.new_pMax != max_ || StaticStore.AlarmLimits.new_pMin != min_) {
+                abs_p.setHint();
                 highlight(R.id.limits_p, true);
                 resetList.add("p");
                 try {
@@ -262,11 +300,12 @@ public class AlarmsFragment extends Fragment {
             setText(R.id.limits_apnea, apnea_);
             short value_ = (short) (Integer.parseInt(apnea_));
             if (StaticStore.AlarmLimits.new_apnea != value_) {
-                highlight(R.id.limits_apnea, true);
+                abs_apnea.setHint();
+                highlight(R.id.limits_apnea_row, true);
                 resetList.add("apnea");
                 try {
-                    if (apnea_.equals("-")) StaticStore.AlarmLimits.apnea = 0;
-                    else StaticStore.AlarmLimits.apnea = value_;
+                    if (apnea_.equals("-")) StaticStore.AlarmLimits.new_apnea = 0;
+                    else StaticStore.AlarmLimits.new_apnea = value_;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -275,10 +314,11 @@ public class AlarmsFragment extends Fragment {
             }
         });
         saveChanges.setOnClickListener(v -> {
+            Observable.just(2L).subscribe(StandbyFragment.confirmButtonClickObserver);
             StaticStore.AlarmLimits.minVolMax = StaticStore.AlarmLimits.new_minVolMax;
             StaticStore.AlarmLimits.minVolMin = StaticStore.AlarmLimits.new_minVolMin;
-            StaticStore.AlarmLimits.fTotalMax = StaticStore.AlarmLimits.new_fTotalMax;
-            StaticStore.AlarmLimits.fTotalMin = StaticStore.AlarmLimits.new_fTotalMin;
+            StaticStore.AlarmLimits.rateMax = StaticStore.AlarmLimits.new_rateMax;
+            StaticStore.AlarmLimits.rateMin = StaticStore.AlarmLimits.new_rateMin;
             StaticStore.AlarmLimits.vtMax = StaticStore.AlarmLimits.new_vtMax;
             StaticStore.AlarmLimits.vtMin = StaticStore.AlarmLimits.new_vtMin;
             StaticStore.AlarmLimits.pMax = StaticStore.AlarmLimits.new_pMax;
@@ -288,8 +328,8 @@ public class AlarmsFragment extends Fragment {
             SharedPreferences.Editor editor = Objects.requireNonNull(getContext()).getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE).edit();
             editor.putString("limits_minVolMax", "" + StaticStore.AlarmLimits.minVolMax);
             editor.putString("limits_minVolMin", "" + StaticStore.AlarmLimits.minVolMin);
-            editor.putString("limits_fTotalMax", "" + StaticStore.AlarmLimits.fTotalMax);
-            editor.putString("limits_fTotalMin", "" + StaticStore.AlarmLimits.fTotalMin);
+            editor.putString("limits_fTotalMax", "" + StaticStore.AlarmLimits.rateMax);
+            editor.putString("limits_fTotalMin", "" + StaticStore.AlarmLimits.rateMin);
             editor.putString("limits_vtMax", "" + StaticStore.AlarmLimits.vtMax);
             editor.putString("limits_vtMi", "" + StaticStore.AlarmLimits.vtMin);
             editor.putString("limits_pMax", "" + StaticStore.AlarmLimits.pMax);
@@ -298,25 +338,7 @@ public class AlarmsFragment extends Fragment {
             editor.apply();
 
             SendPacket sp = new SendPacket();
-            sp.writeInfo((short) (StaticStore.packet_fio2 * 100), 17);
-            sp.writeInfo(StaticStore.modeSelectedShort, 1);
-            sp.writeInfo(StaticStore.packet_vt, 5);
-            sp.writeInfo((short) (StaticStore.packet_vtrig * 100), 10);
-            sp.writeInfo((short) (StaticStore.packet_peep * 100), 4);
-            sp.writeInfo((short) (StaticStore.packet_pinsp * 100), 3);
-            sp.writeInfo((short) (StaticStore.packet_ps * 100), 2);
-            sp.writeInfo((short) (StaticStore.packet_rtotal * 100), 6);
-            sp.writeInfo(StaticStore.packet_ie, 7);
-            //alarm values
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.apnea * 1000), 39);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.minVolMin * 100), 40);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.minVolMax * 100), 41);
-            sp.writeInfo(StaticStore.AlarmLimits.vtMin, 42);
-            sp.writeInfo(StaticStore.AlarmLimits.vtMax, 43);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.pMin * 100), 44);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.pMax * 100), 45);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.fTotalMin * 100), 46);
-            sp.writeInfo((short) ((int) StaticStore.AlarmLimits.fTotalMax * 100), 47);
+            sp.writeDefaultSTRTPacketValues(SendPacket.ALRM);
             if (sp.sendToDevice()) mp.start();
             Vibrator myVib = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
             myVib.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
@@ -336,10 +358,10 @@ public class AlarmsFragment extends Fragment {
                     setText(R.id.limits_minVolMax, String.valueOf(StaticStore.AlarmLimits.minVolMax));
                     break;
                 case "ftotal":
-                    StaticStore.AlarmLimits.new_fTotalMin = StaticStore.AlarmLimits.fTotalMin;
-                    StaticStore.AlarmLimits.new_fTotalMax = StaticStore.AlarmLimits.fTotalMax;
-                    setText(R.id.limits_ftotalMin, String.valueOf(StaticStore.AlarmLimits.fTotalMin));
-                    setText(R.id.limits_ftotalMax, String.valueOf(StaticStore.AlarmLimits.fTotalMax));
+                    StaticStore.AlarmLimits.new_rateMin = StaticStore.AlarmLimits.rateMin;
+                    StaticStore.AlarmLimits.new_rateMax = StaticStore.AlarmLimits.rateMax;
+                    setText(R.id.limits_ftotalMin, String.valueOf(StaticStore.AlarmLimits.rateMin));
+                    setText(R.id.limits_ftotalMax, String.valueOf(StaticStore.AlarmLimits.rateMax));
                     break;
                 case "vt":
                     StaticStore.AlarmLimits.new_vtMin = StaticStore.AlarmLimits.vtMin;
@@ -364,7 +386,7 @@ public class AlarmsFragment extends Fragment {
 
     public void resetChanges() {
         Log.d("MSG", "resetChanges(): " + resetList);
-        setText(R.id.highlight_text, "");
+        setText(R.id.limits_saveChanges, alarmsView.get().getResources().getString(R.string.confirm));
         for (int id : highlightedList) {
             revertRowColor(id);
         }
@@ -427,6 +449,11 @@ public class AlarmsFragment extends Fragment {
     }
 
     public void setText(int id, String s) {
+        TextView tv = alarmsView.get().findViewById(id);
+        tv.setText(s);
+    }
+
+    public void setText(int id, Spanned s) {
         TextView tv = alarmsView.get().findViewById(id);
         tv.setText(s);
     }

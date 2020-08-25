@@ -18,26 +18,38 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.ProgressIndicator;
+
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cdflynn.android.library.checkview.CheckView;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.dvbinventek.dvbapp.MainActivity.PACKET_LENGTH;
 
 public class LaunchActivity extends AppCompatActivity {
 
-    static String packet = "";
+    public static final PublishSubject<byte[]> packetSubject = PublishSubject.create();
+    public DevicePolicyManager mDevicePolicyManager;
+    public PackageManager mPackageManager;
+    public ComponentName mAdminComponentName;
+    ScheduledExecutorService tpe = new ScheduledThreadPoolExecutor(1);
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -60,6 +72,10 @@ public class LaunchActivity extends AppCompatActivity {
             }
         }
     };
+    public int a; // Countdown
+    public CompositeDisposable disposables = new CompositeDisposable();
+    public byte[] packet = {};
+    public int progress;
     public UsbService usbService;
     public MyHandler mHandler;
     public final ServiceConnection usbConnection = new ServiceConnection() {
@@ -75,21 +91,18 @@ public class LaunchActivity extends AppCompatActivity {
             usbService = null;
         }
     };
-    public ProgressBar pb;
-    public CheckView cv;
-    public Button start, skip;
-    public int a;
-    public DevicePolicyManager mDevicePolicyManager;
-    public PackageManager mPackageManager;
-    public ComponentName mAdminComponentName;
-    TextView countdown;
-    boolean gotCCPacket = false, gotDAPacketAgain = false;
-    ScheduledExecutorService tpe = new ScheduledThreadPoolExecutor(1);
-    ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(1);
+    Observable<Long> packetEmitter = Observable.empty();
+    boolean isChecked1 = false;
+    boolean isChecked2 = false;
+    boolean isChecked3 = false;
+    boolean isChecked4 = false;
+    boolean isChecked5 = false;
+    boolean isChecked6 = false;
+    boolean isStartClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        a = 10;
+        a = 30;
         mHandler = new MyHandler(this);
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
@@ -111,71 +124,189 @@ public class LaunchActivity extends AppCompatActivity {
         mPackageManager = this.getPackageManager();
 
         setContentView(R.layout.activity_launch);
-        start = findViewById(R.id.start);
-        skip = findViewById(R.id.skip);
-        countdown = findViewById(R.id.countdown);
+        progress = 0;
 
-        skip.setOnClickListener(v -> {
-            tpe.shutdown();
-            ses.shutdown();
-            MediaPlayer mp = MediaPlayer.create(this, R.raw.button_press);
-            mp.start();
-            if (!MainActivity.mainActivityActive) {
-                Log.d("MSG", "Skip button clicked");
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                finish();
+        //Setup Start, skip buttons, countdown text
+        setupButtons();
+
+        StaticStore.LaunchVars.calibrationError = 0;
+        StaticStore.LaunchVars.calibrationStatus = 0;
+
+        packetSubject.subscribe(new Observer<byte[]>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                disposables.add(d);
+            }
+
+            @Override
+            public void onNext(byte @NonNull [] bytes) {
+                if (packet.length == 0)
+                    packet = Arrays.copyOf(bytes, bytes.length);
+                else if (packet.length < PACKET_LENGTH)
+                    packet = joinArrays(packet, bytes);
+                if (packet.length == PACKET_LENGTH) {
+                    new ReceivePacket(packet, true);
+                    updateProgressBar();
+                    Log.d("PACKET_LAUNCH", Arrays.toString(packet));
+                    packet = new byte[]{};
+                } else if (packet.length > PACKET_LENGTH) {
+                    Log.d("PACKET_DROPPED", Arrays.toString(packet));
+                    packet = new byte[]{};
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
             }
         });
-        tpe.scheduleAtFixedRate(() -> {
-            if (a == 1) {
-                countdown.setText(R.string.auto_skip_1_sec);
-                skip.callOnClick();
-            } else {
-                countdown.setText(getString(R.string.auto_skip_in_i_seconds, a));
-            }
-            a--;
-        }, 1, 1, TimeUnit.SECONDS);
-        start.setOnClickListener(v -> {
-            //TODO: Write packet logic
-//            tpe.shutdownNow();
-//            countdown.setVisibility(View.INVISIBLE);
-//            cv.uncheck();
-//            start.setEnabled(false);
-//            pb.setVisibility(View.VISIBLE);
-//            SendPacket sp = new SendPacket();
-//            sp.writeInfo((short)204, 0);
-//            if(usbService != null) {
-//                Log.d("SENT_PACKET", Arrays.toString(sp.packet));
-//                usbService.write(shortToByte(sp.packet));
-//            } else {
-//                Log.d("SENT_PACKET_ERR", "Could not send packet, service is null");
-//            }
-//            ses.scheduleAtFixedRate(() -> {
-//                Log.d("MSG", "Checking for calibration");
-//                if(gotDAPacketAgain) {
-//                    Log.d("MSG", "Calibrated!");
-//                    skip.callOnClick();
-//                }
-//            }, 10, 1, TimeUnit.SECONDS);
-        });
+        packetEmitter.subscribe();
     }
 
-    void startMainActivityLockTaskMode() {
-        if (MainActivity.mainActivityActive) return;
-        if (mDevicePolicyManager.isDeviceOwnerApp(
-                getApplicationContext().getPackageName())) {
-            Intent lockIntent = new Intent(getApplicationContext(),
-                    MainActivity.class);
+    public void updateProgressBar() {
+        int err = StaticStore.LaunchVars.calibrationError;
+        int status = StaticStore.LaunchVars.calibrationStatus;
+        Log.d("PROGRESS", "Error:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationError) + " Status:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationStatus));
+        if (status > 0 && isStartClicked && status < 64) {
+            for (int i = 0; i < 6; i++)
+                if (((status & 1 << i) >> i) == 1)
+                    checkIt(i);
+            for (int i = 0; i < 24; i++) {
+                if (((err & 1 << i) >> i) == 1) {
+                    showErrors(i);
+                }
+            }
+        }
+    }
 
-            mPackageManager.setComponentEnabledSetting(
-                    new ComponentName(getApplicationContext(),
-                            MainActivity.class),
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-            startActivity(lockIntent);
-            finish();
-        } else {
-            Log.d("MSG", "App not whitelisted as LockTask");
+    public void showErrors(int i) {
+        if (i >= 0 && i < 4) {
+            setVisibility(R.id.check1, View.GONE);
+            setVisibility(R.id.progress_bar1, View.GONE);
+            setVisibility(R.id.cross1, View.VISIBLE);
+        } else if (i >= 4 && i < 8) {
+            setVisibility(R.id.check2, View.GONE);
+            setVisibility(R.id.progress_bar2, View.GONE);
+            setVisibility(R.id.cross2, View.VISIBLE);
+        } else if (i >= 8 && i < 12) {
+            setVisibility(R.id.check3, View.GONE);
+            setVisibility(R.id.progress_bar3, View.GONE);
+            setVisibility(R.id.cross3, View.VISIBLE);
+        } else if (i >= 12 && i < 16) {
+            setVisibility(R.id.check4, View.GONE);
+            setVisibility(R.id.progress_bar4, View.GONE);
+            setVisibility(R.id.cross4, View.VISIBLE);
+        } else if (i >= 16 && i < 20) {
+            setVisibility(R.id.check5, View.GONE);
+            setVisibility(R.id.progress_bar5, View.GONE);
+            setVisibility(R.id.cross5, View.VISIBLE);
+        } else if (i >= 20 && i < 24) {
+            setVisibility(R.id.check6, View.GONE);
+            setVisibility(R.id.progress_bar6, View.GONE);
+            setVisibility(R.id.cross6, View.VISIBLE);
+        }
+        switch (i) {
+            case 0:
+                setVisibility(R.id.sft_error0x1, View.VISIBLE);
+                break;
+            case 1:
+                setVisibility(R.id.sft_error0x2, View.VISIBLE);
+                break;
+            case 2:
+                setVisibility(R.id.sft_error0x4, View.VISIBLE);
+                break;
+            case 3:
+                setVisibility(R.id.sft_error0x8, View.VISIBLE);
+                break;
+            case 4:
+                setVisibility(R.id.sft_error0x10, View.VISIBLE);
+                break;
+            case 5:
+                setVisibility(R.id.sft_error0x20, View.VISIBLE);
+                break;
+            case 6:
+                setVisibility(R.id.sft_error0x40, View.VISIBLE);
+                break;
+            case 8:
+                setVisibility(R.id.sft_error0x100, View.VISIBLE);
+                break;
+            case 12:
+                setVisibility(R.id.sft_error0x1000, View.VISIBLE);
+                break;
+            case 20:
+                setVisibility(R.id.sft_error0x100000, View.VISIBLE);
+                break;
+            case 21:
+                setVisibility(R.id.sft_error0x200000, View.VISIBLE);
+                break;
+        }
+    }
+
+    public void updateProgressBar(int i) {
+        progress += i;
+        ((TextView) findViewById(R.id.progressIndicatorText)).setText(progress + "%");
+        ((ProgressIndicator) findViewById(R.id.progressIndicator)).setProgress(progress);
+        if (progress == 100) {
+            findViewById(R.id.skip).setBackgroundColor(getResources().getColor(R.color.yellow));
+            ((MaterialButton) findViewById(R.id.skip)).setText(R.string.next);
+            findViewById(R.id.skip).setEnabled(true);
+        }
+    }
+
+    public void checkIt(int which) {
+        switch (which) {
+            case 0:
+                setVisibility(R.id.progress_bar1, View.GONE);
+                if (!isChecked1) {
+                    ((CheckView) findViewById(R.id.check1)).check();
+                    isChecked1 = true;
+                    updateProgressBar(16);
+                }
+                break;
+            case 1:
+                setVisibility(R.id.progress_bar2, View.GONE);
+                if (!isChecked2) {
+                    ((CheckView) findViewById(R.id.check2)).check();
+                    isChecked2 = true;
+                    updateProgressBar(17);
+                }
+                break;
+            case 2:
+                setVisibility(R.id.progress_bar3, View.GONE);
+                if (!isChecked3) {
+                    ((CheckView) findViewById(R.id.check3)).check();
+                    isChecked3 = true;
+                    updateProgressBar(16);
+                }
+                break;
+            case 3:
+                setVisibility(R.id.progress_bar4, View.GONE);
+                if (!isChecked4) {
+                    ((CheckView) findViewById(R.id.check4)).check();
+                    isChecked4 = true;
+                    updateProgressBar(17);
+                }
+                break;
+            case 4:
+                setVisibility(R.id.progress_bar5, View.GONE);
+                if (!isChecked5) {
+                    ((CheckView) findViewById(R.id.check5)).check();
+                    isChecked5 = true;
+                    updateProgressBar(17);
+                }
+                break;
+            case 5:
+                setVisibility(R.id.progress_bar6, View.GONE);
+                if (!isChecked6) {
+                    ((CheckView) findViewById(R.id.check6)).check();
+                    isChecked6 = true;
+                    updateProgressBar(17);
+                }
+                break;
         }
     }
 
@@ -235,39 +366,134 @@ public class LaunchActivity extends AppCompatActivity {
         registerReceiver(mUsbReceiver, filter);
     }
 
-    public void handleData(String d) {
-        if (packet.length() == 0) {
-            packet = d;
-        } else if (packet.length() < PACKET_LENGTH) {
-            packet = packet + d;
-        } else if (packet.length() == PACKET_LENGTH) {
-            Log.d("PACKET_LAUNCH", packet);
-            if (packet.charAt(0) == 'C' && packet.charAt(1) == 'C') {
-                gotCCPacket = true;
+    public void setupButtons() {
+        TextView start = findViewById(R.id.start);
+        TextView skip = findViewById(R.id.skip);
+        TextView countdown = findViewById(R.id.countdown);
+        TextView progressText = findViewById(R.id.progressIndicatorText);
+        ProgressIndicator progressCircle = findViewById(R.id.progressIndicator);
+        progressText.setText("");
+        progressCircle.setProgress(0);
+
+        ((CheckView) findViewById(R.id.check1)).uncheck();
+        ((CheckView) findViewById(R.id.check2)).uncheck();
+        ((CheckView) findViewById(R.id.check3)).uncheck();
+        ((CheckView) findViewById(R.id.check4)).uncheck();
+        ((CheckView) findViewById(R.id.check5)).uncheck();
+        ((CheckView) findViewById(R.id.check6)).uncheck();
+        setVisibility(R.id.progress_bar1, View.GONE);
+        setVisibility(R.id.progress_bar2, View.GONE);
+        setVisibility(R.id.progress_bar3, View.GONE);
+        setVisibility(R.id.progress_bar4, View.GONE);
+        setVisibility(R.id.progress_bar5, View.GONE);
+        setVisibility(R.id.progress_bar6, View.GONE);
+        isChecked1 = false;
+        isChecked2 = false;
+        isChecked3 = false;
+        isChecked4 = false;
+        isChecked5 = false;
+        isChecked6 = false;
+        setVisibility(R.id.cross1, View.GONE);
+        setVisibility(R.id.cross2, View.GONE);
+        setVisibility(R.id.cross3, View.GONE);
+        setVisibility(R.id.cross4, View.GONE);
+        setVisibility(R.id.cross5, View.GONE);
+        setVisibility(R.id.cross6, View.GONE);
+
+        skip.setOnClickListener(v -> {
+            tpe.shutdown();
+            MediaPlayer mp = MediaPlayer.create(this, R.raw.button_press);
+            mp.start();
+            if (!MainActivity.mainActivityActive) {
+                Log.d("MSG", "Skipped Self Test");
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+//                startMainActivityLockTaskMode();
             }
-            if (gotCCPacket) {
-                if (packet.charAt(0) == 'D' && packet.charAt(1) == 'A' && gotCCPacket) {
-                    cv.check();
-                    gotDAPacketAgain = true;
-                }
+        });
+        tpe.scheduleAtFixedRate(() -> {
+            if (a == 1) {
+                countdown.setText(R.string.auto_skip_1_sec);
+                skip.callOnClick();
+            } else {
+                countdown.setText(getString(R.string.auto_skip_in_i_seconds, a));
             }
-            packet = "";
-        } else {
-            packet = "";
-            Log.d("MSG", "DROPPED");
-        }
+            a--;
+        }, 1, 1, TimeUnit.SECONDS);
+
+        start.setOnClickListener(v -> {
+            isStartClicked = true;
+            ((CheckView) findViewById(R.id.check1)).uncheck();
+            ((CheckView) findViewById(R.id.check2)).uncheck();
+            ((CheckView) findViewById(R.id.check3)).uncheck();
+            ((CheckView) findViewById(R.id.check4)).uncheck();
+            ((CheckView) findViewById(R.id.check5)).uncheck();
+            ((CheckView) findViewById(R.id.check6)).uncheck();
+            Log.d("SELF_TEST", "Started Self Test");
+            skip.setEnabled(false);
+            tpe.shutdownNow();
+            countdown.setVisibility(View.INVISIBLE);
+            start.setEnabled(false);
+            progressText.setText("0%");
+            progressCircle.setProgress(2);
+            setVisibility(R.id.progress_bar1, View.VISIBLE);
+            setVisibility(R.id.progress_bar2, View.VISIBLE);
+            setVisibility(R.id.progress_bar3, View.VISIBLE);
+            setVisibility(R.id.progress_bar4, View.VISIBLE);
+            setVisibility(R.id.progress_bar5, View.VISIBLE);
+            setVisibility(R.id.progress_bar6, View.VISIBLE);
+            SendPacket sp = new SendPacket();
+            sp.writeInfo(SendPacket.SLFT, 0);
+            sp.writeInfo(SendPacket.SLFT, 276);
+            sp.sendToDevice();
+        });
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         tpe.shutdownNow();
-        ses.shutdownNow();
+    }
+
+    public void setVisibility(int id, int vis) {
+        findViewById(id).setVisibility(vis);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposables != null)
+            if (!disposables.isDisposed())
+                disposables.dispose();
+    }
+
+    void startMainActivityLockTaskMode() {
+        if (MainActivity.mainActivityActive) return;
+        if (mDevicePolicyManager.isDeviceOwnerApp(
+                getApplicationContext().getPackageName())) {
+            Intent lockIntent = new Intent(getApplicationContext(),
+                    MainActivity.class);
+
+            mPackageManager.setComponentEnabledSetting(new ComponentName(getApplicationContext(), MainActivity.class),
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
+            startActivity(lockIntent);
+            finish();
+        } else {
+            Log.d("MSG", "App not whitelisted as LockTask");
+        }
+    }
+
+    public byte[] joinArrays(byte[] array1, byte[] array2) {
+        int aLen = array1.length;
+        int bLen = array2.length;
+        byte[] result = new byte[aLen + bLen];
+        System.arraycopy(array1, 0, result, 0, aLen);
+        System.arraycopy(array2, 0, result, aLen, bLen);
+        return result;
     }
 
     public class MyHandler extends Handler {
         public final WeakReference<LaunchActivity> mActivity;
-        public final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
         public MyHandler(LaunchActivity activity) {
             mActivity = new WeakReference<>(activity);
@@ -278,7 +504,7 @@ public class LaunchActivity extends AppCompatActivity {
             switch (msg.what) {
                 case UsbService.MESSAGE_FROM_SERIAL_PORT:
                     byte[] data = (byte[]) msg.obj;
-                    handleData(bytesToHex(data));
+                    packetSubject.onNext(data);
                     break;
                 case UsbService.CTS_CHANGE:
                     Toast.makeText(mActivity.get(), "CTS_CHANGE", Toast.LENGTH_LONG).show();
@@ -287,16 +513,6 @@ public class LaunchActivity extends AppCompatActivity {
                     Toast.makeText(mActivity.get(), "DSR_CHANGE", Toast.LENGTH_LONG).show();
                     break;
             }
-        }
-
-        public String bytesToHex(byte[] bytes) {
-            char[] hexChars = new char[bytes.length * 2];
-            for (int j = 0; j < bytes.length; j++) {
-                int v = bytes[j] & 0xFF;
-                hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-                hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-            }
-            return new String(hexChars);
         }
     }
 }
