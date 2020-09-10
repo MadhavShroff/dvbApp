@@ -42,6 +42,7 @@ import com.dvbinventek.dvbapp.graphing.DimTracePaletteProvider;
 import com.dvbinventek.dvbapp.graphing.RightAlignedOuterVerticallyStackedYAxisLayoutStrategy;
 import com.dvbinventek.dvbapp.viewPager.ControlsFragment;
 import com.dvbinventek.dvbapp.viewPager.MonitoringFragment;
+import com.dvbinventek.dvbapp.viewPager.SystemsFragment;
 import com.dvbinventek.dvbapp.viewPager.ToolsFragment;
 import com.dvbinventek.dvbapp.viewPager.ViewPagerFragmentAdapter;
 import com.google.android.material.button.MaterialButton;
@@ -88,10 +89,10 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 public class MainActivity extends AppCompatActivity {
 
     //TODO: Make row list in historic data a recycler view
-    //TODO: patient details - switch between inches and cm, kg and pounds,
     // callbacks to controls and alarms to set the values as per IBW and all
     //TODO:isInRange() in alarm limits
     //TODO: default mode
+    //TODO: File storage for historical data
     //TODO: get values from excel sheet
 
     //Tab Layout vars
@@ -182,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
     //LockTask mode vars
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mAdminComponentName;
+
     //LockButton vars
     public Disposable lockFlashDisposable;
     public ISciChartSurface mainChart, FPchart, FVchart, PVchart;
@@ -285,6 +287,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup Lock screen
         setupLockScreenButton();
+
+        //Set initial State
+        setInitialState();
+    }
+
+    public void setInitialState() {
+        findViewById(R.id.mainChart).setVisibility(View.GONE);
+        findViewById(R.id.standbyFragmentContainer).setVisibility(View.VISIBLE);
+        StandbyFragment.setIsInView(true);
+        //restrict use of other buttons to send any packet to device
+        StaticStore.restrictedCommunicationDueToStandby = true;
     }
 
     @Override
@@ -314,7 +327,6 @@ public class MainActivity extends AppCompatActivity {
                 lockFlashDisposable = d;
                 lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
             }
-
             @Override
             public void onNext(@NonNull Long aLong) {
                 if (aLong % 2 == 0)
@@ -322,12 +334,10 @@ public class MainActivity extends AppCompatActivity {
                 else
                     lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
             }
-
             @Override
             public void onError(@NonNull Throwable e) {
                 e.printStackTrace();
             }
-
             @Override
             public void onComplete() {
                 lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
@@ -470,10 +480,6 @@ public class MainActivity extends AppCompatActivity {
                                     disposeAttempts.dispose();
                                 }
                             });
-                            SendPacket sp = new SendPacket();
-                            sp.writeInfo(SendPacket.STOP, 0);
-                            sp.writeInfo(SendPacket.STOP, 276);
-                            sp.sendToDevice();
                         }).setNegativeButton("No", (dialog_, which_) -> {
                             dialog_.dismiss();
                         }).create();
@@ -619,6 +625,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     MonitoringFragment.stopObserving();
                     ToolsFragment.stopObserving();
+                }
+                if (position == 6) {
+                    if (StaticStore.Values.packetType == SendPacket.TYPE_STRT) {
+                        SystemsFragment.disableSelftest(true);
+                    } else {
+                        SystemsFragment.disableSelftest(false);
+                    }
                 }
             }
         });
@@ -782,7 +795,7 @@ public class MainActivity extends AppCompatActivity {
         StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_peep", "0")));
         StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", "0")));
         StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", "0")));
-        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "0"));
+        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "1010"));
         StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", "0"));
         StaticStore.packet_plimit = (byte) Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", "0")));
         StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ps", "0")));
@@ -904,7 +917,7 @@ public class MainActivity extends AppCompatActivity {
         setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
         setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
 //        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
 //        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
         setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
 //        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);

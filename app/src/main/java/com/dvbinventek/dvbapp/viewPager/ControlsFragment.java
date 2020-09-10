@@ -148,6 +148,9 @@ public class ControlsFragment extends Fragment {
         //instantialize BottomSheet
         initializeBottomSheetDialogs();
 
+        //Set initial state of standby button
+        setInitialState(view);
+
         //sets control rows visible for only those views needed as per mode selected
         setControlsForMode();
 
@@ -155,6 +158,13 @@ public class ControlsFragment extends Fragment {
         setClickListeners();
 
         return view;
+    }
+
+    public void setInitialState(View v) {
+        //disable standby button
+        v.findViewById(R.id.stopVentilation).setEnabled(false);
+        v.findViewById(R.id.stopVentilation).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2f2f2f")));
+        ((Button) v.findViewById(R.id.stopVentilation)).setTextColor(Color.parseColor("#515151"));
     }
 
     public void initializeBottomSheetDialogs() {
@@ -448,7 +458,7 @@ public class ControlsFragment extends Fragment {
                         Log.d("MSG", "packet value equals entered value");
                     }
                 }
-                Log.d("MSG", "IE set: " + StaticStore.packet_ie);
+                Log.d("MSG", "IE set: " + StaticStore.new_packet_ie);
             });
         });
         rtotal.get().setButtonClickListener(v -> {
@@ -615,7 +625,7 @@ public class ControlsFragment extends Fragment {
         ps.get().setCurrent(String.valueOf(StaticStore.packet_ps == 0 ? "0" : StaticStore.packet_ps));
         rtotal.get().setCurrent(String.valueOf(StaticStore.packet_rtotal == 0 ? "0" : StaticStore.packet_rtotal));
         tinsp.get().setCurrent(String.valueOf(StaticStore.packet_tinsp == 0 ? "0" : StaticStore.packet_tinsp));
-        ie.get().setCurrent(String.valueOf(StaticStore.packet_ie == 0 ? "0" : getIE(StaticStore.packet_ie)));
+        ie.get().setCurrent(String.valueOf(StaticStore.packet_ie == 0 ? "-" : getIE(StaticStore.packet_ie)));
         plimit.get().setCurrent(String.valueOf(StaticStore.packet_plimit == 0 ? "0" : StaticStore.packet_plimit));
         setControlsForMode();
     }

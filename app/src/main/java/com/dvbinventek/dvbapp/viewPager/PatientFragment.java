@@ -58,8 +58,8 @@ public class PatientFragment extends Fragment {
         femaleChild.setOnClickListener(clickListener);
         ((TextView) patientView.get().findViewById(R.id.patient_view_name)).setText(StaticStore.PatientDetails.name);
         ((TextView) patientView.get().findViewById(R.id.patient_view_age)).setText(StaticStore.PatientDetails.age);
-        ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(StaticStore.PatientDetails.height);
-        ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(StaticStore.PatientDetails.ibw);
+        ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(StaticStore.PatientDetails.height + " cm");
+        ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(StaticStore.PatientDetails.ibw + " kg");
         ((TextView) patientView.get().findViewById(R.id.roomNumber)).setText(StaticStore.PatientDetails.room);
         ((TextView) patientView.get().findViewById(R.id.bedNumber)).setText(StaticStore.PatientDetails.bed);
 
@@ -80,23 +80,23 @@ public class PatientFragment extends Fragment {
             pd.findViewById(R.id.dismissButton).setOnClickListener((vi) -> alert.dismiss());
             openKeyboard();
             alert.setOnDismissListener(dialog -> {
-                Log.d("DIALOG", "onDismiss");
+                Log.d("PATIENT_DIALOG", "onDismiss");
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(ui_flags);
                 if (!((TextInputEditText) pd.findViewById(R.id.patient_name)).getText().toString().isEmpty())
                     ((TextView) patientView.get().findViewById(R.id.patient_view_name)).setText(((TextInputEditText) pd.findViewById(R.id.patient_name)).getText());
                 if (!((TextInputEditText) pd.findViewById(R.id.patient_age)).getText().toString().isEmpty())
                     ((TextView) patientView.get().findViewById(R.id.patient_view_age)).setText(((TextInputEditText) pd.findViewById(R.id.patient_age)).getText());
                 if (!((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText().toString().isEmpty())
-                    ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText() + " " + weightUnitString);
-                if (!((TextInputEditText) pd.findViewById(R.id.patient_height)).getText().toString().isEmpty())
-                    ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(((TextInputEditText) pd.findViewById(R.id.patient_height)).getText() + " " + heightUnitString);
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_weight)).setText(pd.getWeightText());
+                if (!((TextInputEditText) pd.findViewById(R.id.patient_height_cm)).getText().toString().isEmpty())
+                    ((TextView) patientView.get().findViewById(R.id.patient_view_height)).setText(pd.getHeightText());
                 if (!((TextInputEditText) pd.findViewById(R.id.patient_room)).getText().toString().isEmpty())
                     ((TextView) patientView.get().findViewById(R.id.roomNumber)).setText(((TextInputEditText) pd.findViewById(R.id.patient_room)).getText());
                 if (!((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText().toString().isEmpty())
                     ((TextView) patientView.get().findViewById(R.id.bedNumber)).setText(((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText());
                 StaticStore.PatientDetails.name = ((TextInputEditText) pd.findViewById(R.id.patient_name)).getText().toString();
                 StaticStore.PatientDetails.age = ((TextInputEditText) pd.findViewById(R.id.patient_age)).getText().toString();
-                StaticStore.PatientDetails.height = ((TextInputEditText) pd.findViewById(R.id.patient_height)).getText().toString();
+                StaticStore.PatientDetails.height = ((TextInputEditText) pd.findViewById(R.id.patient_height_cm)).getText().toString();
                 StaticStore.PatientDetails.ibw = ((TextInputEditText) pd.findViewById(R.id.patient_weight)).getText().toString();
                 StaticStore.PatientDetails.room = ((TextInputEditText) pd.findViewById(R.id.patient_room)).getText().toString();
                 StaticStore.PatientDetails.bed = ((TextInputEditText) pd.findViewById(R.id.patient_bed)).getText().toString();

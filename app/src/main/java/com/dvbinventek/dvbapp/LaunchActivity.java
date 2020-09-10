@@ -34,11 +34,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cdflynn.android.library.checkview.CheckView;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.dvbinventek.dvbapp.MainActivity.PACKET_LENGTH;
@@ -251,9 +253,46 @@ public class LaunchActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.progressIndicatorText)).setText(progress + "%");
         ((ProgressIndicator) findViewById(R.id.progressIndicator)).setProgress(progress);
         if (progress == 100) {
+            SendPacket sp = new SendPacket();
+            sp.writeInfo(SendPacket.STOP, 0);
+            sp.writeInfo(SendPacket.STOP, 276);
             findViewById(R.id.skip).setBackgroundColor(getResources().getColor(R.color.yellow));
             ((MaterialButton) findViewById(R.id.skip)).setText(R.string.next);
             findViewById(R.id.skip).setEnabled(true);
+            Observable.interval(200, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(10).subscribe(new Observer<Long>() {
+                Disposable disposeAttempts;
+
+                @Override
+                public void onSubscribe(@NonNull Disposable d) {
+                    sp.sendToDevice();
+                    disposeAttempts = d;
+                }
+
+                @Override
+                public void onNext(@NonNull Long aLong) {
+                    if (StaticStore.Values.packetType != SendPacket.TYPE_STOP) {
+                        Log.d("STANDBY", "trying again... " + StaticStore.Values.packetType);
+                        sp.sendToDevice();
+                    } else {
+                        Log.d("STANDBY", "Got packet of type stop");
+                        //restrict use of other buttons to send any packet to device
+                        StaticStore.restrictedCommunicationDueToStandby = true;
+                        //disable standby button
+                        disposeAttempts.dispose();
+                    }
+                }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onComplete() {
+                    Toast.makeText(getApplicationContext(), "ERR: Cannot communicate with device", Toast.LENGTH_SHORT).show();
+                    disposeAttempts.dispose();
+                }
+            });
         }
     }
 
@@ -262,6 +301,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 0:
                 setVisibility(R.id.progress_bar1, View.GONE);
                 if (!isChecked1) {
+                    ((CheckView) findViewById(R.id.check1)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check1)).check();
                     isChecked1 = true;
                     updateProgressBar(16);
@@ -270,6 +310,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 1:
                 setVisibility(R.id.progress_bar2, View.GONE);
                 if (!isChecked2) {
+                    ((CheckView) findViewById(R.id.check2)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check2)).check();
                     isChecked2 = true;
                     updateProgressBar(17);
@@ -278,6 +319,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 2:
                 setVisibility(R.id.progress_bar3, View.GONE);
                 if (!isChecked3) {
+                    ((CheckView) findViewById(R.id.check3)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check3)).check();
                     isChecked3 = true;
                     updateProgressBar(16);
@@ -286,6 +328,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 3:
                 setVisibility(R.id.progress_bar4, View.GONE);
                 if (!isChecked4) {
+                    ((CheckView) findViewById(R.id.check4)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check4)).check();
                     isChecked4 = true;
                     updateProgressBar(17);
@@ -294,6 +337,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 4:
                 setVisibility(R.id.progress_bar5, View.GONE);
                 if (!isChecked5) {
+                    ((CheckView) findViewById(R.id.check5)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check5)).check();
                     isChecked5 = true;
                     updateProgressBar(17);
@@ -302,6 +346,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 5:
                 setVisibility(R.id.progress_bar6, View.GONE);
                 if (!isChecked6) {
+                    ((CheckView) findViewById(R.id.check6)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check6)).check();
                     isChecked6 = true;
                     updateProgressBar(17);
@@ -421,6 +466,12 @@ public class LaunchActivity extends AppCompatActivity {
         }, 1, 1, TimeUnit.SECONDS);
 
         start.setOnClickListener(v -> {
+            isChecked1 = false;
+            isChecked2 = false;
+            isChecked3 = false;
+            isChecked4 = false;
+            isChecked5 = false;
+            isChecked6 = false;
             isStartClicked = true;
             ((CheckView) findViewById(R.id.check1)).uncheck();
             ((CheckView) findViewById(R.id.check2)).uncheck();
@@ -433,6 +484,7 @@ public class LaunchActivity extends AppCompatActivity {
             tpe.shutdownNow();
             countdown.setVisibility(View.INVISIBLE);
             start.setEnabled(false);
+            new Handler().postDelayed(() -> start.setEnabled(true), 10000);
             progressText.setText("0%");
             progressCircle.setProgress(2);
             setVisibility(R.id.progress_bar1, View.VISIBLE);
@@ -441,6 +493,7 @@ public class LaunchActivity extends AppCompatActivity {
             setVisibility(R.id.progress_bar4, View.VISIBLE);
             setVisibility(R.id.progress_bar5, View.VISIBLE);
             setVisibility(R.id.progress_bar6, View.VISIBLE);
+            StaticStore.restrictedCommunicationDueToStandby = false;
             SendPacket sp = new SendPacket();
             sp.writeInfo(SendPacket.SLFT, 0);
             sp.writeInfo(SendPacket.SLFT, 276);

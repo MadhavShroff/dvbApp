@@ -15,8 +15,8 @@ public class StaticStore {
     static public short packet_fio2 = 0;
     static public short packet_vt = 0;
     static public short packet_ie = 0;
-    static public short packet_i = 0;
-    static public short packet_e = 0;
+    static public float packet_i = 0;
+    static public float packet_e = 0;
     static public float packet_pinsp = 0;
     static public float packet_flowTrig = 0;
     static public float packet_peep = 0;
@@ -67,8 +67,8 @@ public class StaticStore {
     public static class PatientDetails {
         public static String name = "Madhav Shroff";
         public static String age = "21";
-        public static String height = "186 cm";
-        public static String ibw = "78 kg";
+        public static String height = "186";
+        public static String ibw = "78";
         public static String room = "2";
         public static String bed = "6";
     }
@@ -188,7 +188,7 @@ public class StaticStore {
     }
 
     // Values being used for MainParamsView values on the left of the screen.
-    // These static values serve as the model of the model view controller.
+    // These static values serve as the model of the MVC (model-view-controller).
     // The controller is the Observer to the USB packet. It observes for new packets and reacts to parse values.
     // Those parsed values are stored here so asynchronous functions can read and display these values
     public static class Values {
@@ -209,9 +209,9 @@ public class StaticStore {
         public static float rateMax;
         public static float rateMin;
         public static float rateMeasured;
-        public static byte fio2;
-        public static byte fio2Max;
-        public static byte fio2Min;
+        public static int fio2;
+        public static int fio2Max;
+        public static int fio2Min;
         public static float rSpont;
         public static byte breathingType;
         public static byte shutdownPress;
@@ -222,14 +222,16 @@ public class StaticStore {
         public static final byte SIGH_HIDDEN = 0;
         public static final byte SIGH_SHOWN = 1;
         public static final byte SIGH_BREATH = 2;
-        public static final byte SILENCED = 0;
-        public static final byte UNSILENCED = 1;
-        public static final byte LOCKED = 2;
-        public static final byte UNLOCKED = 1;
         public static byte sighHold;
         public static byte sighState = SIGH_HIDDEN;
+
+        public static final byte SILENCED = 0;
+        public static final byte UNSILENCED = 1;
         public static byte warningSilence;
         public static byte silenceState = UNSILENCED;
+
+        public static final byte LOCKED = 2;
+        public static final byte UNLOCKED = 1;
         public static byte lockState = UNLOCKED;
     }
 

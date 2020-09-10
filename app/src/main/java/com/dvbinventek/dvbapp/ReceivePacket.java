@@ -89,9 +89,9 @@ public class ReceivePacket {
         StaticStore.Values.rateMeasured = byteBuffer.getFloat(52);
         StaticStore.Values.rateMax = byteBuffer.getFloat(56);
         StaticStore.Values.rateMin = byteBuffer.getFloat(60);
-        StaticStore.Values.fio2 = byteBuffer.get(64);
-        StaticStore.Values.fio2Max = byteBuffer.get(65);
-        StaticStore.Values.fio2Min = byteBuffer.get(66);
+        StaticStore.Values.fio2 = Byte.toUnsignedInt(byteBuffer.get(64));
+        StaticStore.Values.fio2Max = Byte.toUnsignedInt(byteBuffer.get(65));
+        StaticStore.Values.fio2Min = Byte.toUnsignedInt(byteBuffer.get(66));
         StaticStore.MainActivityValues.sighHold = byteBuffer.get(164);
         StaticStore.MainActivityValues.warningSilence = byteBuffer.get(165);
         StaticStore.Warnings.warningSync = byteBuffer.get(166);

@@ -160,7 +160,6 @@
     <string name="female_adult">Female</string>
     <string name="male_adult">Male</string>
     <string name="_21">21</string>
-    <string name="height">Height:</string>
     <string name="paediatric">Paediatric:</string>
     <string name="adult">Adult:</string>
     <string name="rspont">Rspont</string>
@@ -207,5 +206,12 @@
     <string name="_100">100%</string>
     <string name="ventilaton_paused">Ventilaton Paused</string>
     <string name="_3_press_to_start_ventilation">3. Press ▶ to start ventilation</string>
-
+    <string name="lbs">lbs</string>
+    <string name="kg">kg</string>
+    <string name="inches">inches</string>
+    <string name="cm">cm</string>
+    <string name="weight_lbs">IBW: (lbs)</string>
+    <string name="height_inches">Height: (in)</string>
+    <string name="ibw">IBW:</string>
+    <string name="height">Height:</string>
 </resources>

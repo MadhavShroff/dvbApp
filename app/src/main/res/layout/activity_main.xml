@@ -359,6 +359,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" />
         </LinearLayout>
+<!--     Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
         <!--        <LinearLayout-->
         <!--            android:layout_width="match_parent"-->
         <!--            android:layout_height="45dp">-->

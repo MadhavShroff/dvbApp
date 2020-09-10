@@ -87,71 +87,81 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/step2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/step2_"
-            style="?attr/textAppearanceHeadline1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1. Go to the "
-            android:textColor="#000000"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@id/step2_cont2"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/step2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/launch_alarm"
-            android:layout_width="180dp"
-            android:layout_height="80dp"
-            android:backgroundTint="@color/blue"
-            android:fontFamily="@font/arimo"
-            android:padding="0dp"
-            android:text="Alarm Limits"
-            android:textColor="@color/white"
-            android:textSize="26dp"
-            app:layout_constraintBottom_toBottomOf="@id/step2_"
-            app:layout_constraintEnd_toStartOf="@id/step2_cont"
-            app:layout_constraintStart_toEndOf="@id/step2_"
-            app:layout_constraintTop_toTopOf="@id/step2_" />
+            <TextView
+                android:id="@+id/step2_"
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Go to the "
+                android:textColor="#000000"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toTopOf="@id/step2_cont2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/launch_alarm"
+                android:layout_width="180dp"
+                android:layout_height="80dp"
+                android:backgroundTint="@color/blue"
+                android:fontFamily="@font/arimo"
+                android:padding="0dp"
+                android:text="Alarm Limits"
+                android:textColor="@color/white"
+                android:textSize="26dp"
+                app:layout_constraintBottom_toBottomOf="@id/step2_"
+                app:layout_constraintEnd_toStartOf="@id/step2_cont"
+                app:layout_constraintStart_toEndOf="@id/step2_"
+                app:layout_constraintTop_toTopOf="@id/step2_" />
+
+            <TextView
+                android:id="@+id/step2_cont"
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" tab, check settings"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="@id/step2_"
+                app:layout_constraintStart_toEndOf="@id/launch_alarm"
+                app:layout_constraintTop_toTopOf="@id/step2_" />
+
+            <TextView
+                android:id="@+id/step2_cont2"
+                style="?attr/textAppearanceHeadline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="    and confirm"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/launch_alarm" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/step2_cont"
+            android:id="@+id/pressToStart"
             style="?attr/textAppearanceHeadline1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" tab, check settings"
+            android:text="@string/_3_press_to_start_ventilation"
             android:textColor="#000000"
             android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="@id/step2_"
-            app:layout_constraintStart_toEndOf="@id/launch_alarm"
-            app:layout_constraintTop_toTopOf="@id/step2_" />
+            app:layout_constraintStart_toStartOf="@id/step2"
+            app:layout_constraintTop_toBottomOf="@id/step2" />
 
-        <TextView
-            android:id="@+id/step2_cont2"
-            style="?attr/textAppearanceHeadline1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="    and confirm"
-            android:textColor="#000000"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/launch_alarm" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/pressToStart"
-        style="?attr/textAppearanceHeadline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/_3_press_to_start_ventilation"
-        android:textColor="#000000"
-        android:textSize="30sp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/startVentilation"

@@ -190,8 +190,10 @@ public class SendPacket {
         writeInfo((byte) (StaticStore.packet_ps), 11);
         writeInfo(StaticStore.packet_flowTrig, 12);
         writeInfo(StaticStore.packet_rtotal, 16);
-        writeInfo(((int) StaticStore.packet_ie / 100) / 10.0f, 20); // i
-        writeInfo(((int) StaticStore.packet_ie % 100) / 10.0f, 24); // e
+        int i = (int) StaticStore.packet_ie / 100;
+        int e = (int) StaticStore.packet_ie % 100;
+        writeInfo(i / 10.0f, 20); // i
+        writeInfo(e / 10.0f, 24); // e
         writeInfo(StaticStore.packet_plimit, 9);
         writeInfo((byte) 27, 31);
 
