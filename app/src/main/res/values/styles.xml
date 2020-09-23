@@ -17,9 +17,7 @@
     </style>
 
     <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:paddingLeft">5dp</item>
-        <item name="android:paddingRight">5dp</item>
         <item name="strokeColor">@color/colorAccent</item>
-        <item name="strokeWidth">2dp</item>
+        <item name="strokeWidth">3dp</item>
     </style>
 </resources>

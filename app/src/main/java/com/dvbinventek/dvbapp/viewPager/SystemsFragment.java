@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import com.dvbinventek.dvbapp.LaunchActivity;
 import com.dvbinventek.dvbapp.MainActivity;
 import com.dvbinventek.dvbapp.R;
 import com.dvbinventek.dvbapp.SendPacket;
+import com.dvbinventek.dvbapp.StaticStore;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.lang.ref.WeakReference;
@@ -26,6 +28,13 @@ import io.reactivex.rxjava3.core.Observable;
 public class SystemsFragment extends Fragment {
 
     public static WeakReference<Button> selfTest;
+    public static WeakReference<TextView> machineHours;
+    public static WeakReference<TextView> patientHours;
+    public static WeakReference<TextView> lastServiceDate;
+    public static WeakReference<TextView> lastServiceHrs;
+    public static WeakReference<TextView> nextServiceDate;
+    public static WeakReference<TextView> nextServiceHrs;
+    public static WeakReference<TextView> systemVersion;
 
     public static void disableShutdown() {
         //TODO: Disable shutdown button logic
@@ -39,7 +48,27 @@ public class SystemsFragment extends Fragment {
             selfTest.get().setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
             selfTest.get().setTextColor(Color.parseColor("#000000"));
         }
-        selfTest.get().setEnabled(b);
+        selfTest.get().setEnabled(!b);
+    }
+
+    public static void setDetails() {
+        machineHours.get().setText(StaticStore.System.machineHours);
+        patientHours.get().setText(StaticStore.System.patientHours);
+        lastServiceDate.get().setText(StaticStore.System.lastServiceDate);
+        lastServiceHrs.get().setText(StaticStore.System.lastServiceHrs);
+        nextServiceDate.get().setText(StaticStore.System.nextServiceDate);
+        nextServiceHrs.get().setText(StaticStore.System.nextServiceHrs);
+        systemVersion.get().setText(StaticStore.System.systemVersion);
+    }
+
+    public void getWeakReferances(View v) {
+        machineHours = new WeakReference<>(v.findViewById(R.id.machineHours));
+        patientHours = new WeakReference<>(v.findViewById(R.id.patientHours));
+        lastServiceDate = new WeakReference<>(v.findViewById(R.id.lastServiceDate));
+        lastServiceHrs = new WeakReference<>(v.findViewById(R.id.lastServiceHrs));
+        nextServiceDate = new WeakReference<>(v.findViewById(R.id.nextServiceDate));
+        nextServiceHrs = new WeakReference<>(v.findViewById(R.id.nextServiceHrs));
+        systemVersion = new WeakReference<>(v.findViewById(R.id.systemVersion));
     }
 
     @Nullable
@@ -49,6 +78,9 @@ public class SystemsFragment extends Fragment {
         view.findViewById(R.id.selfTest).setOnClickListener(v -> {
             startActivity(new Intent(v.getContext(), LaunchActivity.class));
         });
+
+        getWeakReferances(view);
+
         selfTest = new WeakReference<>(view.findViewById(R.id.selfTest));
         ((MaterialButtonToggleGroup) view.findViewById(R.id.toggleGroup)).addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             SendPacket sp = new SendPacket();

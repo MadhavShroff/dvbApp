@@ -98,10 +98,10 @@ public class ProcessPacket {
             }
 //        Log.d("MSG", "" + ppA + " " + ppB + " " + vFlowA + " " + vFlowB + " " + vtfA + " " + vtfB);
             int mode = StaticStore.modeSelectedShort;
-            showPip = (mode >= 13 && mode <= 17); // 13, 14, 15, 16, 17
+            showPip = (mode >= 13 && mode < 17); // 13, 14, 15, 16
             showCpap = true; // all values
             showVt = (mode == 17 || mode == 18 || mode == 19 || mode == 21);
-            showRatef = (mode == 13 || mode == 17 || mode == 18);
+            showRatef = (mode != 15 && mode != 20 && mode != 16);
             showFio2 = true; // all values
             return true;
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

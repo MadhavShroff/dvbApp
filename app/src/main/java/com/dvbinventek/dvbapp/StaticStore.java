@@ -120,6 +120,7 @@ public class StaticStore {
         public static int warningMedCount = 7;
         public static int warningLowCount = 3;
         public static String[] warningsHigh = {
+                //high
                 "OPEN STATE",
                 "APNEA (SAFE MODE)",
                 "BATTERY SYSTEM ERROR",
@@ -151,7 +152,7 @@ public class StaticStore {
                 "TECHNICAL EVENT - BUZZER FAILED",
                 "TBD",
                 "TBD",
-                "SELF TEST PRESSURE SENSOR FAILED"
+                "SELF TEST FAILED"
         };
         public static String[] warningsMedium = {
                 //medium
@@ -254,7 +255,16 @@ public class StaticStore {
         public static float te;
         public static int flowPeak;
         public static float mvTotal;
+    }
 
+    public static class System {
+        public static String machineHours;
+        public static String patientHours;
+        public static String lastServiceDate;
+        public static String lastServiceHrs;
+        public static String nextServiceDate;
+        public static String nextServiceHrs;
+        public static String systemVersion;
     }
 
     public static class AlarmLimits {

@@ -30,8 +30,8 @@ public class DialogViewPatientDetails extends LinearLayout {
         return tv.getText().toString();
     }
 
-    public double round2(double x) {
-        return Math.round(x * 100) / 100.0;
+    public double round1(double x) {
+        return Math.round(x * 10) / 10.0;
     }
 
     public double round0(double x) {
@@ -58,7 +58,7 @@ public class DialogViewPatientDetails extends LinearLayout {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    s = "" + round2(0.45372051 * fl);
+                    s = "" + round1(0.45372051 * fl);
                     setText(R.id.patient_weight, s);
                     break;
                 case R.id.pounds:
@@ -70,7 +70,7 @@ public class DialogViewPatientDetails extends LinearLayout {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    s = "" + round2(2.203999 * fl);
+                    s = "" + round1(2.203999 * fl);
                     setText(R.id.patient_weight, s);
                     break;
             }
@@ -123,7 +123,7 @@ public class DialogViewPatientDetails extends LinearLayout {
             case R.id.kilograms:
                 return ((TextView) findViewById(R.id.patient_weight)).getText() + " kg";
             case R.id.pounds:
-                return ((TextView) findViewById(R.id.patient_height_cm)).getText() + " lbs";
+                return ((TextView) findViewById(R.id.patient_weight)).getText() + " lbs";
         }
         return "";
     }

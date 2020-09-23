@@ -1,33 +1,19 @@
 package com.dvbinventek.dvbapp;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ReceivePacket {
-//
-//        //Test info
-////        StaticStore.Values.pPeak = 51.7f;
-////        StaticStore.Monitoring.pMean = 22.5f;
-////        StaticStore.Values.pMax = 51.7f;
-////        StaticStore.packet_pip = 25.0f;
-////        StaticStore.Values.pMin = 12.1f;
-////        StaticStore.Values.pMin = 12.1f;
-////        StaticStore.Values.pMin = 12.1f;
-////        StaticStore.packet_cpap = 12f;
-////        StaticStore.Values.vtMax = 400;
-////        StaticStore.Values.vtMin = 399;
-////        StaticStore.Values.viTotal = 400;
-////        StaticStore.packet_vt = 400;
-////        StaticStore.Values.fMax = 20.0f;
-////        StaticStore.Values.fMin = 20.0f;
-////        StaticStore.Values.bpmMeasured = 20.0f;
-////        StaticStore.packet_ratef = 20.0f;
-////        StaticStore.Values.fio2Max = 21f;
-////        StaticStore.Values.fio2Min = 21f;
-////        StaticStore.Values.fio2 = 21f;
-////        StaticStore.packet_fio2 = 21;
-////        StaticStore.Values.mode = getMode((short) 17);
-////        StaticStore.Warnings.warningMode = a;
+
+    @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+    @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
 
     ReceivePacket(byte[] s) {
         try {
@@ -47,24 +33,24 @@ public class ReceivePacket {
 
     public static String getMode(short s) {
         switch (s) {
-            case 17:
-                return "VC-CMV";
             case 13:
                 return "PC-CMV";
-            case 18:
-                return "VC-SIMV";
-            case 15:
-                return "PSV";
             case 14:
                 return "PC-SIMV";
-            case 19:
-                return "PRVC";
-            case 21:
-                return "ACV";
-            case 20:
-                return "CPAP";
+            case 15:
+                return "PSV";
             case 16:
                 return "BPAP";
+            case 17:
+                return "VC-CMV";
+            case 18:
+                return "VC-SIMV";
+            case 19:
+                return "PRVC";
+            case 20:
+                return "CPAP";
+            case 21:
+                return "ACV";
             default:
                 return "--";
         }
@@ -116,13 +102,31 @@ public class ReceivePacket {
         StaticStore.Monitoring.flowPeak = Byte.toUnsignedInt(byteBuffer.get(108));
         StaticStore.Monitoring.pPlat = byteBuffer.getFloat(112);
         StaticStore.Monitoring.autoPeep = byteBuffer.getFloat(116);
-
         //Set Warnings
         StaticStore.Warnings.warningHigh = byteBuffer.getInt(152);
         StaticStore.Warnings.warningMed = byteBuffer.getInt(156);
         StaticStore.Warnings.warningLow = byteBuffer.getInt(160);
-        getWarningModeString(StaticStore.Warnings.warningHigh, StaticStore.Warnings.warningMed, StaticStore.Warnings.warningLow); // set current warnings
-        //Set Monitoring values
+        // Set current warnings
+        getWarningModeString(StaticStore.Warnings.warningHigh, StaticStore.Warnings.warningMed, StaticStore.Warnings.warningLow);
+        // Parse Systems Values
+        getSystemsValues(byteBuffer);
+    }
+
+    public void getSystemsValues(ByteBuffer byteBuffer) {
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 172, 204);
+        StaticStore.System.machineHours = String.valueOf(new char[]{(char)byteBuffer.get(172), (char)byteBuffer.get(173), (char)byteBuffer.get(174), (char)byteBuffer.get(175), (char)byteBuffer.get(176)});
+        StaticStore.System.patientHours = String.valueOf(new char[]{(char)byteBuffer.get(177), (char)byteBuffer.get(178), (char)byteBuffer.get(179), (char)byteBuffer.get(180), (char)byteBuffer.get(181)});
+        StaticStore.System.lastServiceDate = String.valueOf(new char[]{(char)byteBuffer.get(182), (char)byteBuffer.get(183), (char)byteBuffer.get(184), (char)byteBuffer.get(185), (char)byteBuffer.get(186), (char)byteBuffer.get(187)});
+        StaticStore.System.lastServiceHrs = String.valueOf(new char[]{(char)byteBuffer.get(188), (char)byteBuffer.get(189), (char)byteBuffer.get(190), (char)byteBuffer.get(191), (char)byteBuffer.get(192)});
+        StaticStore.System.nextServiceDate = String.valueOf(new char[]{(char)byteBuffer.get(193), (char)byteBuffer.get(194), (char)byteBuffer.get(195), (char)byteBuffer.get(196), (char)byteBuffer.get(197), (char)byteBuffer.get(198)});
+        StaticStore.System.nextServiceHrs = String.valueOf(new char[]{(char)byteBuffer.get(199), (char)byteBuffer.get(200), (char)byteBuffer.get(201), (char)byteBuffer.get(202), (char)byteBuffer.get(203)});
+        StaticStore.System.systemVersion = String.valueOf(new char[]{(char)byteBuffer.get(204), (char)byteBuffer.get(205), (char)byteBuffer.get(206), (char)byteBuffer.get(207), (char)byteBuffer.get(208)});
+        try {
+            StaticStore.System.lastServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.lastServiceDate)));
+            StaticStore.System.nextServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.nextServiceDate)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public void initLaunch(ByteBuffer byteBuffer) {
@@ -134,6 +138,7 @@ public class ReceivePacket {
     public int getType(char c1, char c2, char c3, char c4) {
         char[] c = {c1, c2, c3, c4};
         String s = String.valueOf(c);
+//        Log.d("SYSTEM", s);
         switch (s) {
             case SendPacket.STR_STRT:
                 return SendPacket.TYPE_STRT;
@@ -164,6 +169,7 @@ public class ReceivePacket {
         StaticStore.Warnings.top2warnings[0] = "";
         StaticStore.Warnings.top2warnings[1] = "";
         StaticStore.Warnings.currentWarnings.clear();
+        StaticStore.Warnings.currentWarningsLength = 0;
         int num = 0;
         String ithWarning;
         for (int i = 0; i < StaticStore.Warnings.warningHighCount; ++i) {

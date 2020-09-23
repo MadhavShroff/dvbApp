@@ -117,6 +117,7 @@
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <TextView
+                    android:id="@+id/machineHours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|top"
@@ -135,6 +136,7 @@
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <TextView
+                    android:id="@+id/patientHours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|bottom"
@@ -171,6 +173,7 @@
                     android:padding="5dp">
 
                     <TextView
+                        android:id="@+id/lastServiceDate"
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -180,6 +183,7 @@
                         android:textAppearance="?attr/textAppearanceBody1" />
 
                     <TextView
+                        android:id="@+id/lastServiceHrs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|end"
@@ -205,6 +209,7 @@
                     android:padding="5dp">
 
                     <TextView
+                        android:id="@+id/nextServiceDate"
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -214,6 +219,7 @@
                         android:textAppearance="?attr/textAppearanceBody1" />
 
                     <TextView
+                        android:id="@+id/nextServiceHrs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|end"
@@ -276,7 +282,7 @@
                     android:layout_gravity="end|bottom"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="1.2.2"
+                    android:text="@string/_1_2_2"
                     android:textAppearance="?attr/textAppearanceBody1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

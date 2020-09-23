@@ -89,16 +89,20 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 public class MainActivity extends AppCompatActivity {
 
     //TODO: Make row list in historic data a recycler view
-    // callbacks to controls and alarms to set the values as per IBW and all
-    //TODO:isInRange() in alarm limits
-    //TODO: default mode
     //TODO: File storage for historical data
+    // callbacks to controls and alarms to set the values as per IBW and all
+    //TODO: isInRange() in alarm limits
+    //TODO: default mode
     //TODO: get values from excel sheet
 
     //Tab Layout vars
     public static final int chartWidth = 665;
     public static final int viewPagerWidth = 352;
     public static final int PACKET_LENGTH = 300;
+
+    //For date format in data logs
+    @SuppressLint("SimpleDateFormat")
+    public static SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     //ViewPager vars
     static int ui_flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
@@ -246,17 +250,17 @@ public class MainActivity extends AppCompatActivity {
         // Set decor view flags for fullscreen orientation, and to keep screen from sleeping
         setScreenFlags();
 
-        //set layout
+        // Set layout
         setContentView(R.layout.activity_main);
 
-        //set SharedPreferances values from past session
+        //set SharedPreferences values from past session
         setSharefPrefs();
 
         //setup USB data receiver
         setupUsbDataReceiver();
 
         //Set default handler for crashes/force close
-//        Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler(this));
+        Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler(this));
 
         //Setup COSU policies
         setupCOSU();
@@ -267,16 +271,16 @@ public class MainActivity extends AppCompatActivity {
         //set subscript text to MainParamsView
         setSubscriptTextMainParams();
 
-        //Setup ViewPager with listeners, referances, number of pages to bind (all 7)
+        //Setup ViewPager with listeners, references, number of pages to bind (all 7)
         setupViewPager();
 
         //Setup silence button logic
         setupSilenceButton();
 
-        //Setup ProcessPacket Referances
+        //Setup ProcessPacket References
         configureProcessPacketReferences();
 
-        //Setup DataSnapshots at 3s intervals`
+        //Setup DataSnapshots at 3s intervals
         setupDataLogger();
 
         //Setup standby fragment
@@ -632,6 +636,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         SystemsFragment.disableSelftest(false);
                     }
+                    SystemsFragment.setDetails();
                 }
             }
         });
@@ -711,7 +716,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onSubscribe(@NonNull Disposable d) {
                         disposables.add(d);
                     }
-
                     @Override
                     public void onNext(@NonNull Long aLong) {
                         boolean isWarningString = false;
@@ -729,14 +733,16 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         } else warning = dashes;
-                        if (callNumber <= 20) // 3s call
-                            if (!isWarningString)
-                                return;            //return if there is no warning, called every 3 seconds
-                            else callNumber = 0;
-                        if (StaticStore.Data.size() > 3000)
+                        if (callNumber <= 20) { // 3s call
+                            if (!isWarningString) {
+                                return; //return if there is no warning, called every 3 seconds
+                            }
+                        }
+                        else callNumber = 0;
+                        if (StaticStore.Data.size() > 4800)
                             StaticStore.Data.remove(0);
                         HashMap<String, String> t = new HashMap<>();
-                        t.put("date", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+                        t.put("date", df.format(new Date()));
                         t.put("pinsp", String.valueOf(StaticStore.Values.pInsp));
                         t.put("set-pinsp", String.valueOf(StaticStore.packet_pinsp));
                         t.put("peep", String.valueOf(StaticStore.Values.peep));
@@ -758,12 +764,10 @@ public class MainActivity extends AppCompatActivity {
                         t.put("warning", warning);
                         StaticStore.Data.add(t);
                     }
-
                     @Override
                     public void onError(@NonNull Throwable e) {
                         e.printStackTrace();
                     }
-
                     @Override
                     public void onComplete() {
                         Log.d("INCONSISTENCY", "DataSnapshot Observable called onComplete(). Data Snapshots store for Log data not being stored Cannot be stopped");
@@ -907,24 +911,24 @@ public class MainActivity extends AppCompatActivity {
 //        setUserRestriction(UserManager.DISALLOW_SAFE_BOOT, active);
 //        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
         setUserRestriction(UserManager.DISALLOW_ADD_USER, active);
-        setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, active);
-        setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, active);
-        setUserRestriction(UserManager.DISALLOW_AIRPLANE_MODE, active);
-        setUserRestriction(UserManager.DISALLOW_BLUETOOTH, active);
-        setUserRestriction(UserManager.DISALLOW_APPS_CONTROL, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_CELL_BROADCASTS, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
+//        setUserRestriction(UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA, active);
+//        setUserRestriction(UserManager.DISALLOW_ADJUST_VOLUME, active);
+//        setUserRestriction(UserManager.DISALLOW_AIRPLANE_MODE, active);
+//        setUserRestriction(UserManager.DISALLOW_BLUETOOTH, active);
+//        setUserRestriction(UserManager.DISALLOW_APPS_CONTROL, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_CELL_BROADCASTS, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_SCREEN_TIMEOUT, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
 //        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
 //        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
 //        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
-        setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
+//        setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
 //        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);
-        setUserRestriction(UserManager.DISALLOW_SMS, active);
+//        setUserRestriction(UserManager.DISALLOW_SMS, active);
 //        setUserRestriction(UserManager.DISALLOW_NETWORK_RESET, active);
-        setUserRestriction(UserManager.DISALLOW_USER_SWITCH, active);
-        setUserRestriction(UserManager.DISALLOW_AMBIENT_DISPLAY, active);
+//        setUserRestriction(UserManager.DISALLOW_USER_SWITCH, active);
+//        setUserRestriction(UserManager.DISALLOW_AMBIENT_DISPLAY, active);
 //        setUserRestriction(UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS, active);
 //        setUserRestriction(UserManager.DISALLOW_UNINSTALL_APPS, active);
 
@@ -985,7 +989,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpMainChart() {
         try {
-            SciChartSurface.setRuntimeLicenseKey("nEBMHOM4a26Hy6fzTkNJ6ipJK9qQVAhEKsDo5KZ/+1C5Ukv3Bf9g/19wdOlk5TxKTyp8sIm5nYrN+hrqBoqzqwEK/1f+DjPALfxWNkUClVOWlFatlnFP2lUDabIf3pSLoAsHvgjp7V7+G68cryTZ+QGP9GZVNrrPqb50oX/gcJfk3kDkWDD11becrNfp6bRjexgKUikrrm75nWLrwHck3N4AGhV+PV3pTIcvM7wCSTF6QrJLaqM13jy7N+AHA0+rt1tlpm51M8qVXqe3r/Lzx7+/EydTVzfDTiS76FJap6IvHzPf0RjaVw+pnCfbEP2oRydaN0/7iBQMm8pkUyl0ok/p3o3pTgqjwl1tyg6QrgIwe1n35DXlm4JGzLMFE3x/548rIOvdFEntTl6HvLBbe4PbYweqMhn9pxYcjbddyJDPfCoHx0+V1YZjF1wdEazXhcT3khA8oxxiwbqS3d9BlwrcugcaGVuRdM44t80uKJkVPOteZYsjUwqikohV67smb+BYtWNYj9UPK7CIFgzDd1gvHW+Bh+NSYyPf6+jyW6E0QczwD6+hP4VgYUS4yGii4i2Lrzs=");
+            SciChartSurface.setRuntimeLicenseKey("eERe13rGN/E2C6hBXPW9ugX99/2FamK6pUSKBWKBZqjsNRAj5SLhXxDVNABliDMYzSpsmwx6cBhQ2wGaregbvDhL1bcfVNW82NjhCIUey+it7upLxuvHdRc2GzkbXguxc3/rseh5u+Ia7An6AYeWTEcCi49ygbXvKeywki2sViHaFoD83e0xkXwwpLtI4aBoYJRzT7DGshZUd/bPwkyo9O1QacBWsp7/ykaq6oC4YGZiGFoEW9PJO7a4P61w23RpXVBGZb1fBS/QGmPATX5toDStHlanhoCvhtaAP2uCoZQxEx21YXofQrLoTZsspXRH+EtozuSWg3RlkpcPauK5u7v+9MjKM4rCsqeVverIQRLE6Plz9MKzIQRL0JhAs73JDLa05lwTy1wNniHKrzkK+P9963SgHEO+YUmrnUWVI5BDM3UuZNmWEMtWpUzWuiFiPGa0SO1tsF0LqBKamOz372btjuQYO7KAq0L7paSTKLxHH3neXOn21BDg4jkDjTOJIjvGGikxtnMW8yBmnC/YqNwQS8LGzXfSFQJlMogVa3OYeaiO+z+MCXe7bQjMPdCFS1tFdgTghVDsad0=");
         } catch (Exception e) {
             e.printStackTrace();
         }

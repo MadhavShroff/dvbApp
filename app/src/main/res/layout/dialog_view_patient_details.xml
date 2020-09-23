@@ -75,56 +75,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/massText"
-        android:layout_width="200dp"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/arimo"
-        android:textColor="@color/black"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:text="@string/ibw"
-        android:textSize="25sp" />
-
-    <LinearLayout
-        android:layout_width="250dp"
-        android:layout_margin="10dp"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="200dp"
-            android:layout_height="60dp"
-            android:background="@drawable/rounded_corner_white_yellow_border_patient"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/patient_weight"
-                android:layout_width="180dp"
-                android:layout_height="50dp"
-                android:background="@drawable/rounded_corner_white_yellow_border_patient"
-                android:backgroundTint="@color/white"
-                android:gravity="center"
-                android:imeOptions="actionDone"
-                android:inputType="numberDecimal"
-                android:outlineProvider="paddedBounds"
-                android:padding="5dp"
-                android:textColor="@color/black"
-                android:textSize="28sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/massUnit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:text="@string/kg"
-            android:textColor="@color/black"
-            android:textSize="28sp" />
-    </LinearLayout>
-
-    <TextView
         android:id="@+id/lengthText"
         android:layout_width="200dp"
         android:gravity="center"
@@ -172,7 +122,7 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
-                android:text="ft"
+                android:text="@string/ft"
                 android:textColor="@color/black"
                 android:textSize="28sp" />
 
@@ -202,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="5dp"
-                android:text="in"
+                android:text="@string/in"
                 android:textColor="@color/black"
                 android:textSize="28sp" />
         </LinearLayout>
@@ -245,6 +195,56 @@
                 android:textSize="28sp" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/massText"
+        android:layout_width="200dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/arimo"
+        android:textColor="@color/black"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:text="@string/ibw"
+        android:textSize="25sp" />
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:background="@drawable/rounded_corner_white_yellow_border_patient"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/patient_weight"
+                android:layout_width="180dp"
+                android:layout_height="50dp"
+                android:background="@drawable/rounded_corner_white_yellow_border_patient"
+                android:backgroundTint="@color/white"
+                android:gravity="center"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:outlineProvider="paddedBounds"
+                android:padding="5dp"
+                android:textColor="@color/black"
+                android:textSize="28sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/massUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:text="@string/kg"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+    </LinearLayout>
+
 
     <TextView
         android:layout_width="200dp"
@@ -321,7 +321,8 @@
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleGroupMassUnit"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
+            android:gravity="center"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:checkedButton="@id/kilograms"
@@ -333,7 +334,7 @@
                 style="@style/OutlinedButton"
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:backgroundTint="@color/gray1"
+                android:backgroundTint="@color/blueGray"
                 android:text="@string/lbs"
                 android:textAllCaps="false"
                 android:textSize="24sp" />
@@ -343,7 +344,7 @@
                 style="@style/OutlinedButton"
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:backgroundTint="@color/gray1"
+                android:backgroundTint="@color/blueGray"
                 android:text="@string/kg"
                 android:textAllCaps="false"
                 android:textSize="24sp" />
@@ -351,7 +352,8 @@
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleGroupPatientLengthUnit"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
+            android:gravity="center"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:backgroundTint="@color/gray1"
@@ -364,7 +366,7 @@
                 style="@style/OutlinedButton"
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:backgroundTint="@color/gray1"
+                android:backgroundTint="@color/blueGray"
                 android:text="@string/inches"
                 android:textAllCaps="false"
                 android:textSize="24sp" />
@@ -374,7 +376,7 @@
                 style="@style/OutlinedButton"
                 android:layout_width="120dp"
                 android:layout_height="60dp"
-                android:backgroundTint="@color/gray1"
+                android:backgroundTint="@color/blueGray"
                 android:text="@string/cm"
                 android:textAllCaps="false"
                 android:textSize="24sp" />
