@@ -44,6 +44,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.dvbinventek.dvbapp.MainActivity.PACKET_LENGTH;
+import static com.dvbinventek.dvbapp.MainActivity.ui_flags;
 
 public class LaunchActivity extends AppCompatActivity {
 
@@ -101,21 +102,18 @@ public class LaunchActivity extends AppCompatActivity {
     boolean isChecked5 = false;
     boolean isChecked6 = false;
     boolean isStartClicked = false;
+    int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_FULLSCREEN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         a = 30;
         mHandler = new MyHandler(this);
         super.onCreate(savedInstanceState);
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -374,6 +372,10 @@ public class LaunchActivity extends AppCompatActivity {
         super.onResume();
         setFilters();
         startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(uiOptions);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override
@@ -479,6 +481,13 @@ public class LaunchActivity extends AppCompatActivity {
             ((CheckView) findViewById(R.id.check4)).uncheck();
             ((CheckView) findViewById(R.id.check5)).uncheck();
             ((CheckView) findViewById(R.id.check6)).uncheck();
+            setVisibility(R.id.cross1, View.GONE);
+            setVisibility(R.id.cross2, View.GONE);
+            setVisibility(R.id.cross3, View.GONE);
+            setVisibility(R.id.cross4, View.GONE);
+            setVisibility(R.id.cross5, View.GONE);
+            setVisibility(R.id.cross6, View.GONE);
+            makeAllSubTextGone();
             Log.d("SELF_TEST", "Started Self Test");
             skip.setEnabled(false);
             tpe.shutdownNow();
@@ -487,6 +496,7 @@ public class LaunchActivity extends AppCompatActivity {
             new Handler().postDelayed(() -> start.setEnabled(true), 10000);
             progressText.setText("0%");
             progressCircle.setProgress(2);
+            progress = 0;
             setVisibility(R.id.progress_bar1, View.VISIBLE);
             setVisibility(R.id.progress_bar2, View.VISIBLE);
             setVisibility(R.id.progress_bar3, View.VISIBLE);
@@ -499,6 +509,20 @@ public class LaunchActivity extends AppCompatActivity {
             sp.writeInfo(SendPacket.SLFT, 276);
             sp.sendToDevice();
         });
+    }
+
+    public void makeAllSubTextGone() {
+        setVisibility(R.id.sft_error0x1, View.GONE);
+        setVisibility(R.id.sft_error0x2, View.GONE);
+        setVisibility(R.id.sft_error0x4, View.GONE);
+        setVisibility(R.id.sft_error0x8, View.GONE);
+        setVisibility(R.id.sft_error0x10, View.GONE);
+        setVisibility(R.id.sft_error0x20, View.GONE);
+        setVisibility(R.id.sft_error0x40, View.GONE);
+        setVisibility(R.id.sft_error0x100, View.GONE);
+        setVisibility(R.id.sft_error0x1000, View.GONE);
+        setVisibility(R.id.sft_error0x100000, View.GONE);
+        setVisibility(R.id.sft_error0x200000, View.GONE);
     }
 
     @Override

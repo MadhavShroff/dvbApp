@@ -89,11 +89,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 public class MainActivity extends AppCompatActivity {
 
     //TODO: Make row list in historic data a recycler view
-    //TODO: File storage for historical data
-    // callbacks to controls and alarms to set the values as per IBW and all
     //TODO: isInRange() in alarm limits
-    //TODO: default mode
-    //TODO: get values from excel sheet
 
     //Tab Layout vars
     public static final int chartWidth = 665;
@@ -921,9 +917,9 @@ public class MainActivity extends AppCompatActivity {
 //        setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
 //        setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
 //        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
-//        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
+        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
 //        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
-//        setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
+        setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
 //        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);
 //        setUserRestriction(UserManager.DISALLOW_SMS, active);
 //        setUserRestriction(UserManager.DISALLOW_NETWORK_RESET, active);
@@ -989,7 +985,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpMainChart() {
         try {
-            SciChartSurface.setRuntimeLicenseKey("eERe13rGN/E2C6hBXPW9ugX99/2FamK6pUSKBWKBZqjsNRAj5SLhXxDVNABliDMYzSpsmwx6cBhQ2wGaregbvDhL1bcfVNW82NjhCIUey+it7upLxuvHdRc2GzkbXguxc3/rseh5u+Ia7An6AYeWTEcCi49ygbXvKeywki2sViHaFoD83e0xkXwwpLtI4aBoYJRzT7DGshZUd/bPwkyo9O1QacBWsp7/ykaq6oC4YGZiGFoEW9PJO7a4P61w23RpXVBGZb1fBS/QGmPATX5toDStHlanhoCvhtaAP2uCoZQxEx21YXofQrLoTZsspXRH+EtozuSWg3RlkpcPauK5u7v+9MjKM4rCsqeVverIQRLE6Plz9MKzIQRL0JhAs73JDLa05lwTy1wNniHKrzkK+P9963SgHEO+YUmrnUWVI5BDM3UuZNmWEMtWpUzWuiFiPGa0SO1tsF0LqBKamOz372btjuQYO7KAq0L7paSTKLxHH3neXOn21BDg4jkDjTOJIjvGGikxtnMW8yBmnC/YqNwQS8LGzXfSFQJlMogVa3OYeaiO+z+MCXe7bQjMPdCFS1tFdgTghVDsad0=");
+            SciChartSurface.setRuntimeLicenseKey("mUZa8f4oGQKabCPwa9dbZa4NctRJtftTQTpUzsbvpo83qah4SLuOxCk5dhQ0ijY2GigaUHJC2tALcYaMJBtbRYQ0SmuSgskEVnBVrTO5dp3PjtNIBUY5+uCtURe4L4Ia58NpLAPdvP4GpTODH6D0tnzFn7OSyFBNXkW/uahwBYUl54kvJ7KnOTzpSRuFgmYUpQe94BKUZNRZv3cRny7KCep+oO1CMyPKsdUxepnObTYTC0SJiOP/Si3wQZqhGDDV3CjnGqtXu1clJgJ5JEBGCSesxirGMX4hblmdSSMXByc1ogmdwMzZGDIb69Ieb9wHBRefXS6vRDy0kiaHlhn3f1mTac7P5+5Q3obilPwru9xk6H7GpZW85hWZJi2oopNpkPwGtgYZXwfZLYEfWXnC7eP+AjIhh8H03OTdSgHD89CmcYn84Knf2zrkzKK9q2CTJA2zTg6Ht748aehShNFh2ipIpfDGZ0o0Whimqx19jLOnz0vd577qX6pwNt8=");
         } catch (Exception e) {
             e.printStackTrace();
         }

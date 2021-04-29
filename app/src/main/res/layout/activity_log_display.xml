@@ -61,25 +61,23 @@
 
             <FrameLayout
                 android:id="@+id/frame"
-                android:layout_width="72dp"
+                android:layout_width="69dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="center" />
-
-            <cdflynn.android.library.checkview.CheckView
-                android:id="@+id/check"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="end|center"
-                app:checkView_strokeColor="@color/green"
-                app:checkView_strokeWidth="5dp" />
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center">
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end|center"
+                    app:checkView_strokeColor="@color/green"
+                    app:checkView_strokeWidth="5dp" />
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </FrameLayout>
         </LinearLayout>
-
     </LinearLayout>
 
     <TableLayout

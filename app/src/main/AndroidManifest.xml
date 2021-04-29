@@ -28,11 +28,11 @@
 
         <activity
             android:name=".LogDisplay"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:theme="@style/Theme.MaterialComponents.NoActionBar.Bridge" />
         <activity
             android:name=".LaunchActivity"
-            android:launchMode="standard"
+            android:launchMode="singleInstance"
             android:theme="@style/Theme.MaterialComponents.NoActionBar.Bridge">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

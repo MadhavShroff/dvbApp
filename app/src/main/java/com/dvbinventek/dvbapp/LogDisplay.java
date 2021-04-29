@@ -60,23 +60,21 @@ public class LogDisplay extends AppCompatActivity {
         ProgressBar pb = findViewById(R.id.progress_bar);
         Button save = findViewById(R.id.saveData);
         CheckView cv = findViewById(R.id.check);
-        FrameLayout f = findViewById(R.id.frame);
         pb.setVisibility(View.GONE);
         save.setOnClickListener(v -> {
             cv.uncheck();
-            f.setLayoutParams(new LinearLayout.LayoutParams(80, ViewGroup.LayoutParams.MATCH_PARENT));
             pb.setVisibility(View.VISIBLE);
             final Handler handler = new Handler();
             try {
                 writeDataToFile();
+                save.setClickable(false);
                 handler.postDelayed(() -> {
-                    f.setLayoutParams(new LinearLayout.LayoutParams(130, ViewGroup.LayoutParams.MATCH_PARENT));
                     pb.setVisibility(View.GONE);
                     cv.check();
+                    save.setClickable(true);
                 }, 5000);
             } catch (IOException e) {
                 handler.postDelayed(() -> {
-                    f.setLayoutParams(new LinearLayout.LayoutParams(130, ViewGroup.LayoutParams.MATCH_PARENT));
                     pb.setVisibility(View.GONE);
                 }, 5000);
                 Log.d("MSG", "Error in saving data to file");

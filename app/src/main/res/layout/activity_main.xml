@@ -240,12 +240,14 @@
             android:textColor="@color/green"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:visibility="invisible"
             app:layout_constraintEnd_toStartOf="@id/chargingBoltIcon"
             app:layout_constraintStart_toEndOf="@id/mainSigh"
             app:layout_constraintTop_toTopOf="parent"
             app:rippleColor="#33AAAAAA" />
 
         <ImageView
+            android:visibility="invisible"
             android:id="@+id/chargingBoltIcon"
             android:layout_width="20dp"
             android:layout_height="40dp"
@@ -260,6 +262,7 @@
             app:tint="@color/white" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/batteryPercent"
             android:layout_width="48dp"
             android:layout_height="40dp"
@@ -274,6 +277,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.sasank.roundedhorizontalprogress.RoundedHorizontalProgressBar
+            android:visibility="invisible"
             android:id="@+id/batteryProgressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="60dp"
@@ -289,6 +293,7 @@
             app:progressColor="@color/greenEditButton" />
 
         <FrameLayout
+            android:visibility="invisible"
             android:id="@+id/batteryTip"
             android:layout_width="6dp"
             android:layout_height="8dp"
