@@ -42,13 +42,15 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
     public EditText value;
     public boolean isDone = false;
     public String type;
-    public CompositeDisposable disposables = new CompositeDisposable();
+    public Disposable subscription;
+
     Observable<Long> highlightObservable = Observable.interval(0, 500, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread());
     OnClickListener selectEditTextListener = (v) -> {
         value.setBackgroundResource(R.drawable.rounded_corner_white);
         value = (EditText) v;
+        if (subscription != null) if (!subscription.isDisposed()) subscription.dispose();
         highlightObservable.subscribe(new Observer<Long>() {
             boolean highlighted = false;
 
@@ -63,7 +65,7 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
 
             @Override
             public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                disposables.add(d);
+                subscription = d;
             }
 
             @Override
@@ -212,6 +214,7 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
         max.setText("");
         if (!min.getText().toString().isEmpty()) min.setHint(min.getText());
         min.setText("");
+
     }
 
     @Override

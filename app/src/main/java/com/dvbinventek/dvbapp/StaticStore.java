@@ -65,8 +65,8 @@ public class StaticStore {
     }
 
     public static class PatientDetails {
-        public static String name = "Madhav Shroff";
-        public static String age = "21";
+        public static String name = "John Doe";
+        public static String age = "23";
         public static String height = "186";
         public static String ibw = "78";
         public static String room = "2";

@@ -41,8 +41,7 @@ public class IEControlsBottomSheet extends BaseBottomSheet {
         value.setBackgroundResource(R.drawable.rounded_corner_white);
         value = (EditText) v;
         if (subscription != null) if (!subscription.isDisposed()) subscription.dispose();
-        highlightObservable
-                .subscribe(new Observer<Long>() {
+        highlightObservable.subscribe(new Observer<Long>() {
                     boolean highlighted = false;
 
                     @Override

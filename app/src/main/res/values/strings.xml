@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">dvb Ventilator v0.1</string>
+    <string name="app_name">dvbApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="serial_port">Serial Port</string>
