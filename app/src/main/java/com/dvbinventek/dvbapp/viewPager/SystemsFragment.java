@@ -81,6 +81,8 @@ public class SystemsFragment extends Fragment {
 
         getWeakReferances(view);
 
+        view.findViewById(R.id.sleepDisplay).setOnClickListener(MainActivity.sleepButtonListener);
+
         selfTest = new WeakReference<>(view.findViewById(R.id.selfTest));
         ((MaterialButtonToggleGroup) view.findViewById(R.id.toggleGroup)).addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             SendPacket sp = new SendPacket();

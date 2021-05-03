@@ -225,9 +225,9 @@ public class ControlsFragment extends Fragment {
 
             @Override
             public void onComplete() {
+
             }
         };
-
     }
 
     // Sets the behavior of how controls behave with one another,

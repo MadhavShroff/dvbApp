@@ -112,10 +112,8 @@ public class SendPacket {
     public SharedPreferences.Editor editor;
     public Context context;
     ByteBuffer packet;
-    UsbService service;
 
     public SendPacket() {
-        this.service = StaticStore.service.get();
         packet = ByteBuffer.wrap(new byte[280]).order(ByteOrder.LITTLE_ENDIAN);// insert com_start and com_end
     }
 
@@ -169,8 +167,8 @@ public class SendPacket {
 //        }
         if (StaticStore.restrictedCommunicationDueToStandby) return false;
         Log.d("SENT_PACKET_STRING", getString());
-        if (service != null) {
-            service.write(packet.array());
+        if (StaticStore.service.get() != null) {
+            StaticStore.service.get().write(packet.array());
             return true;
         } else {
             Log.d("SENT_PACKET_ERR", "Could not send packet, service is null");

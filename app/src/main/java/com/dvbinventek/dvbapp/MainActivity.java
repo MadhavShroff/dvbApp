@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static DevicePolicyManager devicePolicyManager;
     public static ComponentName compName;
+
     public static View.OnClickListener sleepButtonListener = (v) -> {
         Log.d("MSG", "Clicked Sleep");
         if (devicePolicyManager.isAdminActive(compName)) {
@@ -261,9 +262,6 @@ public class MainActivity extends AppCompatActivity {
         //set SharedPreferences values from past session
         setSharefPrefs();
 
-        //Setup admin receiver and click listener for Sleep Button on Standby Page
-        setupSleepButton();
-
         //setup USB data receiver
         setupUsbDataReceiver();
 
@@ -291,9 +289,6 @@ public class MainActivity extends AppCompatActivity {
         //Setup DataSnapshots at 3s intervals
         setupDataLogger();
 
-        //Setup standby fragment
-        setupStandby();
-
         //Setup hPa Observer
         setupHpa();
 
@@ -302,12 +297,18 @@ public class MainActivity extends AppCompatActivity {
 
         //Set initial State
         setInitialState();
+
+        //Setup standby fragment
+        setupStandby();
+
+        //Setup admin receiver and click listener for Sleep Button on Standby Page
+        setupSleepButton();
     }
 
     public void setupSleepButton() {
         devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
         compName = new ComponentName(this, MyAdminReceiver.class);
-        Log.d("ADMIN", "" + devicePolicyManager.isAdminActive(compName));
+        Log.d("ADMIN ENABLED", "" + devicePolicyManager.isAdminActive(compName));
     }
 
     public void setInitialState() {
@@ -438,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
-
+    public static Disposable standbyDisposable;
     public void setupStandby() {
         SendPacket sp = new SendPacket();
         sp.writeInfo(SendPacket.STOP, 0);
@@ -458,19 +459,19 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage("This action will stop providing ventilation to the patient. Ensure ...")
                         .setPositiveButton("Yes", (dialog, which1) -> {
                             // send packets continously every 200ms and when received packet has a STRT header, stop sending, and make the change
-                            Observable.interval(200, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(10).subscribe(new Observer<Long>() {
-                                Disposable disposeAttempts;
+                            Observable.interval(1500, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(5).subscribe(new Observer<Long>() {
+
 
                                 @Override
                                 public void onSubscribe(@NonNull Disposable d) {
                                     sp.sendToDevice();
-                                    disposeAttempts = d;
+                                    standbyDisposable = d;
                                 }
 
                                 @Override
                                 public void onNext(@NonNull Long aLong) {
                                     if (StaticStore.Values.packetType != SendPacket.TYPE_STOP) {
-                                        Log.d("STANDBY", "trying again... " + StaticStore.Values.packetType);
+                                        Log.d("STANDBY", "trying again, got packet of type: " + StaticStore.Values.packetType);
                                         sp.sendToDevice();
                                     } else {
                                         Log.d("STANDBY", "Got packet of type stop");
@@ -483,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                                         v.setEnabled(false);
                                         v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2f2f2f")));
                                         ((Button) v).setTextColor(Color.parseColor("#515151"));
-                                        disposeAttempts.dispose();
+                                        standbyDisposable.dispose();
                                     }
                                 }
 
@@ -495,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete() {
                                     Toast.makeText(MainActivity.this, "ERR: Cannot communicate with device", Toast.LENGTH_SHORT).show();
-                                    disposeAttempts.dispose();
+                                    standbyDisposable.dispose();
                                 }
                             });
                         }).setNegativeButton("No", (dialog_, which_) -> {

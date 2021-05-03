@@ -92,7 +92,6 @@ public class StandbyFragment extends Fragment {
             startVentilation.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#62727b")));
             startVentilation.setEnabled(false);
         });
-        view.findViewById(R.id.sleepButton).setOnClickListener(MainActivity.sleepButtonListener);
         return view;
     }
 

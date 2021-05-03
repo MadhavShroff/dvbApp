@@ -174,24 +174,6 @@
             android:foreground="@drawable/play_arrow"
             android:foregroundTint="@color/white" />
 
-        <com.google.android.material.button.MaterialButton
-            app:layout_constraintTop_toBottomOf="@id/step2"
-            app:layout_constraintEnd_toStartOf="@id/startVentilation"
-            android:layout_marginTop="180dp"
-            android:id="@+id/sleepButton"
-            android:layout_gravity="end"
-            android:layout_marginEnd="65dp"
-            android:layout_width="187dp"
-            android:layout_height="84dp"
-            android:backgroundTint="@color/colorAccent"
-            android:drawableTint="#000000"
-            android:hapticFeedbackEnabled="true"
-            android:text="@string/sleep_display"
-            android:textColor="#000000"
-            android:textSize="19sp"
-            app:icon="@drawable/ic_sleep"
-            app:iconGravity="start"/>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
