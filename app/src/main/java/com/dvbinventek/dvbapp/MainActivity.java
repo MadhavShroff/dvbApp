@@ -122,6 +122,15 @@ public class MainActivity extends AppCompatActivity {
     public static Observer<String> hpaObserver;
     public static byte[] packet = {};
 
+    public static DevicePolicyManager devicePolicyManager;
+    public static ComponentName compName;
+    public static View.OnClickListener sleepButtonListener = (v) -> {
+        Log.d("MSG", "Clicked Sleep");
+        if (devicePolicyManager.isAdminActive(compName)) {
+            devicePolicyManager.lockNow();
+        }
+    };
+
     //chart vars
     public SciChartBuilder sciChartBuilder;
     public final XyDataSeries<Double, Double> pressureDataSeries = newDataSeries(FIFO_CAPACITY);
@@ -252,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
         //set SharedPreferences values from past session
         setSharefPrefs();
 
+        //Setup admin receiver and click listener for Sleep Button on Standby Page
+        setupSleepButton();
+
         //setup USB data receiver
         setupUsbDataReceiver();
 
@@ -290,6 +302,12 @@ public class MainActivity extends AppCompatActivity {
 
         //Set initial State
         setInitialState();
+    }
+
+    public void setupSleepButton() {
+        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        compName = new ComponentName(this, MyAdminReceiver.class);
+        Log.d("ADMIN", "" + devicePolicyManager.isAdminActive(compName));
     }
 
     public void setInitialState() {
@@ -694,7 +712,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupCOSU() {
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
+        mAdminComponentName = MyAdminReceiver.getComponentName(this);
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {

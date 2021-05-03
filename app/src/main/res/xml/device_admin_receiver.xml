@@ -3,5 +3,6 @@
 <device-admin>
     <uses-policies>
         <disable-keyguard-features />
+        <force-lock />
     </uses-policies>
 </device-admin>

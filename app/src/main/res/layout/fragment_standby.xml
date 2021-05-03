@@ -87,6 +87,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/step3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -161,14 +162,36 @@
             app:layout_constraintStart_toStartOf="@id/step2"
             app:layout_constraintTop_toBottomOf="@id/step2" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            app:layout_constraintTop_toBottomOf="@id/pressToStart"
+            app:layout_constraintStart_toStartOf="@id/step2"
+            app:layout_constraintEnd_toEndOf="@id/step2"
+            android:id="@+id/startVentilation"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_margin="20dp"
+            android:background="@drawable/round_button_green"
+            android:foreground="@drawable/play_arrow"
+            android:foregroundTint="@color/white" />
+
+        <com.google.android.material.button.MaterialButton
+            app:layout_constraintTop_toBottomOf="@id/step2"
+            app:layout_constraintEnd_toStartOf="@id/startVentilation"
+            android:layout_marginTop="180dp"
+            android:id="@+id/sleepButton"
+            android:layout_gravity="end"
+            android:layout_marginEnd="65dp"
+            android:layout_width="187dp"
+            android:layout_height="84dp"
+            android:backgroundTint="@color/colorAccent"
+            android:drawableTint="#000000"
+            android:hapticFeedbackEnabled="true"
+            android:text="@string/sleep_display"
+            android:textColor="#000000"
+            android:textSize="19sp"
+            app:icon="@drawable/ic_sleep"
+            app:iconGravity="start"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/startVentilation"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_margin="20dp"
-        android:background="@drawable/round_button_green"
-        android:foreground="@drawable/play_arrow"
-        android:foregroundTint="@color/white" />
 </LinearLayout>

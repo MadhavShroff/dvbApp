@@ -44,7 +44,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.dvbinventek.dvbapp.MainActivity.PACKET_LENGTH;
-import static com.dvbinventek.dvbapp.MainActivity.ui_flags;
 
 public class LaunchActivity extends AppCompatActivity {
 
@@ -120,7 +119,7 @@ public class LaunchActivity extends AppCompatActivity {
 
         mDevicePolicyManager = (DevicePolicyManager)
                 getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminComponentName = DeviceAdminReceiver.getComponentName(this);
+        mAdminComponentName = MyAdminReceiver.getComponentName(this);
         mPackageManager = this.getPackageManager();
 
         setContentView(R.layout.activity_launch);

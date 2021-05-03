@@ -218,4 +218,5 @@
     <string name="ft">ft</string>
     <string name="in">in</string>
     <string name="err">Error !</string>
+    <string name="sleep_display">Sleep Display</string>
 </resources>
