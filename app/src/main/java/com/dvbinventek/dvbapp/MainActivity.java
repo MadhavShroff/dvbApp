@@ -806,27 +806,27 @@ public class MainActivity extends AppCompatActivity {
     public void setSharefPrefs() {
         //Set controls info on app launch from memory
         SharedPreferences sharedPref = this.getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE);
-        StaticStore.modeSelected = sharedPref.getString("mode_selected", "-");
-        StaticStore.packet_fio2 = Short.parseShort(sharedPref.getString("packet_fio2", "0"));
-        StaticStore.packet_vt = Short.parseShort(sharedPref.getString("packet_vt", "0"));
-        StaticStore.packet_flowTrig = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_vtrig", "0")));
-        StaticStore.packet_pinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pip", "0")));
-        StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_peep", "0")));
-        StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", "0")));
-        StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", "0")));
-        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", "1010"));
-        StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", "0"));
-        StaticStore.packet_plimit = (byte) Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", "0")));
-        StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ps", "0")));
-        StaticStore.AlarmLimits.minVolMax = Float.parseFloat(sharedPref.getString("limits_minVolMax", "0"));
-        StaticStore.AlarmLimits.minVolMin = Float.parseFloat(sharedPref.getString("limits_minVolMin", "0"));
-        StaticStore.AlarmLimits.rateMax = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMax", "0"));
-        StaticStore.AlarmLimits.rateMin = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMin", "0"));
-        StaticStore.AlarmLimits.vtMax = Short.parseShort(sharedPref.getString("limits_vtMax", "0"));
-        StaticStore.AlarmLimits.vtMin = Short.parseShort(sharedPref.getString("limits_vtMi", "0"));
-        StaticStore.AlarmLimits.pMax = Float.parseFloat(sharedPref.getString("limits_pMax", "0"));
-        StaticStore.AlarmLimits.pMin = Float.parseFloat(sharedPref.getString("limits_pMin", "0"));
-        StaticStore.AlarmLimits.apnea = Short.parseShort(sharedPref.getString("limits_apnea", "0"));
+        StaticStore.modeSelected = sharedPref.getString("mode_selected", StaticStore.DefaultValues.modeSelected_String);
+        StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", StaticStore.DefaultValues.modeSelected_Short));
+        StaticStore.packet_fio2 = Short.parseShort(sharedPref.getString("packet_fio2", StaticStore.DefaultValues.fio2_Short));
+        StaticStore.packet_vt = Short.parseShort(sharedPref.getString("packet_vt", StaticStore.DefaultValues.vt_Short));
+        StaticStore.packet_flowTrig = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_vtrig", StaticStore.DefaultValues.flowTrig_Float)));
+        StaticStore.packet_pinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pip", StaticStore.DefaultValues.pInsp_Float)));
+        StaticStore.packet_peep = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_peep", StaticStore.DefaultValues.peep_Float)));
+        StaticStore.packet_rtotal = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ratef", StaticStore.DefaultValues.rTotal_Float)));
+        StaticStore.packet_tinsp = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_tinsp", StaticStore.DefaultValues.tInsp_Float)));
+        StaticStore.packet_ie = Short.parseShort(sharedPref.getString("packet_ie", StaticStore.DefaultValues.ie_Short));
+        StaticStore.packet_plimit = (byte) Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_pmax", StaticStore.DefaultValues.pLimit_Float)));
+        StaticStore.packet_ps = Float.parseFloat(Objects.requireNonNull(sharedPref.getString("packet_ps", StaticStore.DefaultValues.ps_Float)));
+        StaticStore.AlarmLimits.minVolMax = Float.parseFloat(sharedPref.getString("limits_minVolMax", StaticStore.DefaultValues.minVolMax_Float));
+        StaticStore.AlarmLimits.minVolMin = Float.parseFloat(sharedPref.getString("limits_minVolMin", StaticStore.DefaultValues.minVolMin_Float));
+        StaticStore.AlarmLimits.rateMax = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMax", StaticStore.DefaultValues.rateMax_Float));
+        StaticStore.AlarmLimits.rateMin = (byte) Float.parseFloat(sharedPref.getString("limits_fTotalMin", StaticStore.DefaultValues.rateMin_Float));
+        StaticStore.AlarmLimits.vtMax = Short.parseShort(sharedPref.getString("limits_vtMax", StaticStore.DefaultValues.vtMax_Short));
+        StaticStore.AlarmLimits.vtMin = Short.parseShort(sharedPref.getString("limits_vtMi", StaticStore.DefaultValues.vtMin_Short));
+        StaticStore.AlarmLimits.pMax = Float.parseFloat(sharedPref.getString("limits_pMax", StaticStore.DefaultValues.pMax_Float));
+        StaticStore.AlarmLimits.pMin = Float.parseFloat(sharedPref.getString("limits_pMin", StaticStore.DefaultValues.pMin_Float));
+        StaticStore.AlarmLimits.apnea = Short.parseShort(sharedPref.getString("limits_apnea", StaticStore.DefaultValues.apnea_Short));
     }
 
     public void setFilters() {

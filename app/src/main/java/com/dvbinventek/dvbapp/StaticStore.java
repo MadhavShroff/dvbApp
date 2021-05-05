@@ -66,11 +66,37 @@ public class StaticStore {
 
     public static class PatientDetails {
         public static String name = "John Doe";
-        public static String age = "23";
-        public static String height = "186";
-        public static String ibw = "78";
-        public static String room = "2";
-        public static String bed = "6";
+        public static String age = "30";
+        public static String height = "150";
+        public static String ibw = "50";
+        public static String room = "1";
+        public static String bed = "1";
+    }
+
+    public static class DefaultValues {
+        public static String modeSelected_String = "VC-SIMV";
+        public static String modeSelected_Short = "18";
+        public static String fio2_Short = "21";
+        public static String vt_Short = "300";
+        public static String flowTrig_Float = "10.0";
+        public static String pInsp_Float = "15.0";
+        public static String peep_Float = "5.0";
+        public static String rTotal_Float = "12.0";
+        public static String tInsp_Float = "1.666";
+        public static String ie_Short = "1040";
+        public static String ps_Float = "10.0";
+        public static String pLimit_Float = "50.0";
+
+        public static String minVolMax_Float = "5.4";
+        public static String minVolMin_Float = "2.16";
+        public static String rateMax_Float = "40.0";
+        public static String rateMin_Float = "0.0";
+        public static String vtMax_Short = "1000";
+        public static String vtMin_Short = "50";
+        public static String pMax_Float = "40.0";
+        public static String pMin_Float = "0.0";
+        public static String apnea_Short = "20";
+
     }
 
     //Controls values that cannot be exceeded
