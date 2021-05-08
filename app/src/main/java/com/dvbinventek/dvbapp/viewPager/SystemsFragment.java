@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.core.Observable;
 public class SystemsFragment extends Fragment {
 
     public static WeakReference<Button> selfTest;
+    public static WeakReference<Button> shutdown;
     public static WeakReference<TextView> machineHours;
     public static WeakReference<TextView> patientHours;
     public static WeakReference<TextView> lastServiceDate;
@@ -35,10 +36,6 @@ public class SystemsFragment extends Fragment {
     public static WeakReference<TextView> nextServiceDate;
     public static WeakReference<TextView> nextServiceHrs;
     public static WeakReference<TextView> systemVersion;
-
-    public static void disableShutdown() {
-        //TODO: Disable shutdown button logic
-    }
 
     public static void disableSelftest(boolean b) {
         if (b) {
@@ -49,6 +46,17 @@ public class SystemsFragment extends Fragment {
             selfTest.get().setTextColor(Color.parseColor("#000000"));
         }
         selfTest.get().setEnabled(!b);
+    }
+
+    public static void disableShutdown(boolean b) {
+        if (b) {
+            shutdown.get().setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2f2f2f")));
+            shutdown.get().setTextColor(Color.parseColor("#515151"));
+        } else {
+            shutdown.get().setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
+            shutdown.get().setTextColor(Color.parseColor("#000000"));
+        }
+        shutdown.get().setEnabled(!b);
     }
 
     public static void setDetails() {
@@ -82,8 +90,11 @@ public class SystemsFragment extends Fragment {
         getWeakReferances(view);
 
         view.findViewById(R.id.sleepDisplay).setOnClickListener(MainActivity.sleepButtonListener);
+        view.findViewById(R.id.shutdown).setOnClickListener(MainActivity.shutdownClickListener);
 
         selfTest = new WeakReference<>(view.findViewById(R.id.selfTest));
+        shutdown = new WeakReference<>(view.findViewById(R.id.shutdown));
+
         ((MaterialButtonToggleGroup) view.findViewById(R.id.toggleGroup)).addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             SendPacket sp = new SendPacket();
             sp.writeInfo(SendPacket.RNTM, 0);

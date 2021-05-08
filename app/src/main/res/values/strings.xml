@@ -219,4 +219,6 @@
     <string name="in">in</string>
     <string name="err">Error !</string>
     <string name="sleep_display">Sleep Display</string>
+    <string name="shutdown_display">Shutdown Display</string>
+    <string name="_2_3_1">2.3.1</string>
 </resources>

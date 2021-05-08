@@ -67,6 +67,8 @@ import com.scichart.drawing.common.PenStyle;
 import com.scichart.drawing.utility.ColorUtil;
 import com.scichart.extensions.builders.SciChartBuilder;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -126,9 +128,25 @@ public class MainActivity extends AppCompatActivity {
     public static ComponentName compName;
 
     public static View.OnClickListener sleepButtonListener = (v) -> {
-        Log.d("MSG", "Clicked Sleep");
+        Log.d("MSG", "Clicked Sleep Button");
         if (devicePolicyManager.isAdminActive(compName)) {
             devicePolicyManager.lockNow();
+        }
+    };
+
+    public static View.OnClickListener shutdownClickListener = (v) -> {
+        Log.d("MSG", "Clicked Shutdown Button");
+        Process chperm;
+        try {
+            chperm=Runtime.getRuntime().exec("su");
+            DataOutputStream os =
+                    new DataOutputStream(chperm.getOutputStream());
+
+            os.writeBytes("am start -a com.android.internal.intent.action.REQUEST_SHUTDOWN\n");
+            os.flush();
+            chperm.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     };
 
@@ -148,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
     public final XyDataSeries<Double, Double> FPDataSeries = newDataSeries(FIFO_CAPACITY / 2);
     public final XyDataSeries<Double, Double> FVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
     public final XyDataSeries<Double, Double> PVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
+
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -163,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case UsbService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
+                    handleUsbDisconnected();
                     break;
                 case UsbService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
                     Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
@@ -170,6 +190,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    public void handleUsbDisconnected() {
+        // Ring Alarm on device if USB Disconnected, show a dialog box with options to shutdown or sleep (?) and sound alarm
+
+    }
 
     //UsbService setup and vars
     public UsbHandler mHandler = new UsbHandler(this);
@@ -439,6 +464,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
     public static Disposable standbyDisposable;
     public void setupStandby() {
         SendPacket sp = new SendPacket();
@@ -460,14 +486,11 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", (dialog, which1) -> {
                             // send packets continously every 200ms and when received packet has a STRT header, stop sending, and make the change
                             Observable.interval(1500, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(5).subscribe(new Observer<Long>() {
-
-
                                 @Override
                                 public void onSubscribe(@NonNull Disposable d) {
                                     sp.sendToDevice();
                                     standbyDisposable = d;
                                 }
-
                                 @Override
                                 public void onNext(@NonNull Long aLong) {
                                     if (StaticStore.Values.packetType != SendPacket.TYPE_STOP) {
@@ -487,7 +510,6 @@ public class MainActivity extends AppCompatActivity {
                                         standbyDisposable.dispose();
                                     }
                                 }
-
                                 @Override
                                 public void onError(@NonNull Throwable e) {
                                     e.printStackTrace();
@@ -646,10 +668,12 @@ public class MainActivity extends AppCompatActivity {
                     ToolsFragment.stopObserving();
                 }
                 if (position == 6) {
-                    if (StaticStore.Values.packetType == SendPacket.TYPE_STRT) {
+                    if (StaticStore.Values.packetType == SendPacket.TYPE_STRT) { // If ventilation is going on
                         SystemsFragment.disableSelftest(true);
-                    } else {
+                        SystemsFragment.disableShutdown(true);
+                    } else {                                             // If Ventilation is paused
                         SystemsFragment.disableSelftest(false);
+                        SystemsFragment.disableShutdown(false);
                     }
                     SystemsFragment.setDetails();
                 }
@@ -779,6 +803,7 @@ public class MainActivity extends AppCompatActivity {
                         t.put("warning", warning);
                         StaticStore.Data.add(t);
                     }
+
                     @Override
                     public void onError(@NonNull Throwable e) {
                         e.printStackTrace();
@@ -804,7 +829,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setSharefPrefs() {
+
         //Set controls info on app launch from memory
+
         SharedPreferences sharedPref = this.getSharedPreferences("dvbVentilator", Context.MODE_PRIVATE);
         StaticStore.modeSelected = sharedPref.getString("mode_selected", StaticStore.DefaultValues.modeSelected_String);
         StaticStore.modeSelectedShort = Short.parseShort(sharedPref.getString("mode_selected_short", StaticStore.DefaultValues.modeSelected_Short));
