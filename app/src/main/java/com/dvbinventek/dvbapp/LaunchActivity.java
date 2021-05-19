@@ -146,7 +146,7 @@ public class LaunchActivity extends AppCompatActivity {
                 if (packet.length == PACKET_LENGTH) {
                     new ReceivePacket(packet, true);
                     updateProgressBar();
-                    Log.d("PACKET_LAUNCH", Arrays.toString(packet));
+//                    Log.d("PACKET_LAUNCH", Arrays.toString(packet));
                     packet = new byte[]{};
                 } else if (packet.length > PACKET_LENGTH) {
                     Log.d("PACKET_DROPPED", Arrays.toString(packet));

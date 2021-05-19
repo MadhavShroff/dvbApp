@@ -115,7 +115,6 @@ public class ProcessPacket {
                     if (!modeBox.get().getText().equals(StaticStore.Values.mode))
                         modeBox.get().setText(StaticStore.Values.mode); // for displaying mode received from packet
                     setStatusText();
-
                     if (MainActivity.graphShownRef == R.id.mainChart)
                         UpdateSuspender.using(chart.get(), () -> {
                             try {
@@ -297,7 +296,6 @@ public class ProcessPacket {
         }
         //sigh indicator set values after check state, to avoid overwrite computation
         switch (StaticStore.MainActivityValues.sighHold) {
-            //TODO: add logic to control state of sigh button from here depending on this value.
             case 0:
                 if (StaticStore.MainActivityValues.sighState != StaticStore.MainActivityValues.SIGH_HIDDEN) {
                     sigh.get().setVisibility(View.INVISIBLE);

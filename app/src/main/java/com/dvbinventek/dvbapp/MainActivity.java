@@ -893,7 +893,7 @@ public class MainActivity extends AppCompatActivity {
                 packet = joinArrays(packet, bytes);
             } else if (packet.length == PACKET_LENGTH) {
                 new ProcessPacket(packet);
-                Log.d("PACKET_MAIN", Arrays.toString(packet));
+//                Log.d("PACKET_MAIN", Arrays.toString(packet));
                 packet = new byte[]{};
             } else {
                 Log.d("PACKET_DROPPED", Arrays.toString(packet));

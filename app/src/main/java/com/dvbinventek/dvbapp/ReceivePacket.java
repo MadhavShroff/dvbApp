@@ -138,7 +138,6 @@ public class ReceivePacket {
     public int getType(char c1, char c2, char c3, char c4) {
         char[] c = {c1, c2, c3, c4};
         String s = String.valueOf(c);
-        Log.d("RECEIVED PACKET TYPE", s);
         switch (s) {
             case SendPacket.STR_STRT:
                 return SendPacket.TYPE_STRT;
@@ -160,8 +159,8 @@ public class ReceivePacket {
     }
 
     public int concatIE(float i, float e) {
-        int i_ = (int) i * 10;
-        int e_ = (int) e * 10;
+        int i_ = (int) (i * 10);
+        int e_ = (int) (e * 10);
         return i_ * 100 + e_;
     }
 

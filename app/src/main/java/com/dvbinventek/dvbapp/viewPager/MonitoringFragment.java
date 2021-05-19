@@ -49,15 +49,14 @@ public class MonitoringFragment extends Fragment {
         int id = (ie / 100) % 10;
         int e = (ie / 10) % 10;
         int ed = ie % 10;
-        if (id == 0 && ed == 0) {
-            s = i + ":" + e;
-        } else if (id == 0) {
-            s = i + ":" + e + "." + ed;
-        } else if (ed == 0) {
-            s = i + "." + id + ":" + e;
-        } else {
+//        if (id == 0 && ed == 0)
+//            s = i + ":" + e;
+//        else if (id == 0)
+//            s = i + ":" + e + "." + ed;
+//        else if (ed == 0)
+//            s = i + "." + id + ":" + e;
+//        else  // Write IE in Monitoring as i.id : e.ed always irrespective of if decimal is 0
             s = i + "." + id + ":" + e + "." + ed;
-        }
         return s;
     }
 
