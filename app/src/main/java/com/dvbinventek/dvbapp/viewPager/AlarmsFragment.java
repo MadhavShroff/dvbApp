@@ -169,11 +169,11 @@ public class AlarmsFragment extends Fragment {
     }
 
     public void setOnClickListeners() {
-        AlarmLimitsBottomSheet abs_minVol = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("MV<sub><small>total</small></sub> (l)"), "minvol");
-        AlarmLimitsBottomSheet abs_rate = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Rate (b/min)"), "rate");
-        AlarmLimitsBottomSheet abs_vt = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Vt (ml)"), "vt");
-        abs_p = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"), "p");
-        AlarmLimitsBottomSheetApnea abs_apnea = new AlarmLimitsBottomSheetApnea(getActivity(), Html.fromHtml("Apnea Time (s)"));
+        AlarmLimitsBottomSheet abs_minVol = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("MV<sub><small>total</small></sub> (l)"), "minvol", "0 to 50", "0 to 50");
+        AlarmLimitsBottomSheet abs_rate = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Rate (b/min)"), "rate", "0 to 70", "0 to 70");
+        AlarmLimitsBottomSheet abs_vt = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("Vt (ml)"), "vt", "0 to 3000", "0 to 3000");
+        abs_p = new AlarmLimitsBottomSheet(getActivity(), Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"), "p", "0 to 80", "0 to 80");
+        AlarmLimitsBottomSheetApnea abs_apnea = new AlarmLimitsBottomSheetApnea(getActivity(), Html.fromHtml("Apnea Time (s) 5 to 60s"));
 
         ImageButton minVol = alarmsView.get().findViewById(R.id.limits_minvol_change);
         ImageButton ftotal = alarmsView.get().findViewById(R.id.limits_ftotal_change);

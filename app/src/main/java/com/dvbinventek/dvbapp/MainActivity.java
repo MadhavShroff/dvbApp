@@ -14,6 +14,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.MediaPlayer;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -88,6 +89,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
+import static com.dvbinventek.dvbapp.StaticStore.Values.packetType;
+
 public class MainActivity extends AppCompatActivity {
 
     //TODO: Make row list in historic data a recycler view
@@ -97,6 +100,15 @@ public class MainActivity extends AppCompatActivity {
     public static final int chartWidth = 665;
     public static final int viewPagerWidth = 352;
     public static final int PACKET_LENGTH = 300;
+
+    //GraphView Screen Integer mapping
+    public static final int GRAPHS = 1;
+    public static final int STANDBY = 2;
+    public static final int USB_DISCONNECTED = 3;
+
+    public static WeakReference<LinearLayout> chartLayout; // 1
+    public static WeakReference<LinearLayout> standbyLayout; // 2
+    public static WeakReference<LinearLayout> usbDisconnectedLayout; // 3
 
     //For date format in data logs
     @SuppressLint("SimpleDateFormat")
@@ -141,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
             chperm=Runtime.getRuntime().exec("su");
             DataOutputStream os =
                     new DataOutputStream(chperm.getOutputStream());
-
             os.writeBytes("am start -a com.android.internal.intent.action.REQUEST_SHUTDOWN\n");
             os.flush();
             chperm.waitFor();
@@ -166,10 +177,11 @@ public class MainActivity extends AppCompatActivity {
     public final XyDataSeries<Double, Double> FPDataSeries = newDataSeries(FIFO_CAPACITY / 2);
     public final XyDataSeries<Double, Double> FVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
     public final XyDataSeries<Double, Double> PVDataSeries = newDataSeries(FIFO_CAPACITY / 2);
-
+    public static Observer<String> usbStateObserver;
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d("BroadcastReceiver action", "" + Objects.requireNonNull(intent.getAction()));
             switch (Objects.requireNonNull(intent.getAction())) {
                 case UsbService.ACTION_USB_PERMISSION_GRANTED: // USB PERMISSION GRANTED
                     Toast.makeText(context, "Connected to Ventilator", Toast.LENGTH_SHORT).show();
@@ -182,19 +194,16 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case UsbService.ACTION_USB_DISCONNECTED: // USB DISCONNECTED
                     Toast.makeText(context, "USB disconnected", Toast.LENGTH_SHORT).show();
-                    handleUsbDisconnected();
                     break;
                 case UsbService.ACTION_USB_NOT_SUPPORTED: // USB NOT SUPPORTED
                     Toast.makeText(context, "USB device not supported", Toast.LENGTH_SHORT).show();
                     break;
+                case UsbService.ACTION_USB_ATTACHED: // USB CONNECTED
+                    Toast.makeText(context, "USB device Connected", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     };
-
-    public void handleUsbDisconnected() {
-        // Ring Alarm on device if USB Disconnected, show a dialog box with options to shutdown or sleep (?) and sound alarm
-
-    }
 
     //UsbService setup and vars
     public UsbHandler mHandler = new UsbHandler(this);
@@ -272,6 +281,9 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    public boolean isAdmin = false;
+    MediaPlayer alarmSound;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Set app theme, from splash screen
@@ -305,8 +317,8 @@ public class MainActivity extends AppCompatActivity {
         //Setup ViewPager with listeners, references, number of pages to bind (all 7)
         setupViewPager();
 
-        //Setup silence button logic
-        setupSilenceButton();
+        //Setup UsbStateEventChangeListener
+        setupUsbStateChangeEvents();
 
         //Setup ProcessPacket References
         configureProcessPacketReferences();
@@ -328,6 +340,61 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup admin receiver and click listener for Sleep Button on Standby Page
         setupSleepButton();
+
+        // Unset Device Policy Manager when running app in Development mode
+        if (isAdmin) {
+            DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+            devicePolicyManager.clearDeviceOwnerApp(this.getPackageName());
+        }
+    }
+
+    public void setupUsbStateChangeEvents() {
+        standbyLayout = new WeakReference<>(findViewById(R.id.standbyFragmentContainer)); // 2
+        usbDisconnectedLayout = new WeakReference<>(findViewById(R.id.usbDisconnectedFragmentContainer));
+        usbStateObserver = new Observer<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                disposables.add(d);
+            }
+
+            @Override
+            public void onNext(@NonNull String o) {
+                if (o.equals("disconnected")) {
+                    handleUsbDisconnected();
+                } else if (o.equals("connected")) {
+                    handleUsbConnected();
+                } else {
+                    Log.d("INCONSISTENCY", "Unknown Event Received: " + o);
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+    }
+
+    // Ring Alarm on device if USB Disconnected, show a dialog box with options to shutdown or sleep (?) and sound alarm
+    public void handleUsbDisconnected() {
+        handleUsbConnected(); // first stop audio and remove dialog before starting and showing it again
+        setGraphView(USB_DISCONNECTED);
+        alarmSound = MediaPlayer.create(MainActivity.this, R.raw.alarm_sound);
+        alarmSound.start();
+        alarmSound.setLooping(true);
+    }
+
+    public void handleUsbConnected() {
+        if (packetType == SendPacket.TYPE_STRT) {
+            setGraphView(GRAPHS);
+        } else {
+            setGraphView(STANDBY);
+        }
+        if (alarmSound != null && alarmSound.isPlaying()) alarmSound.stop();
+        getWindow().getDecorView().setSystemUiVisibility(ui_flags);
     }
 
     public void setupSleepButton() {
@@ -337,11 +404,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setInitialState() {
-        findViewById(R.id.mainChart).setVisibility(View.GONE);
-        findViewById(R.id.standbyFragmentContainer).setVisibility(View.VISIBLE);
-        StandbyFragment.setIsInView(true);
-        //restrict use of other buttons to send any packet to device
-        StaticStore.restrictedCommunicationDueToStandby = true;
+        setGraphView(STANDBY);
     }
 
     @Override
@@ -465,7 +528,34 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    public void setGraphView(int which) {
+        //Reset view
+        chartLayout.get().setVisibility(View.GONE);
+        standbyLayout.get().setVisibility(View.GONE);
+        usbDisconnectedLayout.get().setVisibility(View.GONE);
+        StandbyFragment.setIsInView(false);
+        StaticStore.restrictedCommunicationDueToStandby = false;
+        //make one visible
+        switch (which) {
+            case GRAPHS:
+                chartLayout.get().setVisibility(View.VISIBLE);
+                setupSilenceButton(1);
+                break;
+            case STANDBY:
+                standbyLayout.get().setVisibility(View.VISIBLE);
+                StandbyFragment.setIsInView(true);
+                setupSilenceButton(1);
+                StaticStore.restrictedCommunicationDueToStandby = true;
+                break;
+            case USB_DISCONNECTED:
+                usbDisconnectedLayout.get().setVisibility(View.VISIBLE);
+//                setupSilenceButton(2);
+                break;
+        }
+    }
+
     public static Disposable standbyDisposable;
+
     public void setupStandby() {
         SendPacket sp = new SendPacket();
         sp.writeInfo(SendPacket.STOP, 0);
@@ -493,13 +583,12 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 @Override
                                 public void onNext(@NonNull Long aLong) {
-                                    if (StaticStore.Values.packetType != SendPacket.TYPE_STOP) {
-                                        Log.d("STANDBY", "trying again, got packet of type: " + StaticStore.Values.packetType);
+                                    if (packetType != SendPacket.TYPE_STOP) {
+                                        Log.d("STANDBY", "trying again, got packet of type: " + packetType);
                                         sp.sendToDevice();
                                     } else {
-                                        Log.d("STANDBY", "Got packet of type stop");
-                                        findViewById(R.id.mainChart).setVisibility(View.GONE);
-                                        findViewById(R.id.standbyFragmentContainer).setVisibility(View.VISIBLE);
+                                        Log.d("STANDBY", "Got packet of type stop, entering standby");
+                                        setGraphView(STANDBY);
                                         StandbyFragment.setIsInView(true);
                                         //restrict use of other buttons to send any packet to device
                                         StaticStore.restrictedCommunicationDueToStandby = true;
@@ -577,22 +666,27 @@ public class MainActivity extends AppCompatActivity {
         alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
-    public void setupSilenceButton() {
+    public void setupSilenceButton(int which) {
         MaterialButton silence = findViewById(R.id.snooze);
         silence.setOnClickListener(v -> {
-            if (silence.getText().equals(getResources().getString(R.string.silence_alarm))) {
-                SendPacket sp = new SendPacket();
-                sp.writeInfo(SendPacket.RNTM, 0);
-                sp.writeInfo(SendPacket.RNTM, 276);
-                sp.writeInfo((byte) 2, 114);
-                sp.sendToDevice();
-            } else {
-                SendPacket sp = new SendPacket();
-                sp.writeInfo(SendPacket.RNTM, 0);
-                sp.writeInfo(SendPacket.RNTM, 276);
-                sp.writeInfo((byte) 1, 114);
-                sp.sendToDevice();
+            switch (which) {
+                case 1:
+                    if (silence.getText().equals(getResources().getString(R.string.silence_alarm))) {
+                        SendPacket sp = new SendPacket();
+                        sp.writeInfo(SendPacket.RNTM, 0);
+                        sp.writeInfo(SendPacket.RNTM, 276);
+                        sp.writeInfo((byte) 2, 114);
+                        sp.sendToDevice();
+                    } else {
+                        SendPacket sp = new SendPacket();
+                        sp.writeInfo(SendPacket.RNTM, 0);
+                        sp.writeInfo(SendPacket.RNTM, 276);
+                        sp.writeInfo((byte) 1, 114);
+                        sp.sendToDevice();
+                    }
+                    break;
             }
+
         });
     }
 
@@ -668,7 +762,7 @@ public class MainActivity extends AppCompatActivity {
                     ToolsFragment.stopObserving();
                 }
                 if (position == 6) {
-                    if (StaticStore.Values.packetType == SendPacket.TYPE_STRT) { // If ventilation is going on
+                    if (packetType == SendPacket.TYPE_STRT) { // If ventilation is going on
                         SystemsFragment.disableSelftest(true);
                         SystemsFragment.disableShutdown(true);
                     } else {                                             // If Ventilation is paused
@@ -905,6 +999,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        //if during activity startup the Usb state is disconnected, show the alarm
         setFilters();
         // Start listening notifications from UsbService
         // Start UsbService(if it was not started before) and Bind it
@@ -913,6 +1008,15 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
         getWindow().getDecorView().setSystemUiVisibility(ui_flags);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        new Handler().postDelayed(() -> { // check if connected and packet type to decide which screen to show
+            if (!UsbService.serialPortConnected) { // IF USB is disconnected in onResume
+                handleUsbDisconnected();
+            } else { // If USB is connected in onResume
+                handleUsbConnected();
+                Log.d("onResume", "" + packetType);
+            }
+        }, 8000);
     }
 
     private HorizontalLineAnnotation generateBaseLines(String yAxisId) {
@@ -963,7 +1067,7 @@ public class MainActivity extends AppCompatActivity {
 //        setUserRestriction(UserManager.DISALLOW_CONFIG_TETHERING, active);
 //        setUserRestriction(UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS, active);
 //        setUserRestriction(UserManager.DISALLOW_CREATE_WINDOWS, active);
-        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
+//        setUserRestriction(UserManager.DISALLOW_CONFIG_WIFI, active);
 //        setUserRestriction(UserManager.DISALLOW_FACTORY_RESET, active);
         setUserRestriction(UserManager.DISALLOW_DATA_ROAMING, active);
 //        setUserRestriction(UserManager.DISALLOW_INSTALL_APPS, active);
@@ -1041,8 +1145,8 @@ public class MainActivity extends AppCompatActivity {
         SciChartBuilder.init(this);
         sciChartBuilder = SciChartBuilder.instance();
         mainChart = new SciChartSurface(this);
-        LinearLayout chartLayout = findViewById(R.id.mainChart);
-        chartLayout.addView((View) mainChart, 0);
+        chartLayout = new WeakReference<>(findViewById(R.id.mainChart));
+        chartLayout.get().addView((View) mainChart, 0);
 
         final NumericAxis xAxis = sciChartBuilder.newNumericAxis()
                 .withVisibleRange(0, 10)
@@ -1205,7 +1309,6 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.generateLineSeries(pressureId, FVDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build())
             );
         });
-
 
 //        MaterialButtonToggleGroup group = findViewById(R.id.toggleGroupMain);
 //        group.addOnButtonCheckedListener((group1, checkedId, isChecked) -> {

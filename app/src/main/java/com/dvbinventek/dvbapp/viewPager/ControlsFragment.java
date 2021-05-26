@@ -230,6 +230,8 @@ public class ControlsFragment extends Fragment {
         };
     }
 
+    Disposable disposable1;
+
     // Sets the behavior of how controls behave with one another,
     public void setClickListeners() {
         //Send button onClickListener
@@ -559,12 +561,39 @@ public class ControlsFragment extends Fragment {
             });
         });
 
+
         stopVentilation = new WeakReference<>(controlsView.get().findViewById(R.id.stopVentilation));
         stopVentilation.get().setOnClickListener(v -> Observable.just(v).subscribe(MainActivity.standbyClickObserver));
         ShapeableImageView up = controlsView.get().findViewById(R.id.swipeup);
-        up.setOnClickListener(v -> {
+        up.setOnClickListener(view -> {
             ScrollView sv = controlsView.get().findViewById(R.id.controls_scrollable);
             sv.smoothScrollTo(0, 500);
+        });
+        ScrollView sv = controlsView.get().findViewById(R.id.controls_scrollable);
+        sv.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            int bottom = (sv.getChildAt(sv.getChildCount() - 1)).getHeight() - sv.getHeight() - scrollY;
+            if (bottom == 0) {
+                tryToDispose(disposable1);
+                Observable.timer(10, TimeUnit.SECONDS).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable1 = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Long aLong) {
+                        sv.smoothScrollTo(0, -500);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+            }
         });
         revertStandbyClickObserver = new Observer<View>() {
             @Override

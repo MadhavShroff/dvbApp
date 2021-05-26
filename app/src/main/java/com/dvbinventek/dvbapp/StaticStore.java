@@ -124,14 +124,41 @@ public class StaticStore {
 
         //TODO: refer to excel sheet
         public static short max_ratef = 60;
-        public static short max_ie = 4040;
-        public static float max_tinsp = 6f;
-        public static float max_pinsp = 60f;
-
         public static short min_ratef = 4;
+
+        public static short max_ie = 4040;
         public static short min_ie = 1010;
+
+        public static float max_tinsp = 6f;
         public static float min_tinsp = 0.3f;
+
+        public static float max_pinsp = 60f;
         public static float min_pinsp = 0f;
+
+        public static class Alarms {
+            public static float max_mv_max = 50;
+            public static float max_mv_min = 0;
+            public static float min_mv_max = 50;
+            public static float min_mv_min = 0;
+
+            public static byte max_rate_max = 70;
+            public static byte max_rate_min = 0;
+            public static byte min_rate_max = 70;
+            public static byte min_rate_min = 0;
+
+            public static int max_vt_max = 3000;
+            public static int max_vt_min = 0;
+            public static int min_vt_max = 3000;
+            public static int min_vt_min = 0;
+
+            public static float max_p_max = 80;
+            public static float max_p_min = 0;
+            public static float min_p_max = 80;
+            public static float min_p_min = 0;
+
+            public static short apnea_max = 60;
+            public static short apnea_min = 5;
+        }
     }
 
     public static class Warnings {

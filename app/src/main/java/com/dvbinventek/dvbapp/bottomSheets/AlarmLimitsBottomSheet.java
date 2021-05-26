@@ -20,6 +20,7 @@ import com.arthurivanets.bottomsheets.BaseBottomSheet;
 import com.arthurivanets.bottomsheets.config.BaseConfig;
 import com.arthurivanets.bottomsheets.config.Config;
 import com.dvbinventek.dvbapp.R;
+import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.customViews.CustomKeyboardView;
 
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -99,15 +99,13 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
         tv.setText(s);
     }
 
-    public AlarmLimitsBottomSheet(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
-        super(hostActivity, config);
-    }
-
-    public AlarmLimitsBottomSheet(@NonNull Activity hostActivity, Spanned h, String type) {
+    public AlarmLimitsBottomSheet(@NonNull Activity hostActivity, Spanned h, String type, String maxSubText, String minSubText) {
         this(hostActivity, new Config.Builder(hostActivity).build());
         this.type = type;
         heading.setText(R.string.setAlarmLimits);
         subHeading.setText(h);
+        setMaxSubText(maxSubText);
+        setMinSubText(minSubText);
         done.setImageTintList(ColorStateList.valueOf(Color.parseColor("#afafaf")));
         done.setOnClickListener(positiveListener);
         max.setOnClickListener(selectEditTextListener);
@@ -138,6 +136,20 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
         });
     }
 
+    public AlarmLimitsBottomSheet(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
+        super(hostActivity, config);
+    }
+
+    public void setMaxSubText(String s) {
+        TextView tv = findViewById(R.id.subTextMax);
+        tv.setText(s);
+    }
+
+    public void setMinSubText(String s) {
+        TextView tv = findViewById(R.id.subTextMin);
+        tv.setText(s);
+    }
+
     public void backspace() {
         if (value == null) return;
         String str = value.getText().toString();
@@ -160,25 +172,34 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
     }
 
     public boolean isInRange() {
-        String s = value.getText().toString();
-        if (s.equals(".")) return false;
+        String s_max = getMin();
+        String s_min = getMax();
+        if (s_max.equals(".") || s_min.equals(".")) return false;
+        float f_max, f_min;
         try {
-            Float.parseFloat(s);
+            f_max = Float.parseFloat(s_max);
+            f_min = Float.parseFloat(s_min);
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
-//        switch (this.type) {
-//            case "minvol":
-//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2));
-//            case "rate":
-//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
-//            case "vt":
-//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
-//            case "p":
-//                return !(f > StaticStore.DeviceParameterLimits.max_fio2) && !(f < StaticStore.DeviceParameterLimits.min_fio2) && (((f * 10) % 10) == 0);
-//        }
-        //TODO:
+        switch (this.type) { // Max box
+            case "minvol":
+                return (!(f_max > StaticStore.DeviceParameterLimits.Alarms.max_mv_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_mv_min)
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_mv_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_mv_min) && !(f_max > f_min))
+                        || f_max == 123456 || f_min == 123456;
+            case "rate": // No decimal place allowed
+                return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_rate_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_rate_min) && !(((f_max * 10) % 10) > 0)
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_rate_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_rate_min) && !(((f_min * 10) % 10) > 0)
+                        && !(f_max > f_min);
+            case "vt": // No decimal place allowed
+                return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_vt_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_vt_min) && !(((f_max * 10) % 10) > 0)
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_vt_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_vt_min) && !(((f_min * 10) % 10) > 0)
+                        && !(f_max > f_min);
+            case "p":
+                return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_p_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_p_min)
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_p_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_p_min)
+                        && !(f_max > f_min);
+        }
         return true;
     }
 

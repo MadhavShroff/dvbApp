@@ -363,8 +363,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical" />
+
         </LinearLayout>
-<!--     Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
+
+        <LinearLayout
+            android:id="@+id/usbDisconnectedFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <fragment
+                android:id="@+id/usbDisconnectedFragment"
+                android:name="com.dvbinventek.dvbapp.UsbDisconnectedFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+
+        <!--     Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
         <!--        <LinearLayout-->
         <!--            android:layout_width="match_parent"-->
         <!--            android:layout_height="45dp">-->

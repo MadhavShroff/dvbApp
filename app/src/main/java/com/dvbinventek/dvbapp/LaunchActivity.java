@@ -29,8 +29,6 @@ import com.google.android.material.progressindicator.ProgressIndicator;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cdflynn.android.library.checkview.CheckView;
@@ -51,7 +49,6 @@ public class LaunchActivity extends AppCompatActivity {
     public DevicePolicyManager mDevicePolicyManager;
     public PackageManager mPackageManager;
     public ComponentName mAdminComponentName;
-    ScheduledExecutorService tpe = new ScheduledThreadPoolExecutor(1);
     public final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -76,6 +73,7 @@ public class LaunchActivity extends AppCompatActivity {
     };
     public int a; // Countdown
     public CompositeDisposable disposables = new CompositeDisposable();
+    public Disposable timerDisposable;
     public byte[] packet = {};
     public int progress;
     public UsbService usbService;
@@ -125,9 +123,6 @@ public class LaunchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_launch);
         progress = 0;
 
-        //Setup Start, skip buttons, countdown text
-        setupButtons();
-
         StaticStore.LaunchVars.calibrationError = 0;
         StaticStore.LaunchVars.calibrationStatus = 0;
 
@@ -169,7 +164,7 @@ public class LaunchActivity extends AppCompatActivity {
     public void updateProgressBar() {
         int err = StaticStore.LaunchVars.calibrationError;
         int status = StaticStore.LaunchVars.calibrationStatus;
-        Log.d("PROGRESS", "Error:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationError) + " Status:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationStatus));
+//        Log.d("PROGRESS", "Error:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationError) + " Status:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationStatus));
         if (status > 0 && isStartClicked && status < 64) {
             for (int i = 0; i < 6; i++)
                 if (((status & 1 << i) >> i) == 1)
@@ -298,7 +293,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 0:
                 setVisibility(R.id.progress_bar1, View.GONE);
                 if (!isChecked1) {
-                    ((CheckView) findViewById(R.id.check1)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check1).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check1)).check();
                     isChecked1 = true;
                     updateProgressBar(16);
@@ -307,7 +302,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 1:
                 setVisibility(R.id.progress_bar2, View.GONE);
                 if (!isChecked2) {
-                    ((CheckView) findViewById(R.id.check2)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check2).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check2)).check();
                     isChecked2 = true;
                     updateProgressBar(17);
@@ -316,7 +311,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 2:
                 setVisibility(R.id.progress_bar3, View.GONE);
                 if (!isChecked3) {
-                    ((CheckView) findViewById(R.id.check3)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check3).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check3)).check();
                     isChecked3 = true;
                     updateProgressBar(16);
@@ -325,7 +320,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 3:
                 setVisibility(R.id.progress_bar4, View.GONE);
                 if (!isChecked4) {
-                    ((CheckView) findViewById(R.id.check4)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check4).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check4)).check();
                     isChecked4 = true;
                     updateProgressBar(17);
@@ -334,7 +329,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 4:
                 setVisibility(R.id.progress_bar5, View.GONE);
                 if (!isChecked5) {
-                    ((CheckView) findViewById(R.id.check5)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check5).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check5)).check();
                     isChecked5 = true;
                     updateProgressBar(17);
@@ -343,7 +338,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 5:
                 setVisibility(R.id.progress_bar6, View.GONE);
                 if (!isChecked6) {
-                    ((CheckView) findViewById(R.id.check6)).setVisibility(View.VISIBLE);
+                    findViewById(R.id.check6).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check6)).check();
                     isChecked6 = true;
                     updateProgressBar(17);
@@ -371,10 +366,12 @@ public class LaunchActivity extends AppCompatActivity {
         super.onResume();
         setFilters();
         startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
-
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(uiOptions);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //Setup Start, skip buttons, countdown text
+        setupButtons();
     }
 
     @Override
@@ -413,6 +410,9 @@ public class LaunchActivity extends AppCompatActivity {
     }
 
     public void setupButtons() {
+        tryToDispose(timerDisposable);
+        tryToDispose(disposables);
+
         TextView start = findViewById(R.id.start);
         TextView skip = findViewById(R.id.skip);
         TextView countdown = findViewById(R.id.countdown);
@@ -447,7 +447,7 @@ public class LaunchActivity extends AppCompatActivity {
         setVisibility(R.id.cross6, View.GONE);
 
         skip.setOnClickListener(v -> {
-            tpe.shutdown();
+            tryToDispose(timerDisposable);
             MediaPlayer mp = MediaPlayer.create(this, R.raw.button_press);
             mp.start();
             if (!MainActivity.mainActivityActive) {
@@ -456,15 +456,37 @@ public class LaunchActivity extends AppCompatActivity {
 //                startMainActivityLockTaskMode();
             }
         });
-        tpe.scheduleAtFixedRate(() -> {
-            if (a == 1) {
-                countdown.setText(R.string.auto_skip_1_sec);
-                skip.callOnClick();
-            } else {
-                countdown.setText(getString(R.string.auto_skip_in_i_seconds, a));
-            }
-            a--;
-        }, 1, 1, TimeUnit.SECONDS);
+        Observable.interval(1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        timerDisposable = d;
+                        a = 30;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Long aLong) {
+                        if (a == 1) {
+                            countdown.setText(R.string.auto_skip_1_sec);
+                            skip.callOnClick();
+                            tryToDispose(timerDisposable);
+                        } else {
+                            countdown.setText(getString(R.string.auto_skip_in_i_seconds, a));
+                        }
+                        a--;
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
 
         start.setOnClickListener(v -> {
             isChecked1 = false;
@@ -489,7 +511,7 @@ public class LaunchActivity extends AppCompatActivity {
             makeAllSubTextGone();
             Log.d("SELF_TEST", "Started Self Test");
             skip.setEnabled(false);
-            tpe.shutdownNow();
+            tryToDispose(timerDisposable);
             countdown.setVisibility(View.INVISIBLE);
             start.setEnabled(false);
             new Handler().postDelayed(() -> start.setEnabled(true), 10000);
@@ -524,10 +546,19 @@ public class LaunchActivity extends AppCompatActivity {
         setVisibility(R.id.sft_error0x200000, View.GONE);
     }
 
+    private void tryToDispose(Disposable d) {
+        if (d != null) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        tpe.shutdownNow();
+        tryToDispose(timerDisposable);
+        tryToDispose(disposables);
     }
 
     public void setVisibility(int id, int vis) {

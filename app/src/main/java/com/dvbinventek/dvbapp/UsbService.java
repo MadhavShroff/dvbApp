@@ -21,6 +21,10 @@ import com.felhr.usbserial.UsbSerialInterface;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class UsbService extends Service {
 
     public static final String TAG = "UsbService";
@@ -51,7 +55,7 @@ public class UsbService extends Service {
     public UsbDeviceConnection connection;
     public UsbSerialDevice serialPort;
 
-    public boolean serialPortConnected;
+    public static boolean serialPortConnected;
     /*
      * Different notifications from OS will be received here (USB attached, detached, permission responses...)
      * About BroadcastReceiver: http://developer.android.com/reference/android/content/BroadcastReceiver.html
@@ -83,6 +87,9 @@ public class UsbService extends Service {
                     serialPort.close();
                 }
                 serialPortConnected = false;
+                if (MainActivity.usbStateObserver != null)
+                    Observable.just("disconnected").subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe(MainActivity.usbStateObserver);
             }
         }
     };
@@ -144,38 +151,13 @@ public class UsbService extends Service {
         setFilter();
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         findSerialPortDevice();
-//        Observable.interval(1000, 100, TimeUnit.MILLISECONDS)
-//                .subscribeOn(Schedulers.newThread())
-//        .subscribe(new Observer<Long>() {
-//            byte[] bytes = new byte[300];
-//            @Override
-//            public void onSubscribe(@NonNull Disposable d) {
-//            }
-//            @Override
-//            public void onNext(@NonNull Long aLong) {
-//                serialPort.syncOpen();
-//                int gotBytes = serialPort.syncRead(bytes,1);
-//                Log.d("MSG", "bytes received:" + gotBytes);
-//                try {
-//                    if (mHandler != null)
-//                            mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, bytes).sendToTarget();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                serialPort.syncClose();
-//            }
-//            @Override
-//            public void onError(@NonNull Throwable e) { e.printStackTrace(); }
-//            @Override
-//            public void onComplete() {
-//            }
-//        });
     }
 
     /* MUST READ about services
      * http://developer.android.com/guide/components/services.html
      * http://developer.android.com/guide/components/bound-services.html
      */
+
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
@@ -274,7 +256,6 @@ public class UsbService extends Service {
             return UsbService.this;
         }
     }
-
     /*
      * A simple thread to open a serial port.
      * Although it should be a fast operation. moving usb operations away from UI thread is a good thing.
@@ -282,11 +263,14 @@ public class UsbService extends Service {
     public class ConnectionThread extends Thread {
         @Override
         public void run() {
-            Context context = getApplicationContext(); // TODO: Confirm that this change works
+            Context context = getApplicationContext();
             serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection);
             if (serialPort != null) {
                 if (serialPort.open()) {
                     serialPortConnected = true;
+                    if (MainActivity.usbStateObserver != null)
+                        Observable.just("connected").subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread()).subscribe(MainActivity.usbStateObserver);
                     serialPort.setBaudRate(BAUD_RATE);
                     serialPort.setDataBits(UsbSerialInterface.DATA_BITS_8);
                     serialPort.setStopBits(UsbSerialInterface.STOP_BITS_1);
