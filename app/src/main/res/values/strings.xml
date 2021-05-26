@@ -50,6 +50,7 @@
     <string name="mode1">Mode:</string>
     <string name="fio21">FiO2:</string>
     <string name="percent">%</string>
+    <string name="d_percent">%d\%</string>
     <string name="ml">ml</string>
     <string name="flow">Flow</string>
     <string name="vtrig">Vtrig</string>
