@@ -1,7 +1,6 @@
 package com.dvbinventek.dvbapp;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -138,7 +137,7 @@ public class ReceivePacket {
     public int getType(char c1, char c2, char c3, char c4) {
         char[] c = {c1, c2, c3, c4};
         String s = String.valueOf(c);
-        Log.d("PACKET_TYPE", s);
+//        Log.d("PACKET_TYPE", s);
         switch (s) {
             case SendPacket.STR_STRT:
                 return SendPacket.TYPE_STRT;

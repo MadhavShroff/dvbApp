@@ -50,6 +50,7 @@
     <string name="mode1">Mode:</string>
     <string name="fio21">FiO2:</string>
     <string name="percent">%</string>
+    <string name="d_percent">%d\%</string>
     <string name="ml">ml</string>
     <string name="flow">Flow</string>
     <string name="vtrig">Vtrig</string>
@@ -82,11 +83,16 @@
     <string name="save_logs">Save Logs</string>
     <string name="show_historic_data">Show Historic data</string>
     <string name="alarm_limits">Alarm Limits</string>
-    <string name="minvol_ltrs">MinVol (ltrs)</string>
-    <string name="rate_b_min">Rate (b/min)</string>
-    <string name="vt_ml">Vt (ml)</string>
-    <string name="p_cm_h2o">P (cm H2O)</string>
-    <string name="apnea_time_s">Apnea Time (s)</string>
+    <string name="minvol_ltrs">MinVol</string>
+    <string name="minvol_ltrs_unit">l</string>
+    <string name="rate_b_min">Rate</string>
+    <string name="rate_b_min_unit">b/min</string>
+    <string name="vt_ml">Vt</string>
+    <string name="vt_ml_unit">ml</string>
+    <string name="p_cm_h2o">P</string>
+    <string name="p_cm_h2o_unit">cm H2O</string>
+    <string name="apnea_time_s">Apnea</string>
+    <string name="apnea_time_s_unit">s</string>
     <string name="monitoring">Monitoring</string>
     <string name="woman">woman</string>
     <string name="man">man</string>
@@ -233,4 +239,10 @@
     <string name="_6_check_replace_fuse">6.\tCheck / Replace fuse</string>
     <string name="_7_replace_the_external_ups">7.\tReplace the External UPS</string>
     <string name="_8_disconnect_power_cord_from_ventilator_n_wait_10_seconds_reconnect">8. Disconnect Power Cord from Ventilator, \n wait 10 seconds, Reconnect</string>
+    <string name="_1_ensure_ups_is_on">1. Ensure UPS is ON</string>
+    <string name="_2_check_power_cord_from_ups_to_ventilator">2.\tCheck power cord from UPS to Ventilator</string>
+    <string name="_3_ensure_ups_batteries_not_discharged">3.\tEnsure UPS batteries not discharged</string>
+    <string name="_4_check_replace_fuse">4.\tCheck / Replace fuse</string>
+    <string name="_5_replace_the_external_ups">5.\tReplace the External UPS</string>
+    <string name="_6_disconnect_power_cord_from_ventilator_nwait_10_seconds_reconnect">6. Disconnect Power Cord from Ventilator,\n\t wait 10 seconds, Reconnect</string>
 </resources>

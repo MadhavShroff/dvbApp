@@ -31,17 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="18dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/minVolText"
-                android:layout_width="130dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center|start"
-                android:text="@string/minvol_ltrs"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -49,8 +40,37 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/minVolText"
+                    android:layout_width="90dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/minvol_ltrs"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/minVolText_unit"
+                    android:layout_width="90dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/minvol_ltrs_unit"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/max"
@@ -58,8 +78,8 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/min"
@@ -74,27 +94,29 @@
 
                 <TextView
                     android:id="@+id/limits_minVolMax"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/limits_minVolMin"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <ImageButton
                 android:id="@+id/limits_minvol_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="66dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
@@ -106,16 +128,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="18dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="130dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center|start"
-                android:text="@string/rate_b_min"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -123,8 +137,36 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="90dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/rate_b_min"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/rate_b_min_unit"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/max"
@@ -132,8 +174,8 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/min"
@@ -148,27 +190,29 @@
 
                 <TextView
                     android:id="@+id/limits_ftotalMax"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/limits_ftotalMin"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <ImageButton
                 android:id="@+id/limits_ftotal_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="66dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
@@ -180,16 +224,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="18dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="130dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center|start"
-                android:text="@string/vt_ml"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -197,8 +233,34 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="90dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/vt_ml"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/vt_ml_unit"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/max"
@@ -206,8 +268,8 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/min"
@@ -222,27 +284,29 @@
 
                 <TextView
                     android:id="@+id/limits_vtMax"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
+                    android:textSize="26sp"
                     android:gravity="center"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/limits_vtMin"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <ImageButton
                 android:id="@+id/limits_vt_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="66dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
@@ -254,17 +318,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="18dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/limits_pText"
-                android:layout_width="130dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center|start"
-                android:text="@string/p_cm_h2o"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -272,8 +327,36 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/limits_pText"
+                    android:layout_width="90dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/p_cm_h2o"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/p_unit"
+                    android:layout_width="90dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/p_cm_h2o_unit"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/max"
@@ -281,8 +364,8 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:layout_width="55dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="@string/min"
@@ -297,27 +380,29 @@
 
                 <TextView
                     android:id="@+id/limits_pMax"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/limits_pMin"
-                    android:layout_width="110dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="33dp"
                     android:layout_gravity="center"
                     android:gravity="center"
+                    android:textSize="26sp"
                     android:textColor="@color/white"
-                    android:textSize="20sp" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <ImageButton
                 android:id="@+id/limits_p_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="66dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
@@ -331,28 +416,46 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="185dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:gravity="center|start"
-                android:text="@string/apnea_time_s"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="130dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center|start"
+                    android:text="@string/apnea_time_s"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="start"
+                    android:gravity="start"
+                    android:text="@string/apnea_time_s_unit"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="italic" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/limits_apnea"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:textSize="26sp"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/limits_apnea_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="66dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"

@@ -1,39 +1,33 @@
 package com.dvbinventek.dvbapp;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TableLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.HashMap;
 
 import cdflynn.android.library.checkview.CheckView;
 
 public class LogDisplay extends AppCompatActivity {
+
+    HistoricalDataRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +35,6 @@ public class LogDisplay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_display);
         Button back = findViewById(R.id.back);
-        TableLayout tl = findViewById(R.id.table);
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -86,7 +79,10 @@ public class LogDisplay extends AppCompatActivity {
                 }, 5000);
             }
         });
-        new GenerateTableRowsAsyncTask(getApplicationContext(), tl).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        RecyclerView recyclerView = findViewById(R.id.table_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new HistoricalDataRecyclerViewAdapter(StaticStore.Data);
+        recyclerView.setAdapter(adapter);
     }
 
     public void writeDataToFile() throws IOException {

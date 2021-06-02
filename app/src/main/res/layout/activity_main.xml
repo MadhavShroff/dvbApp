@@ -380,6 +380,20 @@
                 android:orientation="vertical" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/usbDisconnectedPostStandbyFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <fragment
+                android:id="@+id/usbDisconnectedPostStandbyFragment"
+                android:name="com.dvbinventek.dvbapp.UsbDisconnectedPostStandbyFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" />
+        </LinearLayout>
+
 
         <!--     Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
         <!--        <LinearLayout-->

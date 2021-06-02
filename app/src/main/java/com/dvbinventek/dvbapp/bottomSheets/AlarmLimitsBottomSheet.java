@@ -185,20 +185,17 @@ public class AlarmLimitsBottomSheet extends BaseBottomSheet {
         switch (this.type) { // Max box
             case "minvol":
                 return (!(f_max > StaticStore.DeviceParameterLimits.Alarms.max_mv_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_mv_min)
-                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_mv_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_mv_min) && !(f_max > f_min))
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_mv_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_mv_min))
                         || f_max == 123456 || f_min == 123456;
             case "rate": // No decimal place allowed
                 return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_rate_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_rate_min) && !(((f_max * 10) % 10) > 0)
-                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_rate_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_rate_min) && !(((f_min * 10) % 10) > 0)
-                        && !(f_max > f_min);
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_rate_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_rate_min) && !(((f_min * 10) % 10) > 0);
             case "vt": // No decimal place allowed
                 return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_vt_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_vt_min) && !(((f_max * 10) % 10) > 0)
-                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_vt_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_vt_min) && !(((f_min * 10) % 10) > 0)
-                        && !(f_max > f_min);
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_vt_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_vt_min) && !(((f_min * 10) % 10) > 0);
             case "p":
                 return !(f_max > StaticStore.DeviceParameterLimits.Alarms.max_p_max) && !(f_max < StaticStore.DeviceParameterLimits.Alarms.max_p_min)
-                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_p_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_p_min)
-                        && !(f_max > f_min);
+                        && !(f_min > StaticStore.DeviceParameterLimits.Alarms.min_p_max) && !(f_min < StaticStore.DeviceParameterLimits.Alarms.min_p_min);
         }
         return true;
     }

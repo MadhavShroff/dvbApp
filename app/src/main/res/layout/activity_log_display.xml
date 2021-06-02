@@ -210,11 +210,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center">
 
-        <TableLayout
-            android:id="@+id/table"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/table_recycler"
+            android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"></TableLayout>
+            android:paddingRight="10dp" />
+
     </ScrollView>
 </LinearLayout>

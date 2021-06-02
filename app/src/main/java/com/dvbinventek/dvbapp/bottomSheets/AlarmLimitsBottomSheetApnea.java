@@ -47,9 +47,10 @@ public class AlarmLimitsBottomSheetApnea extends BaseBottomSheet {
         super(hostActivity, config);
     }
 
-    public AlarmLimitsBottomSheetApnea(@NonNull Activity hostActivity, Spanned s) {
+    public AlarmLimitsBottomSheetApnea(@NonNull Activity hostActivity, Spanned s, String limit) {
         this(hostActivity, new Config.Builder(hostActivity).build());
         subheading.setText(s);
+        ((TextView) findViewById(R.id.albsap_subText)).setText(limit);
         heading.setText(R.string.setAlarmLimits);
         cancel.setOnClickListener(v -> {
             isDone = false;

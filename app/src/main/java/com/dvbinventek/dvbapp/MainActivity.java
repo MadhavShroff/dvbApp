@@ -89,6 +89,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
+import static com.dvbinventek.dvbapp.ProcessPacket.silenceAlarm;
+import static com.dvbinventek.dvbapp.ProcessPacket.silencedAlarm;
 import static com.dvbinventek.dvbapp.StaticStore.Values.packetType;
 
 public class MainActivity extends AppCompatActivity {
@@ -105,10 +107,12 @@ public class MainActivity extends AppCompatActivity {
     public static final int GRAPHS = 1;
     public static final int STANDBY = 2;
     public static final int USB_DISCONNECTED = 3;
+    public static final int USB_DISCONNECTED_POST_STANDBY = 4;
 
     public static WeakReference<LinearLayout> chartLayout; // 1
     public static WeakReference<LinearLayout> standbyLayout; // 2
     public static WeakReference<LinearLayout> usbDisconnectedLayout; // 3
+    public static WeakReference<LinearLayout> usbDisconnectedPostLayout; // 4
 
     //For date format in data logs
     @SuppressLint("SimpleDateFormat")
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isAdmin = false;
-    MediaPlayer alarmSound;
+    public MediaPlayer alarmSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -348,9 +352,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    Disposable silenceDisposable;
+
     public void setupUsbStateChangeEvents() {
         standbyLayout = new WeakReference<>(findViewById(R.id.standbyFragmentContainer)); // 2
-        usbDisconnectedLayout = new WeakReference<>(findViewById(R.id.usbDisconnectedFragmentContainer));
+        usbDisconnectedLayout = new WeakReference<>(findViewById(R.id.usbDisconnectedFragmentContainer)); // 3
+        usbDisconnectedPostLayout = new WeakReference<>(findViewById(R.id.usbDisconnectedPostStandbyFragmentContainer)); // 4
         usbStateObserver = new Observer<String>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -376,15 +383,6 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete() {
             }
         };
-    }
-
-    // Ring Alarm on device if USB Disconnected, show a dialog box with options to shutdown or sleep (?) and sound alarm
-    public void handleUsbDisconnected() {
-        handleUsbConnected(); // first stop audio and remove dialog before starting and showing it again
-        setGraphView(USB_DISCONNECTED);
-        alarmSound = MediaPlayer.create(MainActivity.this, R.raw.alarm_sound);
-        alarmSound.start();
-        alarmSound.setLooping(true);
     }
 
     public void handleUsbConnected() {
@@ -528,29 +526,17 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    public void setGraphView(int which) {
-        //Reset view
-        chartLayout.get().setVisibility(View.GONE);
-        standbyLayout.get().setVisibility(View.GONE);
-        usbDisconnectedLayout.get().setVisibility(View.GONE);
-        StandbyFragment.setIsInView(false);
-        StaticStore.restrictedCommunicationDueToStandby = false;
-        //make one visible
-        switch (which) {
-            case GRAPHS:
-                chartLayout.get().setVisibility(View.VISIBLE);
-                setupSilenceButton(1);
-                break;
-            case STANDBY:
-                standbyLayout.get().setVisibility(View.VISIBLE);
-                StandbyFragment.setIsInView(true);
-                setupSilenceButton(1);
-                StaticStore.restrictedCommunicationDueToStandby = true;
-                break;
-            case USB_DISCONNECTED:
-                usbDisconnectedLayout.get().setVisibility(View.VISIBLE);
-//                setupSilenceButton(2);
-                break;
+    // Ring Alarm on device if USB Disconnected, show a dialog box with options to shutdown or sleep (?) and sound alarm
+    public void handleUsbDisconnected() {
+        handleUsbConnected(); // first stop audio and remove dialog before starting and showing it again
+        if (packetType == SendPacket.TYPE_STRT) {
+            setGraphView(USB_DISCONNECTED);
+            alarmSound = MediaPlayer.create(MainActivity.this, R.raw.alarm_sound);
+            alarmSound.start();
+            alarmSound.setLooping(true);
+        } else {
+            setGraphView(USB_DISCONNECTED_POST_STANDBY);
+            if (alarmSound != null && alarmSound.isPlaying()) alarmSound.stop();
         }
     }
 
@@ -666,11 +652,41 @@ public class MainActivity extends AppCompatActivity {
         alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
+    public void setGraphView(int which) {
+        //Reset view
+        chartLayout.get().setVisibility(View.GONE);
+        standbyLayout.get().setVisibility(View.GONE);
+        usbDisconnectedLayout.get().setVisibility(View.GONE);
+        usbDisconnectedPostLayout.get().setVisibility(View.GONE);
+        StandbyFragment.setIsInView(false);
+        StaticStore.restrictedCommunicationDueToStandby = false;
+        //make one visible
+        switch (which) {
+            case GRAPHS:
+                chartLayout.get().setVisibility(View.VISIBLE);
+                setupSilenceButton(1);
+                break;
+            case STANDBY:
+                standbyLayout.get().setVisibility(View.VISIBLE);
+                StandbyFragment.setIsInView(true);
+                setupSilenceButton(1);
+                StaticStore.restrictedCommunicationDueToStandby = true;
+                break;
+            case USB_DISCONNECTED:
+                usbDisconnectedLayout.get().setVisibility(View.VISIBLE);
+                setupSilenceButton(2);
+                break;
+            case USB_DISCONNECTED_POST_STANDBY:
+                usbDisconnectedPostLayout.get().setVisibility(View.VISIBLE);
+                setupSilenceButton(1);
+        }
+    }
+
     public void setupSilenceButton(int which) {
         MaterialButton silence = findViewById(R.id.snooze);
-        silence.setOnClickListener(v -> {
-            switch (which) {
-                case 1:
+        switch (which) {
+            case 1:
+                silence.setOnClickListener(v -> {
                     if (silence.getText().equals(getResources().getString(R.string.silence_alarm))) {
                         SendPacket sp = new SendPacket();
                         sp.writeInfo(SendPacket.RNTM, 0);
@@ -684,10 +700,54 @@ public class MainActivity extends AppCompatActivity {
                         sp.writeInfo((byte) 1, 114);
                         sp.sendToDevice();
                     }
-                    break;
-            }
+                });
+                break;
+            case 2:
+                silence.setOnClickListener(v -> {
+                    if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.UNSILENCED) {
+                        Observable.interval(1, TimeUnit.SECONDS).take(60).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                silenceDisposable = d;
+                                silence.setIcon(silencedAlarm);
+                                if (alarmSound != null && alarmSound.isPlaying()) alarmSound.stop();
+                                silence.setText(silence.getResources().getString(R.string.silenced, 60));
+                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.SILENCED;
+                            }
 
-        });
+                            @Override
+                            public void onNext(@NonNull Long aLong) {
+                                silence.setText(silence.getResources().getString(R.string.silenced, 60 - aLong - 1));
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                            }
+
+                            @Override
+                            public void onComplete() { // 60 seconds over
+                                silence.setIcon(silenceAlarm);
+                                silence.setText(R.string.silence_alarm);
+                                if (alarmSound != null && !alarmSound.isPlaying()) {
+                                    alarmSound.start();
+                                    alarmSound.setLooping(true);
+                                }
+                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.UNSILENCED;
+                            }
+                        });
+                    } else if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.SILENCED) {
+                        tryToDispose(silenceDisposable);
+                        silence.setIcon(silenceAlarm);
+                        silence.setText(R.string.silence_alarm);
+                        if (alarmSound != null && !alarmSound.isPlaying()) {
+                            alarmSound.start();
+                            alarmSound.setLooping(true);
+                        }
+                        StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.UNSILENCED;
+                    }
+                });
+                break;
+        }
     }
 
     public void configureProcessPacketReferences() {
@@ -718,8 +778,8 @@ public class MainActivity extends AppCompatActivity {
         ProcessPacket.inspExp = new WeakReference<>(findViewById(R.id.mainInspExp));
         ProcessPacket.sigh = new WeakReference<>(findViewById(R.id.mainSigh));
         ProcessPacket.viewPagerHolder = new WeakReference<>(findViewById(R.id.viewPagerWrapper));
-        ProcessPacket.silenceAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silence_alarm);
-        ProcessPacket.silencedAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silenced);
+        silenceAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silence_alarm);
+        silencedAlarm = ContextCompat.getDrawable(this, R.drawable.ic_silenced);
         ProcessPacket.RRRedAlarm = ContextCompat.getDrawable(this, R.drawable.rounded_corner_red);
         ProcessPacket.RRRedMode = ContextCompat.getDrawable(this, R.drawable.rounded_corner_red);
         ProcessPacket.RRHolderRed = ContextCompat.getDrawable(this, R.drawable.rounded_corners_holder_red);
@@ -1009,14 +1069,34 @@ public class MainActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(ui_flags);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
 
-        new Handler().postDelayed(() -> { // check if connected and packet type to decide which screen to show
-            if (!UsbService.serialPortConnected) { // IF USB is disconnected in onResume
-                handleUsbDisconnected();
-            } else { // If USB is connected in onResume
-                handleUsbConnected();
-                Log.d("onResume", "" + packetType);
-            }
-        }, 8000);
+        Observable.timer(8, TimeUnit.SECONDS).take(1).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Long>() {
+                    Disposable disp;
+
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        disp = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Long aLong) {
+                        if (!UsbService.serialPortConnected) { // IF USB is disconnected in onResume
+                            handleUsbDisconnected();
+                        } else { // If USB is connected in onResume
+                            handleUsbConnected();
+                        }
+                        Log.d("onResume", "" + packetType);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        disp.dispose();
+                    }
+                });
     }
 
     private HorizontalLineAnnotation generateBaseLines(String yAxisId) {

@@ -38,32 +38,36 @@
                 <LinearLayout
                     android:id="@+id/controls_mode"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="50dp"
                     android:gravity="center"
                     android:orientation="horizontal">
+
                     <TextView
-                        android:layout_width="140dp"
+                        android:layout_width="110dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:gravity="center|start"
                         android:text="@string/mode1"
+                        android:textSize="26sp"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/controls_mode_current"
-                        android:layout_width="110dp"
+                        android:layout_width="130dp"
                         android:layout_height="45dp"
                         android:layout_gravity="center"
                         android:gravity="center"
+                        android:textSize="26sp"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textStyle="bold" />
 
                     <ImageButton
                         android:id="@+id/controls_mode_change"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="100dp"
+                        android:layout_height="55dp"
                         android:layout_gravity="center"
+                        android:layout_marginBottom="2dp"
                         android:backgroundTint="@color/greenEditButton"
                         android:src="@drawable/ic_action_name"
                         android:text="@string/edit" />
