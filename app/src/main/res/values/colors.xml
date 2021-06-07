@@ -30,5 +30,7 @@
     <color name="yellow3">#c7b800</color>
     <color name="yellow">#FCDD03</color>
     <color name="orange">#ff5722</color>
-
+    <color name="dark_gray">#FF424242</color>
+    <color name="unit_gray">#909090</color>
+    <color name="light_gray">#D3D3D3</color>
 </resources>

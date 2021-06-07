@@ -1,6 +1,7 @@
 package com.dvbinventek.dvbapp;
 
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -112,8 +113,16 @@ public class ProcessPacket {
                     tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showRatef ? "" + StaticStore.packet_rtotal : "");
                     tv5.get().setMaxMinValue(StaticStore.Values.fio2Max, StaticStore.Values.fio2Min, StaticStore.Values.fio2, showFio2 ? "" + StaticStore.packet_fio2 : "");
                     //modeBox.get().setText(StaticStore.modeSelected); // for displaying mode entered
-                    if (!modeBox.get().getText().equals(StaticStore.Values.mode))
-                        modeBox.get().setText(StaticStore.Values.mode); // for displaying mode received from packet
+                    if (!modeBox.get().getText().equals(StaticStore.Values.mode)) {
+                        modeBox.get().setText(StaticStore.Values.mode); // for displaying a new mode received from packet
+                        if (StaticStore.Values.mode.equals("HFO2")) { // Mode changed to HFO2
+                            tv4.get().setUnit("(lpm)");
+                            tv4.get().setLabel(Html.fromHtml("Flow Rate"));
+                        } else { // Mode changed to not HFO2
+                            tv4.get().setUnit("(b/min)");
+                            tv4.get().setLabel(Html.fromHtml("Rate"));
+                        }
+                    }
                     setStatusText();
                     if (MainActivity.graphShownRef == R.id.mainChart)
                         UpdateSuspender.using(chart.get(), () -> {
@@ -172,18 +181,15 @@ public class ProcessPacket {
                         public void onSubscribe(@NonNull Disposable d) {
                             highDisposable = d;
                         }
-
                         @Override
                         public void onNext(@NonNull Long aLong) {
                             if (aLong % 2 == 1) setAlarmColorsRed();
                             else resetAlarmColors();
                         }
-
                         @Override
                         public void onError(@NonNull Throwable e) {
                             e.printStackTrace();
                         }
-
                         @Override
                         public void onComplete() {
                             resetAlarmColors();
@@ -196,18 +202,15 @@ public class ProcessPacket {
                         public void onSubscribe(@NonNull Disposable d) {
                             mediumDisposable = d;
                         }
-
                         @Override
                         public void onNext(@NonNull Long aLong) {
                             if (aLong % 2 == 1) setAlarmColorsYellow();
                             else resetAlarmColors();
                         }
-
                         @Override
                         public void onError(@NonNull Throwable e) {
                             e.printStackTrace();
                         }
-
                         @Override
                         public void onComplete() {
                             resetAlarmColors();
@@ -218,9 +221,9 @@ public class ProcessPacket {
                     setAlarmColorsYellow();
                     break;
                 case 0: // no alarm
-                    resetAlarmColors();
                     tryToDispose(highDisposable);
                     tryToDispose(mediumDisposable);
+                    resetAlarmColors();
             }
             StaticStore.Warnings.warningSyncState = StaticStore.Warnings.warningSync;
         }

@@ -23,6 +23,7 @@ public class StaticStore {
     static public float packet_ps = 0;
     static public float packet_rtotal = 0;
     static public float packet_tinsp = 0;
+    static public float packet_flowRate = 0;
     static public byte packet_plimit = 0;
 
     static public short new_packet_mode = 0;
@@ -36,6 +37,7 @@ public class StaticStore {
     static public float new_packet_rtotal = 0;
     static public float new_packet_tinsp = 0;
     static public byte new_packet_plimit = 0;
+    static public float new_packet_flowRate = 0;
     public static boolean restrictedCommunicationDueToStandby = false;
 
     //map (short mode) -> mode String
@@ -107,8 +109,14 @@ public class StaticStore {
         public static short max_fio2 = 100;
         public static short min_fio2 = 21;
         // vt
-        public static short max_vt = 1500;
+//        public static short max_vt = 1500;
+//        public static short min_vt = 50;
+
+        //TODO: remove testing limits for vt
+        // vt
+        public static short max_vt = 2000;
         public static short min_vt = 50;
+
         // V trig / Flow Trig
         public static short max_vtrig = 20;
         public static short min_vtrig = 1;
@@ -122,9 +130,11 @@ public class StaticStore {
         public static short max_delps = 45;
         public static short min_delps = 5;
 
-        //TODO: refer to excel sheet
         public static short max_ratef = 60;
         public static short min_ratef = 4;
+
+        public static short max_flowRate = 80;
+        public static short min_flowRate = 1;
 
         public static short max_ie = 4040;
         public static short min_ie = 1010;
@@ -167,8 +177,8 @@ public class StaticStore {
         public static final int LOW = 1;
         public static byte warningSync;
         public static byte warningSyncState;
-        public static final List<String> currentWarnings = Collections.synchronizedList(new ArrayList<String>());
-        public static final List<String> allWarnings = Collections.synchronizedList(new ArrayList<String>());
+        public static final List<String> currentWarnings = Collections.synchronizedList(new ArrayList<>());
+        public static final List<String> allWarnings = Collections.synchronizedList(new ArrayList<>());
         public static int warningHighCount = 32;
         public static int warningMedCount = 7;
         public static int warningLowCount = 3;

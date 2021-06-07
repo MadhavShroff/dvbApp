@@ -417,53 +417,54 @@ public class MainActivity extends AppCompatActivity {
         mainActivityActive = false;
     }
 
+    Observable<Long> flashLockButtonObservable = Observable.interval(500, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(5);
+    Observer<Long> flashLockButtonObserver = new Observer<Long>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            lockFlashDisposable = d;
+            findViewById(R.id.lockScreen).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
+        }
+
+        @Override
+        public void onNext(@NonNull Long aLong) {
+            if (aLong % 2 == 0)
+                findViewById(R.id.lockScreen).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
+            else
+                findViewById(R.id.lockScreen).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onComplete() {
+            findViewById(R.id.lockScreen).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
+        }
+    };
+
     @SuppressLint("ClickableViewAccessibility")
     public void setupLockScreenButton() {
         ImageButton lockButton = findViewById(R.id.lockScreen);
         Button viewPagerCover = findViewById(R.id.viewPagerCover);
         Button tabCover = findViewById(R.id.tabLayoutCover);
         Button chartsCover = findViewById(R.id.chartsCover);
-        Button silenceCover = findViewById(R.id.silenceCover);
         Button mainCover = findViewById(R.id.mainCover);
-        Observable<Long> flashLockButtonObservable = Observable.interval(500, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(5);
-        Observer<Long> flashLockButtonObserver = new Observer<Long>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {
-                lockFlashDisposable = d;
-                lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
-            }
-            @Override
-            public void onNext(@NonNull Long aLong) {
-                if (aLong % 2 == 0)
-                    lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
-                else
-                    lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
-            }
-            @Override
-            public void onError(@NonNull Throwable e) {
-                e.printStackTrace();
-            }
-            @Override
-            public void onComplete() {
-                lockButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#00b686")));
-            }
-        };
         View.OnClickListener flashButton = v -> {
             tryToDispose(lockFlashDisposable);
             flashLockButtonObservable.subscribe(flashLockButtonObserver);
-            Toast.makeText(this, "Screen Locked", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Screen Locked", Toast.LENGTH_SHORT).show();
         };
         viewPagerCover.setOnClickListener(flashButton);
         tabCover.setOnClickListener(flashButton);
         chartsCover.setOnClickListener(flashButton);
-        silenceCover.setOnClickListener(flashButton);
         mainCover.setOnClickListener(flashButton);
         lockButton.setOnClickListener(v -> {
             if (StaticStore.MainActivityValues.lockState == StaticStore.MainActivityValues.UNLOCKED) { // Lock Screen
                 tabCover.setVisibility(View.VISIBLE);
                 viewPagerCover.setVisibility(View.VISIBLE);
                 chartsCover.setVisibility(View.VISIBLE);
-                silenceCover.setVisibility(View.VISIBLE);
                 mainCover.setVisibility(View.VISIBLE);
                 lockButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.locked, null));
                 StaticStore.MainActivityValues.lockState = StaticStore.MainActivityValues.LOCKED;
@@ -472,7 +473,6 @@ public class MainActivity extends AppCompatActivity {
                 tabCover.setVisibility(View.GONE);
                 viewPagerCover.setVisibility(View.GONE);
                 chartsCover.setVisibility(View.GONE);
-                silenceCover.setVisibility(View.GONE);
                 mainCover.setVisibility(View.GONE);
                 lockButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.unlocked, null));
                 StaticStore.MainActivityValues.lockState = StaticStore.MainActivityValues.UNLOCKED;
@@ -500,6 +500,7 @@ public class MainActivity extends AppCompatActivity {
             public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
                 if (s.equals("hpa")) {
                     ((MainParamsView) findViewById(R.id.pinsp)).setUnit("(hPa)");
+                    ((MainParamsView) findViewById(R.id.peep)).setUnit("(hPa)");
                     UpdateSuspender.using(mainChart, () -> {
                         Collections.replaceAll(mainChart.getAnnotations(),
                                 sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (cm H2O)").withFontStyle(18, ColorUtil.White).build(),
@@ -507,6 +508,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                 } else {
                     ((MainParamsView) findViewById(R.id.pinsp)).setUnit(Html.fromHtml("(cm H<small><sub>2</sub></small>O)"));
+                    ((MainParamsView) findViewById(R.id.peep)).setUnit(Html.fromHtml("(cm H<small><sub>2</sub></small>O)"));
                     UpdateSuspender.using(mainChart, () -> {
                         Collections.replaceAll(mainChart.getAnnotations(),
                                 sciChartBuilder.newTextAnnotation().withXAxisId("XAxis").withYAxisId(pressureId).withY1(0d).withText(" Pressure (hPa)").withFontStyle(18, ColorUtil.White).build(),
@@ -596,17 +598,14 @@ public class MainActivity extends AppCompatActivity {
                                     standbyDisposable.dispose();
                                 }
                             });
-                        }).setNegativeButton("No", (dialog_, which_) -> {
-                            dialog_.dismiss();
-                        }).create();
+                        }).setNegativeButton("No", (dialog_, which_) -> dialog_.dismiss())
+                        .create();
                 AlertDialog alertDialog = builder
                         .setTitle("Are you sure you want to stop ventilation")
                         .setMessage("This action will stop providing ventilation to the patient")
-                        .setPositiveButton("Yes", (dialog, which) -> {
-                            showDialogHideNav(alertDialogInner);
-                        }).setNegativeButton("No", (dialog_, which_) -> {
-                            dialog_.dismiss();
-                        }).create();
+                        .setPositiveButton("Yes", (dialog, which) -> showDialogHideNav(alertDialogInner))
+                        .setNegativeButton("No", (dialog_, which_) -> dialog_.dismiss())
+                        .create();
                 showDialogHideNav(alertDialog);
             }
 
@@ -684,9 +683,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void setupSilenceButton(int which) {
         MaterialButton silence = findViewById(R.id.snooze);
+        tryToDispose(silenceDisposable);
         switch (which) {
             case 1:
                 silence.setOnClickListener(v -> {
+                    if (findViewById(R.id.chartsCover).getVisibility() == View.VISIBLE) { // Screen is locked
+                        tryToDispose(lockFlashDisposable);
+                        flashLockButtonObservable.subscribe(flashLockButtonObserver);
+                        Toast.makeText(this, "Screen Locked", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (silence.getText().equals(getResources().getString(R.string.silence_alarm))) {
                         SendPacket sp = new SendPacket();
                         sp.writeInfo(SendPacket.RNTM, 0);
@@ -704,7 +710,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 silence.setOnClickListener(v -> {
-                    if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.UNSILENCED) {
+                    if (findViewById(R.id.chartsCover).getVisibility() == View.VISIBLE) { // Screen is locked
+                        tryToDispose(lockFlashDisposable);
+                        flashLockButtonObservable.subscribe(flashLockButtonObserver);
+                        Toast.makeText(this, "Screen Locked", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.SILENCED) {
                         Observable.interval(1, TimeUnit.SECONDS).take(60).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
@@ -712,7 +724,7 @@ public class MainActivity extends AppCompatActivity {
                                 silence.setIcon(silencedAlarm);
                                 if (alarmSound != null && alarmSound.isPlaying()) alarmSound.stop();
                                 silence.setText(silence.getResources().getString(R.string.silenced, 60));
-                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.SILENCED;
+                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.UNSILENCED;
                             }
 
                             @Override
@@ -729,21 +741,23 @@ public class MainActivity extends AppCompatActivity {
                                 silence.setIcon(silenceAlarm);
                                 silence.setText(R.string.silence_alarm);
                                 if (alarmSound != null && !alarmSound.isPlaying()) {
+                                    alarmSound = MediaPlayer.create(MainActivity.this, R.raw.alarm_sound);
                                     alarmSound.start();
                                     alarmSound.setLooping(true);
                                 }
-                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.UNSILENCED;
+                                StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.SILENCED;
                             }
                         });
-                    } else if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.SILENCED) {
+                    } else if (StaticStore.MainActivityValues.silenceState == StaticStore.MainActivityValues.UNSILENCED) {
                         tryToDispose(silenceDisposable);
                         silence.setIcon(silenceAlarm);
                         silence.setText(R.string.silence_alarm);
                         if (alarmSound != null && !alarmSound.isPlaying()) {
+                            alarmSound = MediaPlayer.create(MainActivity.this, R.raw.alarm_sound);
                             alarmSound.start();
                             alarmSound.setLooping(true);
                         }
-                        StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.UNSILENCED;
+                        StaticStore.MainActivityValues.silenceState = StaticStore.MainActivityValues.SILENCED;
                     }
                 });
                 break;
@@ -842,11 +856,13 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 showSidebar();
                 tab.getIcon().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_IN);
+                tab.view.setBackgroundColor(getColor(R.color.blue));
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 tab.getIcon().setColorFilter(getResources().getColor(android.R.color.darker_gray), PorterDuff.Mode.SRC_IN);
+                tab.view.setBackgroundColor(getColor(R.color.dark_gray));
             }
 
             @Override
@@ -858,7 +874,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayoutMediator tm = new TabLayoutMediator(tabLayout, viewPager, true, true, new TabLayoutMediator.TabConfigurationStrategy() {
             int[] icons = {R.drawable.controls_icon, R.drawable.ic_monitoring, R.drawable.ic_alarm, R.drawable.ic_tools, R.drawable.ic_patient, R.drawable.ic_events, R.drawable.ic_controls};
             String[] texts = {"Controls", "Monitoring", "Alarms", "Tools", "Patient", "Events", "System"};
-
             @Override
             public void onConfigureTab(@androidx.annotation.NonNull TabLayout.Tab tab, int position) {
                 tab.setIcon(icons[position]);
@@ -882,6 +897,8 @@ public class MainActivity extends AppCompatActivity {
         mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
         mpv = findViewById(R.id.fio2);
         mpv.setLabel(Html.fromHtml("FiO<small><sub>2</sub></small>"));
+        mpv = findViewById(R.id.peep);
+        mpv.setUnit(Html.fromHtml("(cm H<small><sub>2</sub></small>O)"));
     }
 
     public void showSidebar() {
@@ -902,7 +919,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupDataLogger() {
-        Observable.interval(3, 3, TimeUnit.SECONDS)
+        Observable.interval(10, 3, TimeUnit.SECONDS)
                 .observeOn(Schedulers.newThread())
                 .subscribe(new Observer<Long>() {
                     @Override
@@ -978,6 +995,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+        if (alarmSound != null && alarmSound.isPlaying()) alarmSound.stop();
+        ((MaterialButton) findViewById(R.id.snooze)).setIcon(silenceAlarm);
+        ((MaterialButton) findViewById(R.id.snooze)).setText(R.string.silence_alarm);
+        tryToDispose(silenceDisposable);
         unregisterReceiver(mUsbReceiver);
         unbindService(usbConnection);
     }

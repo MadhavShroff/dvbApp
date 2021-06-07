@@ -50,6 +50,8 @@ public class ReceivePacket {
                 return "CPAP";
             case 21:
                 return "ACV";
+            case 22:
+                return "HFO2";
             default:
                 return "--";
         }
@@ -113,13 +115,13 @@ public class ReceivePacket {
 
     public void getSystemsValues(ByteBuffer byteBuffer) {
         byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), 172, 204);
-        StaticStore.System.machineHours = String.valueOf(new char[]{(char)byteBuffer.get(172), (char)byteBuffer.get(173), (char)byteBuffer.get(174), (char)byteBuffer.get(175), (char)byteBuffer.get(176)});
-        StaticStore.System.patientHours = String.valueOf(new char[]{(char)byteBuffer.get(177), (char)byteBuffer.get(178), (char)byteBuffer.get(179), (char)byteBuffer.get(180), (char)byteBuffer.get(181)});
-        StaticStore.System.lastServiceDate = String.valueOf(new char[]{(char)byteBuffer.get(182), (char)byteBuffer.get(183), (char)byteBuffer.get(184), (char)byteBuffer.get(185), (char)byteBuffer.get(186), (char)byteBuffer.get(187)});
-        StaticStore.System.lastServiceHrs = String.valueOf(new char[]{(char)byteBuffer.get(188), (char)byteBuffer.get(189), (char)byteBuffer.get(190), (char)byteBuffer.get(191), (char)byteBuffer.get(192)});
-        StaticStore.System.nextServiceDate = String.valueOf(new char[]{(char)byteBuffer.get(193), (char)byteBuffer.get(194), (char)byteBuffer.get(195), (char)byteBuffer.get(196), (char)byteBuffer.get(197), (char)byteBuffer.get(198)});
-        StaticStore.System.nextServiceHrs = String.valueOf(new char[]{(char)byteBuffer.get(199), (char)byteBuffer.get(200), (char)byteBuffer.get(201), (char)byteBuffer.get(202), (char)byteBuffer.get(203)});
-        StaticStore.System.systemVersion = String.valueOf(new char[]{(char)byteBuffer.get(204), (char)byteBuffer.get(205), (char)byteBuffer.get(206), (char)byteBuffer.get(207), (char)byteBuffer.get(208)});
+        StaticStore.System.machineHours = String.valueOf(new char[]{(char) byteBuffer.get(172), (char) byteBuffer.get(173), (char) byteBuffer.get(174), (char) byteBuffer.get(175), (char) byteBuffer.get(176)});
+        StaticStore.System.patientHours = String.valueOf(new char[]{(char) byteBuffer.get(177), (char) byteBuffer.get(178), (char) byteBuffer.get(179), (char) byteBuffer.get(180), (char) byteBuffer.get(181)});
+        StaticStore.System.lastServiceDate = String.valueOf(new char[]{(char) byteBuffer.get(182), (char) byteBuffer.get(183), (char) byteBuffer.get(184), (char) byteBuffer.get(185), (char) byteBuffer.get(186), (char) byteBuffer.get(187)});
+        StaticStore.System.lastServiceHrs = String.valueOf(new char[]{(char) byteBuffer.get(188), (char) byteBuffer.get(189), (char) byteBuffer.get(190), (char) byteBuffer.get(191), (char) byteBuffer.get(192)});
+        StaticStore.System.nextServiceDate = String.valueOf(new char[]{(char) byteBuffer.get(193), (char) byteBuffer.get(194), (char) byteBuffer.get(195), (char) byteBuffer.get(196), (char) byteBuffer.get(197), (char) byteBuffer.get(198)});
+        StaticStore.System.nextServiceHrs = String.valueOf(new char[]{(char) byteBuffer.get(199), (char) byteBuffer.get(200), (char) byteBuffer.get(201), (char) byteBuffer.get(202), (char) byteBuffer.get(203)});
+        StaticStore.System.systemVersion = String.valueOf(new char[]{(char) byteBuffer.get(204), (char) byteBuffer.get(205), (char) byteBuffer.get(206), (char) byteBuffer.get(207), (char) byteBuffer.get(208), (char) byteBuffer.get(209), (char) byteBuffer.get(210), (char) byteBuffer.get(211), (char) byteBuffer.get(212)});
         try {
             StaticStore.System.lastServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.lastServiceDate)));
             StaticStore.System.nextServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.nextServiceDate)));

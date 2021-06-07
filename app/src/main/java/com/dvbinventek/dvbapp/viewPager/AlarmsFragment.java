@@ -50,12 +50,13 @@ public class AlarmsFragment extends Fragment {
 
     //TODO: Do not permit Max value to be lower than min value
 
-    public static Set<String> resetList = new HashSet<String>();
+    public static Set<String> resetList = new HashSet<>();
     public static List<Integer> highlightedList = new ArrayList<>();
     public static int countdown = 30;
     public static boolean countdownStarted = false;
     public final int white = Color.parseColor("#ffffff");
     public final int black = Color.parseColor("#000000");
+    public final int lightGray = Color.parseColor("#909090");
     public WeakReference<View> alarmsView;
     public MediaPlayer mp;
     public CompositeDisposable disposables = new CompositeDisposable();
@@ -102,6 +103,7 @@ public class AlarmsFragment extends Fragment {
         //Set subtext
         ((TextView) view.findViewById(R.id.minVolText)).setText(Html.fromHtml("MV<sub><small>total</small></sub>"));
         ((TextView) view.findViewById(R.id.p_unit)).setText(Html.fromHtml("cm H<sub><small>2</small></sub>O"));
+        ((TextView) view.findViewById(R.id.vt_alarm_limits)).setText(Html.fromHtml("V<sub><small>t</small></sub>"));
 
         //Set Past Session Values
         setPastSessionValues();
@@ -141,11 +143,11 @@ public class AlarmsFragment extends Fragment {
             @Override
             public void onNext(@io.reactivex.rxjava3.annotations.NonNull String s) {
                 if (s.equals("hpa")) {
-                    setText(R.id.limits_pText, "P (hPa)");
+                    setText(R.id.p_unit, "hPa");
                     abs_p.setSubHeading(Html.fromHtml("P (hPa)"));
                 } else {
-                    setText(R.id.limits_pText, Html.fromHtml("P (cm H<small><sub>2</sub></small>O)"));
-                    abs_p.setSubHeading(Html.fromHtml("P (cm H<sub><small>2</small></sub>0)"));
+                    setText(R.id.p_unit, Html.fromHtml("cm H<small><sub>2</sub></small>O"));
+                    abs_p.setSubHeading(Html.fromHtml("P (cm H<sub><small>2</small></sub>O)"));
                 }
             }
 
@@ -182,21 +184,11 @@ public class AlarmsFragment extends Fragment {
         ImageButton apnea = alarmsView.get().findViewById(R.id.limits_apnea_change);
         Button saveChanges = alarmsView.get().findViewById(R.id.limits_saveChanges);
 
-        minVol.setOnClickListener(v -> {
-            abs_minVol.show(true);
-        });
-        ftotal.setOnClickListener(v -> {
-            abs_rate.show(true);
-        });
-        vt.setOnClickListener(v -> {
-            abs_vt.show(true);
-        });
-        p.setOnClickListener(v -> {
-            abs_p.show(true);
-        });
-        apnea.setOnClickListener(v -> {
-            abs_apnea.show(true);
-        });
+        minVol.setOnClickListener(v -> abs_minVol.show(true));
+        ftotal.setOnClickListener(v -> abs_rate.show(true));
+        vt.setOnClickListener(v -> abs_vt.show(true));
+        p.setOnClickListener(v -> abs_p.show(true));
+        apnea.setOnClickListener(v -> abs_apnea.show(true));
 
         abs_minVol.setOnDismissListener(bottomSheet -> {
             String max = abs_minVol.getMax();
@@ -385,7 +377,7 @@ public class AlarmsFragment extends Fragment {
     }
 
     public void resetChanges() {
-        Log.d("MSG", "resetChanges(): " + resetList);
+        Log.d("MSG", "resetChanges() : " + resetList);
         setText(R.id.limits_saveChanges, alarmsView.get().getResources().getString(R.string.confirm));
         for (int id : highlightedList) {
             revertRowColor(id);
@@ -440,8 +432,10 @@ public class AlarmsFragment extends Fragment {
                 for (int j = 0; j < ((LinearLayout) v).getChildCount(); j++) {
                     View vi = ((LinearLayout) v).getChildAt(j);
                     if (vi instanceof TextView) {
-                        Log.d("MSG", "");
-                        ((TextView) vi).setTextColor(white);
+                        if (i == 0 && j == 1)
+                            ((TextView) vi).setTextColor(lightGray); // set color of unit to light gray
+                        else ((TextView) vi).setTextColor(white); // rest of the text to white
+
                     }
                 }
             }

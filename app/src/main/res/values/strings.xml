@@ -69,6 +69,7 @@
     <string name="max_value">Max Value:</string>
     <string name="bpap">BPAP</string>
     <string name="cpap">CPAP</string>
+    <string name="hfo2">HFO2</string>
     <string name="acv">ACV</string>
     <string name="prvc">PRVC</string>
     <string name="psv">PSV</string>
@@ -113,6 +114,7 @@
     <string name="pmean">Pmean</string>
     <string name="mvspont">MVspont</string>
     <string name="i_e">I:E</string>
+    <string name="flowRate">FlowRate</string>
     <string name="cstat">Cstat</string>
     <string name="alarms1">Alarms</string>
     <string name="sigh">Sigh</string>
@@ -226,7 +228,7 @@
     <string name="err">Error !</string>
     <string name="sleep_display">Sleep Display</string>
     <string name="shutdown_display">Shutdown Display</string>
-    <string name="version">2.5.0</string>
+    <string name="version">2.6.1</string>
     <string name="system_alarm">SYSTEM ALARM</string>
     <string name="nno_ups_power">\nNO UPS POWER</string>
     <string name="or">OR</string>
@@ -245,4 +247,9 @@
     <string name="_4_check_replace_fuse">4.\tCheck / Replace fuse</string>
     <string name="_5_replace_the_external_ups">5.\tReplace the External UPS</string>
     <string name="_6_disconnect_power_cord_from_ventilator_nwait_10_seconds_reconnect">6. Disconnect Power Cord from Ventilator,\n\t wait 10 seconds, Reconnect</string>
+    <string name="edit_button_">Edit Button</string>
+    <string name="machine_hours">Machine Hours</string>
+    <string name="patient_hours">Patient Hours</string>
+    <string name="last_service">Last Service</string>
+    <string name="next_service">Next Service</string>
 </resources>

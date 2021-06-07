@@ -24,7 +24,7 @@
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleGroup"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:outlineAmbientShadowColor="@color/colorAccent"
         app:checkedButton="@id/cmH20"
         app:selectionRequired="true"
@@ -34,7 +34,7 @@
             android:id="@+id/hPa"
             style="@style/OutlinedButton"
             android:layout_width="125dp"
-            android:layout_height="80dp"
+            android:layout_height="match_parent"
             android:text="@string/hpa"
             android:textAllCaps="false"
             android:textSize="21sp" />
@@ -43,7 +43,7 @@
             android:id="@+id/cmH20"
             style="@style/OutlinedButton"
             android:layout_width="125dp"
-            android:layout_height="80dp"
+            android:layout_height="match_parent"
             android:text="@string/cm_h2o"
             android:textAllCaps="false"
             android:textSize="21sp" />
@@ -127,7 +127,7 @@
                     android:layout_gravity="start|top"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="Machine Hours"
+                    android:text="@string/machine_hours"
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <TextView
@@ -146,7 +146,7 @@
                     android:layout_gravity="start|bottom"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="Patient Hours"
+                    android:text="@string/patient_hours"
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <TextView
@@ -177,7 +177,7 @@
                     android:layout_gravity="start|top"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="Last Service"
+                    android:text="@string/last_service"
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <LinearLayout
@@ -193,7 +193,7 @@
                         android:layout_gravity="center"
                         android:background="?attr/colorPrimaryDark"
                         android:gravity="end"
-                        android:text="Jul 29 2020"
+                        android:text=""
                         android:textAppearance="?attr/textAppearanceBody1" />
 
                     <TextView
@@ -202,7 +202,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|end"
                         android:background="?attr/colorPrimaryDark"
-                        android:text="200 hrs"
+                        android:text=""
                         android:textAppearance="?attr/textAppearanceBody1" />
                 </LinearLayout>
 
@@ -212,7 +212,7 @@
                     android:layout_gravity="start|top"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="Next Service"
+                    android:text="@string/next_service"
                     android:textAppearance="?attr/textAppearanceBody1" />
 
                 <LinearLayout
@@ -229,7 +229,7 @@
                         android:layout_gravity="center"
                         android:background="?attr/colorPrimaryDark"
                         android:gravity="end"
-                        android:text="Sept 29 2020"
+                        android:text=""
                         android:textAppearance="?attr/textAppearanceBody1" />
 
                     <TextView
@@ -238,7 +238,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|end"
                         android:background="?attr/colorPrimaryDark"
-                        android:text="800 hrs"
+                        android:text=""
                         android:textAppearance="?attr/textAppearanceBody1" />
                 </LinearLayout>
             </GridLayout>
@@ -271,7 +271,7 @@
                     android:layout_gravity="end|top"
                     android:background="?attr/colorPrimaryDark"
                     android:padding="5dp"
-                    android:text="1.4.7"
+                    android:text=""
                     android:textAppearance="?attr/textAppearanceBody1"
                     app:layout_constraintBottom_toTopOf="@id/displayVersion"
                     app:layout_constraintEnd_toEndOf="parent"

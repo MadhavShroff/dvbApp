@@ -22,8 +22,10 @@
         android:textSize="35sp" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="510dp"
+        android:layout_width="match_parent"
+        android:layout_height="520dp"
+        android:layout_gravity="center"
+        android:gravity="center|top"
         android:orientation="vertical">
 
         <LinearLayout
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginBottom="18dp"
+            android:paddingBottom="11dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -41,10 +44,11 @@
 
                 <TextView
                     android:id="@+id/minVolText"
+                    android:layout_height="46dp"
                     android:layout_width="90dp"
-                    android:layout_height="40dp"
+                    android:gravity="bottom"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:paddingBottom="10dp"
                     android:text="@string/minvol_ltrs"
                     android:textColor="@color/white"
                     android:textSize="26sp"
@@ -53,35 +57,35 @@
                 <TextView
                     android:id="@+id/minVolText_unit"
                     android:layout_width="90dp"
-                    android:layout_height="26dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/minvol_ltrs_unit"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
+                    android:textColor="@color/unit_gray"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:layout_gravity="bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/max"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/min"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
@@ -90,14 +94,15 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/limits_minVolMax"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -105,9 +110,9 @@
                 <TextView
                     android:id="@+id/limits_minVolMin"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -118,6 +123,7 @@
                 android:layout_width="100dp"
                 android:layout_height="66dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5.5dp"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
                 android:src="@drawable/ic_action_name" />
@@ -129,6 +135,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginBottom="18dp"
+            android:paddingBottom="11dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -138,9 +145,9 @@
 
                 <TextView
                     android:layout_width="90dp"
-                    android:layout_height="40dp"
+                    android:layout_height="46dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/rate_b_min"
                     android:textColor="@color/white"
                     android:textSize="26sp"
@@ -148,13 +155,12 @@
 
                 <TextView
                     android:layout_width="90dp"
-                    android:layout_height="26dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/rate_b_min_unit"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
+                    android:textColor="@color/unit_gray"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
@@ -162,22 +168,23 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/max"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/min"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
@@ -186,14 +193,15 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/limits_ftotalMax"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -201,9 +209,9 @@
                 <TextView
                     android:id="@+id/limits_ftotalMin"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -214,6 +222,7 @@
                 android:layout_width="100dp"
                 android:layout_height="66dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5.5dp"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
                 android:src="@drawable/ic_action_name" />
@@ -225,6 +234,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginBottom="18dp"
+            android:paddingBottom="11dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -233,10 +243,12 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/vt_alarm_limits"
                     android:layout_width="90dp"
-                    android:layout_height="40dp"
+                    android:layout_height="46dp"
+                    android:gravity="bottom"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:paddingBottom="10dp"
                     android:text="@string/vt_ml"
                     android:textColor="@color/white"
                     android:textSize="26sp"
@@ -244,34 +256,34 @@
 
                 <TextView
                     android:layout_width="90dp"
-                    android:layout_height="26dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/vt_ml_unit"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
+                    android:textColor="@color/unit_gray"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/max"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/min"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
@@ -280,24 +292,25 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/limits_vtMax"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:textSize="26sp"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/limits_vtMin"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -308,6 +321,7 @@
                 android:layout_width="100dp"
                 android:layout_height="66dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5.5dp"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
                 android:src="@drawable/ic_action_name" />
@@ -318,6 +332,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:paddingBottom="11dp"
             android:layout_marginBottom="18dp"
             android:orientation="horizontal">
 
@@ -329,9 +344,9 @@
                 <TextView
                     android:id="@+id/limits_pText"
                     android:layout_width="90dp"
-                    android:layout_height="30dp"
+                    android:layout_height="46dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/p_cm_h2o"
                     android:textColor="@color/white"
                     android:textSize="26sp"
@@ -340,34 +355,35 @@
                 <TextView
                     android:id="@+id/p_unit"
                     android:layout_width="90dp"
-                    android:layout_height="34dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
+                    android:paddingBottom="7dp"
                     android:text="@string/p_cm_h2o_unit"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
+                    android:textColor="@color/unit_gray"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/max"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="40dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom"
                     android:text="@string/min"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
@@ -376,14 +392,15 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/limits_pMax"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
+                    android:gravity="bottom|center"
                     android:textSize="26sp"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
@@ -391,11 +408,11 @@
                 <TextView
                     android:id="@+id/limits_pMin"
                     android:layout_width="100dp"
-                    android:layout_height="33dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
-                    android:textSize="26sp"
+                    android:gravity="bottom|center"
                     android:textColor="@color/white"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -404,6 +421,7 @@
                 android:layout_width="100dp"
                 android:layout_height="66dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5.5dp"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
                 android:src="@drawable/ic_action_name" />
@@ -414,6 +432,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:paddingBottom="11dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -423,9 +442,9 @@
 
                 <TextView
                     android:layout_width="130dp"
-                    android:layout_height="40dp"
+                    android:layout_height="46dp"
                     android:layout_gravity="center"
-                    android:gravity="center|start"
+                    android:gravity="bottom"
                     android:text="@string/apnea_time_s"
                     android:textColor="@color/white"
                     android:textSize="26sp"
@@ -433,13 +452,12 @@
 
                 <TextView
                     android:layout_width="100dp"
-                    android:layout_height="26dp"
+                    android:layout_height="23dp"
                     android:layout_gravity="start"
-                    android:gravity="start"
+                    android:gravity="bottom"
                     android:text="@string/apnea_time_s_unit"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:textStyle="italic" />
+                    android:textColor="@color/unit_gray"
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <TextView
@@ -447,6 +465,7 @@
                 android:layout_width="100dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="7.5dp"
                 android:gravity="center"
                 android:textSize="26sp"
                 android:textColor="@color/white"
@@ -457,6 +476,7 @@
                 android:layout_width="100dp"
                 android:layout_height="66dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5.5dp"
                 android:backgroundTint="@color/greenButton"
                 android:contentDescription="@string/edit"
                 android:src="@drawable/ic_action_name"

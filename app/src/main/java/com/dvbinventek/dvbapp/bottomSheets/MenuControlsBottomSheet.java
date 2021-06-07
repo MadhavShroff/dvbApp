@@ -26,6 +26,7 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
     public final Button acv = findViewById(R.id.acv);
     public final Button cpap = findViewById(R.id.cpap);
     public final Button bpap = findViewById(R.id.bpap);
+    public final Button hfo2 = findViewById(R.id.hfo2);
     View b;
 
     public MenuControlsBottomSheet(@NonNull Activity hostActivity) {
@@ -40,6 +41,7 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
         acv.setOnClickListener(new ControlsChangeOnClickListener());
         cpap.setOnClickListener(new ControlsChangeOnClickListener());
         bpap.setOnClickListener(new ControlsChangeOnClickListener());
+        hfo2.setOnClickListener(new ControlsChangeOnClickListener());
     }
 
     public MenuControlsBottomSheet(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
@@ -75,6 +77,9 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
                 break;
             case 16:
                 bpap.performClick();
+                break;
+            case 22:
+                hfo2.performClick();
                 break;
             default:
                 b.setAlpha(0.3f);
@@ -138,6 +143,10 @@ public class MenuControlsBottomSheet extends BaseBottomSheet {
                 case R.id.bpap:
                     StaticStore.modeSelected = "BPAP";
                     StaticStore.modeSelectedShort = 16;
+                    break;
+                case R.id.hfo2:
+                    StaticStore.modeSelected = "HFO2";
+                    StaticStore.modeSelectedShort = 22;
                     break;
             }
             dismiss(true);

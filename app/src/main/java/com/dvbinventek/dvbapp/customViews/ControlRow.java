@@ -22,6 +22,7 @@ public class ControlRow extends LinearLayout {
     WeakReference<TextView> mLabel, mUnit, mCurrent;
     public final int white = Color.parseColor("#ffffff");
     public final int black = Color.parseColor("#000000");
+    public final int lightGray = Color.parseColor("#909090");
     WeakReference<ImageButton> mEdit;
 
 
@@ -58,7 +59,7 @@ public class ControlRow extends LinearLayout {
         } else {
             mRow.get().setBackgroundColor(0);
             mLabel.get().setTextColor(white);
-            mUnit.get().setTextColor(white);
+            mUnit.get().setTextColor(lightGray);
             mCurrent.get().setTextColor(white);
         }
     }

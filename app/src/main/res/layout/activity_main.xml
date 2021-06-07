@@ -73,7 +73,7 @@
         android:layout_marginStart="3dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pinsp"
-        app:unit="(l)"
+        app:unit="(cm H2O)"
         app:value="0" />
 
     <com.dvbinventek.dvbapp.customViews.MainParamsView
@@ -134,18 +134,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/snooze" />
 
-    <Button
-        android:id="@+id/silenceCover"
-        android:layout_width="187dp"
-        android:layout_height="80dp"
-        android:layout_marginStart="3dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:elevation="10dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/lockScreen"
-        app:layout_constraintTop_toBottomOf="@id/fio2" />
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/snooze"
         android:layout_width="187dp"
@@ -153,6 +141,7 @@
         android:layout_marginStart="3dp"
         android:backgroundTint="@color/colorAccent"
         android:drawableTint="#000000"
+        android:elevation="2dp"
         android:hapticFeedbackEnabled="true"
         android:text="@string/silence_alarm"
         android:textColor="#000000"
@@ -478,7 +467,7 @@
             app:tabGravity="fill"
             app:tabIndicatorColor="#ff0000"
             app:tabIndicatorHeight="4dp"
-            app:tabSelectedTextColor="#ff0000" />
+            app:tabSelectedTextColor="#ffffff" />
 
     </com.google.android.material.card.MaterialCardView>
 

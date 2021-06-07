@@ -35,13 +35,11 @@ public class MainParamsView extends LinearLayout {
     }
 
     public void setUnit(String s) {
-        TextView tv = findViewById(R.id.unit);
-        tv.setText(s);
+        ((TextView) findViewById(R.id.unit)).setText(s);
     }
 
     public void setUnit(Spanned s) {
-        TextView tv = findViewById(R.id.unit);
-        tv.setText(s);
+        ((TextView) findViewById(R.id.unit)).setText(s);
     }
 
     public MainParamsView(Context context, @Nullable AttributeSet attrs) {
@@ -170,7 +168,6 @@ public class MainParamsView extends LinearLayout {
         } finally {
             typedArray.recycle();
         }
-
         Min.setText(min);
         Max.setText(max);
         Value.setText(value);
@@ -184,6 +181,7 @@ public class MainParamsView extends LinearLayout {
         maxText.setTextSize(15);
         minText.setTextSize(15);
     }
+
 
     public void setAlarmColors(int color1, int color2, int color3, int color) {
         if (color == RED) {

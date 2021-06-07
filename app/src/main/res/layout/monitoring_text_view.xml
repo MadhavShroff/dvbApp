@@ -25,17 +25,16 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="@color/green3"
-                android:textStyle="italic"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textColor="@color/white"
+                android:textColor="@color/light_gray"
                 android:textSize="16sp" />
 
             <TextView
                 android:layout_height="wrap_content"
                 android:id="@+id/value"
                 android:layout_width="140dp"
-                android:text="0.0"
+                android:text=""
                 android:layout_gravity="center"
                 android:background="@color/green1"
                 android:gravity="center"

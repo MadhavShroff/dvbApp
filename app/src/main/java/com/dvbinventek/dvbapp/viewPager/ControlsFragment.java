@@ -55,7 +55,7 @@ public class ControlsFragment extends Fragment {
     public static List<Integer> highlightedList = new ArrayList<>();
     public final int white = Color.parseColor("#ffffff");
     public final int black = Color.parseColor("#000000");
-    public ControlsBottomSheet cbs_fio2, cbs_vt, cbs_vtrig, cbs_cpap, cbs_pip, cbs_delps, cbs_ratef, cbs_tinsp, cbs_pmax;
+    public ControlsBottomSheet cbs_fio2, cbs_vt, cbs_vtrig, cbs_cpap, cbs_pip, cbs_delps, cbs_ratef, cbs_tinsp, cbs_pmax, cbs_flowRate;
     public IEControlsBottomSheet cbs_ie;
     public short new_mode;
     public String new_modeString;
@@ -65,7 +65,7 @@ public class ControlsFragment extends Fragment {
     //TODO: Optimize lookups
     WeakReference<View> controlsView;
     public static WeakReference<Button> stopVentilation;
-    WeakReference<ControlRow> fio2, vt, pinsp, plimit, peep, ps, vtrig, tinsp, ie, rtotal;
+    WeakReference<ControlRow> fio2, vt, pinsp, plimit, peep, ps, vtrig, tinsp, ie, rtotal, flowRate;
     WeakReference<MenuControlsBottomSheet> modeBottomSheet;
     Observable<Long> observable = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).take(60);
     public static Observer<View> revertStandbyClickObserver;
@@ -141,6 +141,7 @@ public class ControlsFragment extends Fragment {
         tinsp = new WeakReference<>(view.findViewById(R.id.controls_tinsp));
         ie = new WeakReference<>(view.findViewById(R.id.controls_ie));
         rtotal = new WeakReference<>(view.findViewById(R.id.controls_rtotal));
+        flowRate = new WeakReference<>(view.findViewById(R.id.controls_flowRate));
 
         //Set subscript text for units and control labels and Default Controls
         setSubscriptAndPastSessionValues();
@@ -172,7 +173,7 @@ public class ControlsFragment extends Fragment {
         cbs_fio2 = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set FiO<small><sub>2</sub></small> (%)"), "fio2");
         cbs_fio2.setSubText("21 to 100"); // no decimal
         cbs_vt = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set V<small><sub>t</sub></small> (ml)"), "vt");
-        cbs_vt.setSubText("50 to 1500");
+        cbs_vt.setSubText("50 to 2000");
         cbs_vtrig = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set Flow<small><sub>trig</sub></small> (lpm)"), "vtrig");
         cbs_vtrig.setSubText("1(least effort) to 20(greatest effort)");
         cbs_cpap = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set PEEP (cm H<small><sub>2</sub></small>O)"), "cpap");
@@ -188,6 +189,8 @@ public class ControlsFragment extends Fragment {
         cbs_tinsp.setSubText("0.3 to 6s");
         cbs_pmax = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set P<small><sub>limit</sub></small> (cm H<small><sub>2</sub></small>O)"), "pmax");
         cbs_pmax.setSubText(Html.fromHtml("PEEP+1 to 60"));
+        cbs_flowRate = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set Flow<small><sub>rate</sub></small> (lpm)"), "flowrate");
+        cbs_flowRate.setSubText(Html.fromHtml("1 to 80"));
 
         //setup hpa unit change listener
         hpaObserver = new Observer<String>() {
@@ -225,7 +228,6 @@ public class ControlsFragment extends Fragment {
 
             @Override
             public void onComplete() {
-
             }
         };
     }
@@ -235,8 +237,7 @@ public class ControlsFragment extends Fragment {
     // Sets the behavior of how controls behave with one another,
     public void setClickListeners() {
         //Send button onClickListener
-        Button send = controlsView.get().findViewById(R.id.send);
-        send.setOnClickListener(v -> {
+        controlsView.get().findViewById(R.id.send).setOnClickListener(v -> {
             Observable.just(1L).subscribe(StandbyFragment.confirmButtonClickObserver);
             setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm));
             StaticStore.packet_fio2 = StaticStore.new_packet_fio2;
@@ -249,6 +250,7 @@ public class ControlsFragment extends Fragment {
             StaticStore.packet_rtotal = StaticStore.new_packet_rtotal;
             StaticStore.packet_tinsp = StaticStore.new_packet_tinsp;
             StaticStore.packet_plimit = StaticStore.new_packet_plimit;
+            StaticStore.packet_flowRate = StaticStore.new_packet_flowRate;
             new_mode = StaticStore.modeSelectedShort;
             new_modeString = StaticStore.modeSelected;
 
@@ -269,6 +271,7 @@ public class ControlsFragment extends Fragment {
             editor.putString("packet_ie", "" + StaticStore.packet_ie);
             editor.putString("packet_tinsp", "" + StaticStore.packet_tinsp);
             editor.putString("packet_pmax", "" + StaticStore.packet_plimit);
+            editor.putString("packet_flowRate", "" + StaticStore.packet_flowRate);
             editor.putString("mode_selected", StaticStore.modeSelected);
             editor.putString("mode_selected_short", Short.toString(StaticStore.modeSelectedShort));
             // play sound and vibration
@@ -526,6 +529,23 @@ public class ControlsFragment extends Fragment {
                 }
             });
         });
+        flowRate.get().setButtonClickListener(v -> {
+            cbs_flowRate.show(true);
+            cbs_flowRate.clearValue();
+            cbs_flowRate.setOnDismissListener(bottomSheet -> {
+                if (cbs_flowRate.canceled) return;
+                String s = cbs_flowRate.getValue();
+                float sh = Float.parseFloat(s);
+                if (StaticStore.new_packet_flowRate != sh) {
+                    highlight(R.id.controls_flowRate, true);
+                    resetList.add("flowRate");
+                    flowRate.get().setCurrent(s);
+                    StaticStore.new_packet_flowRate = sh;
+                } else {
+                    Log.d("MSG", "pip packet value equals entered value");
+                }
+            });
+        });
         vt.get().setButtonClickListener(v -> {
             cbs_vt.show(true);
             cbs_vt.clearValue();
@@ -560,7 +580,6 @@ public class ControlsFragment extends Fragment {
                 }
             });
         });
-
 
         stopVentilation = new WeakReference<>(controlsView.get().findViewById(R.id.stopVentilation));
         stopVentilation.get().setOnClickListener(v -> Observable.just(v).subscribe(MainActivity.standbyClickObserver));
@@ -619,7 +638,6 @@ public class ControlsFragment extends Fragment {
     }
 
     public void setSubscriptAndPastSessionValues() {
-
         //Set subscript text for units and control labels and Default Controls
         //Set Static Store temp values to most recently comitted values
         StaticStore.new_packet_fio2 = StaticStore.packet_fio2;
@@ -632,6 +650,7 @@ public class ControlsFragment extends Fragment {
         StaticStore.new_packet_rtotal = StaticStore.packet_rtotal;
         StaticStore.new_packet_tinsp = StaticStore.packet_tinsp;
         StaticStore.new_packet_plimit = StaticStore.packet_plimit;
+        StaticStore.new_packet_flowRate = StaticStore.packet_flowRate;
         new_mode = StaticStore.modeSelectedShort;
         new_modeString = StaticStore.modeSelected;
 
@@ -643,9 +662,11 @@ public class ControlsFragment extends Fragment {
         vtrig.get().setLabel(Html.fromHtml("Flow<small><sub>trig</sub></small>"));
         tinsp.get().setLabel(Html.fromHtml("T<small><sub>insp</sub></small>"));
         pinsp.get().setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
+        plimit.get().setLabel(Html.fromHtml("P<small><sub>limit</sub></small>"));
+        flowRate.get().setLabel(Html.fromHtml("Flow<small><sub>rate</sub></small>"));
+        vt.get().setLabel(Html.fromHtml("V<small><sub>t</sub></small>"));
 
-        TextView tv = controlsView.get().findViewById(R.id.controls_mode_current);
-        tv.setText(StaticStore.modeSelected == null ? "-" : StaticStore.modeSelected);
+        ((TextView) controlsView.get().findViewById(R.id.controls_mode_current)).setText(StaticStore.modeSelected == null ? "-" : StaticStore.modeSelected);
         fio2.get().setCurrent(String.valueOf(StaticStore.packet_fio2 == 0 ? "0" : StaticStore.packet_fio2));
         vt.get().setCurrent(String.valueOf(StaticStore.packet_vt == 0 ? "0" : StaticStore.packet_vt));
         vtrig.get().setCurrent(String.valueOf(StaticStore.packet_flowTrig == 0 ? "0" : StaticStore.packet_flowTrig));
@@ -656,6 +677,7 @@ public class ControlsFragment extends Fragment {
         tinsp.get().setCurrent(String.valueOf(StaticStore.packet_tinsp == 0 ? "0" : StaticStore.packet_tinsp));
         ie.get().setCurrent(String.valueOf(StaticStore.packet_ie == 0 ? "-" : getIE(StaticStore.packet_ie)));
         plimit.get().setCurrent(String.valueOf(StaticStore.packet_plimit == 0 ? "0" : StaticStore.packet_plimit));
+        flowRate.get().setCurrent(String.valueOf(StaticStore.packet_flowRate == 0 ? "0" : StaticStore.packet_flowRate));
         setControlsForMode();
     }
     void setControlsForMode() {
@@ -666,6 +688,7 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_vtrig, View.GONE);
                 visibility(R.id.controls_ps, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "PC-CMV":
                 setAllVisible();
@@ -673,21 +696,25 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_vtrig, View.GONE);
                 visibility(R.id.controls_ps, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "VC-SIMV":
                 setAllVisible();
                 visibility(R.id.controls_pinsp, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "PRVC":
                 setAllVisible();
                 visibility(R.id.controls_pinsp, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "ACV":
                 setAllVisible();
                 visibility(R.id.controls_ps, View.GONE);
                 visibility(R.id.controls_pinsp, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "PSV":
                 setAllVisible();
@@ -697,11 +724,13 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_rtotal, View.GONE);
                 visibility(R.id.controls_ie, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "PC-SIMV":
                 setAllVisible();
                 visibility(R.id.controls_vt, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "CPAP":
                 setAllVisible();
@@ -713,6 +742,7 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_tinsp, View.GONE);
                 visibility(R.id.controls_ie, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
                 break;
             case "BPAP":
                 setAllVisible();
@@ -722,6 +752,19 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_rtotal, View.GONE);
                 visibility(R.id.controls_ie, View.GONE);
                 visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_flowRate, View.GONE);
+                break;
+            case "HFO2":
+                setAllVisible();
+                visibility(R.id.controls_vt, View.GONE);
+                visibility(R.id.controls_pinsp, View.GONE);
+                visibility(R.id.controls_plimit, View.GONE);
+                visibility(R.id.controls_peep, View.GONE);
+                visibility(R.id.controls_ps, View.GONE);
+                visibility(R.id.controls_vtrig, View.GONE);
+                visibility(R.id.controls_rtotal, View.GONE);
+                visibility(R.id.controls_tinsp, View.GONE);
+                visibility(R.id.controls_ie, View.GONE);
                 break;
         }
     }
@@ -744,10 +787,10 @@ public class ControlsFragment extends Fragment {
         visibility(R.id.controls_rtotal, View.VISIBLE);
         visibility(R.id.controls_ie, View.VISIBLE);
         visibility(R.id.controls_plimit, View.VISIBLE);
+        visibility(R.id.controls_flowRate, View.VISIBLE);
     }
 
     public void resetChanges() {
-        Log.d("MSG", "resetChanges() called");
         for (int id : highlightedList) revertRowColor(id);
         highlightedList.clear();
         resetValues();
@@ -837,6 +880,10 @@ public class ControlsFragment extends Fragment {
                     StaticStore.new_packet_flowTrig = StaticStore.packet_flowTrig;
                     vtrig.get().setCurrent(String.valueOf(cleanNumber(StaticStore.packet_flowTrig)));
                     break;
+                case "hfo2":
+                    StaticStore.new_packet_flowRate = StaticStore.packet_flowRate;
+                    flowRate.get().setCurrent(String.valueOf(cleanNumber(StaticStore.packet_flowRate)));
+                    break;
                 case "mode":
                     StaticStore.modeSelected = this.new_modeString;
                     StaticStore.modeSelectedShort = this.new_mode;
@@ -864,7 +911,6 @@ public class ControlsFragment extends Fragment {
                 }
             }
         } else {
-            Log.d("MSG", "makeRowYellow -> else");
             ControlRow r = controlsView.get().findViewById(id);
             r.highlight(true);
         }

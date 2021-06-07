@@ -140,6 +140,8 @@ public class ControlsBottomSheet extends BaseBottomSheet {
                 return !(f > StaticStore.DeviceParameterLimits.max_pip) && !(f < StaticStore.DeviceParameterLimits.min_pip) && (f >= StaticStore.new_packet_peep);
             case "ratef":
                 return !(f > StaticStore.DeviceParameterLimits.max_ratef) && !(f < StaticStore.DeviceParameterLimits.min_ratef);
+            case "flowrate":
+                return !(f > StaticStore.DeviceParameterLimits.max_flowRate) && !(f < StaticStore.DeviceParameterLimits.min_flowRate);
             case "vt":
                 return !(f > StaticStore.DeviceParameterLimits.max_vt) && !(f < StaticStore.DeviceParameterLimits.min_vt) && !(((f * 10) % 10) > 0);
             case "vtrig":

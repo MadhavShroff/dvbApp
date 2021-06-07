@@ -123,10 +123,41 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/bpap"
+                android:layout_width="170dp"
+                android:layout_height="75dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="30dp"
+                android:alpha="0.3"
+                android:backgroundTint="@color/yellow"
+                android:text="@string/bpap"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/cpap"
+                android:layout_width="170dp"
+                android:layout_height="75dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:alpha="0.3"
+                android:backgroundTint="@color/yellow"
+                android:text="@string/cpap"
+                android:textColor="#000000"
+                android:textSize="24sp" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/bpap"
+            android:id="@+id/hfo2"
             android:layout_width="170dp"
             android:layout_height="75dp"
             android:layout_marginStart="5dp"
@@ -134,21 +165,9 @@
             android:layout_marginBottom="30dp"
             android:alpha="0.3"
             android:backgroundTint="@color/yellow"
-            android:text="@string/bpap"
+            android:text="@string/hfo2"
             android:textColor="#000000"
-            android:textSize="24sp" />
-
-        <Button
-            android:id="@+id/cpap"
-            android:layout_width="170dp"
-            android:layout_height="75dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:alpha="0.3"
-            android:backgroundTint="@color/yellow"
-            android:text="@string/cpap"
-            android:textColor="#000000"
-            android:textSize="24sp" />
-
+            android:textSize="24sp"
+            android:visibility="gone" />
     </LinearLayout>
 </GridLayout>

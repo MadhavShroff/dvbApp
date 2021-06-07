@@ -43,7 +43,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="110dp"
+                        android:layout_width="115dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:gravity="center|start"
@@ -57,12 +57,13 @@
                         android:layout_width="130dp"
                         android:layout_height="45dp"
                         android:layout_gravity="center"
-                        android:gravity="center"
+                        android:gravity="center|end"
                         android:textSize="26sp"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
                     <ImageButton
+                        android:contentDescription="@string/edit_button_"
                         android:id="@+id/controls_mode_change"
                         android:layout_width="100dp"
                         android:layout_height="55dp"
@@ -109,6 +110,7 @@
                     app:controlLabel="@string/peep"
                     app:controlUnit="@string/cm_h2o"
                     app:current="" />
+
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_ps"
                     android:layout_width="match_parent"
@@ -116,6 +118,15 @@
                     app:controlLabel="@string/ps"
                     app:controlUnit="@string/cm_h2o"
                     app:current="" />
+
+                <com.dvbinventek.dvbapp.customViews.ControlRow
+                    android:id="@+id/controls_flowRate"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:controlLabel="@string/flowRate"
+                    app:controlUnit="@string/lpm"
+                    app:current="" />
+
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_vtrig"
                     android:layout_width="match_parent"
@@ -123,6 +134,7 @@
                     app:controlLabel="@string/vtrig"
                     app:controlUnit="@string/lpm"
                     app:current="" />
+
                 <com.dvbinventek.dvbapp.customViews.ControlRow
                     android:id="@+id/controls_rtotal"
                     android:layout_width="match_parent"
