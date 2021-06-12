@@ -54,7 +54,7 @@ public class ProcessPacket {
     public static double x = 0;
     public static boolean isATrace = false;
     public final ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) modeBox.get().getLayoutParams();
-    public boolean showPip, showCpap, showVt, showRatef, showFio2;
+    public boolean showPip, showCpap, showVt, showRatef, showFio2, showFlowRate;
     public static boolean isAlarmSet = false;
 
 
@@ -104,13 +104,17 @@ public class ProcessPacket {
             showVt = (mode == 17 || mode == 18 || mode == 19 || mode == 21);
             showRatef = (mode != 15 && mode != 20 && mode != 16);
             showFio2 = true; // all values
+            showFlowRate = true;
             return true;
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(next -> {
                     tv1.get().setMaxMinValue(StaticStore.Values.pPeak, StaticStore.Values.pMean, StaticStore.Values.pInsp, showPip ? "" + StaticStore.packet_pinsp : "");
                     tv2.get().setMaxMinValue(StaticStore.Values.peepMax, StaticStore.Values.peepMin, StaticStore.Values.peep, showCpap ? "" + StaticStore.packet_peep : "");
                     tv3.get().setMaxMinValueVIT(StaticStore.Values.vtMax, StaticStore.Values.vtMin, StaticStore.Values.vt, showVt ? "" + StaticStore.packet_vt : "");
-                    tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showRatef ? "" + StaticStore.packet_rtotal : "");
+                    if (!StaticStore.Values.mode.equals("HFO"))
+                        tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showRatef ? "" + StaticStore.packet_rtotal : "");
+                    else
+                        tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showFlowRate ? "" + StaticStore.packet_flowRate : "");
                     tv5.get().setMaxMinValue(StaticStore.Values.fio2Max, StaticStore.Values.fio2Min, StaticStore.Values.fio2, showFio2 ? "" + StaticStore.packet_fio2 : "");
                     //modeBox.get().setText(StaticStore.modeSelected); // for displaying mode entered
                     if (!modeBox.get().getText().equals(StaticStore.Values.mode)) { // enters on mode change
