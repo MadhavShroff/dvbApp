@@ -69,7 +69,7 @@
     <string name="max_value">Max Value:</string>
     <string name="bpap">BPAP</string>
     <string name="cpap">CPAP</string>
-    <string name="hfo2">HFO2</string>
+    <string name="hfo">HFO</string>
     <string name="acv">ACV</string>
     <string name="prvc">PRVC</string>
     <string name="psv">PSV</string>
@@ -228,7 +228,7 @@
     <string name="err">Error !</string>
     <string name="sleep_display">Sleep Display</string>
     <string name="shutdown_display">Shutdown Display</string>
-    <string name="version">2.6.1</string>
+    <string name="version">2.7.1</string>
     <string name="system_alarm">SYSTEM ALARM</string>
     <string name="nno_ups_power">\nNO UPS POWER</string>
     <string name="or">OR</string>
@@ -252,4 +252,5 @@
     <string name="patient_hours">Patient Hours</string>
     <string name="last_service">Last Service</string>
     <string name="next_service">Next Service</string>
+    <string name="oxygen_concentrator">Oxygen Concentrator</string>
 </resources>

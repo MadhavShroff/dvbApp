@@ -754,7 +754,7 @@ public class ControlsFragment extends Fragment {
                 visibility(R.id.controls_plimit, View.GONE);
                 visibility(R.id.controls_flowRate, View.GONE);
                 break;
-            case "HFO2":
+            case "HFO":
                 setAllVisible();
                 visibility(R.id.controls_vt, View.GONE);
                 visibility(R.id.controls_pinsp, View.GONE);

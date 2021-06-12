@@ -136,7 +136,6 @@
                 android:layout_height="75dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginBottom="30dp"
                 android:alpha="0.3"
                 android:backgroundTint="@color/yellow"
                 android:text="@string/bpap"
@@ -157,7 +156,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/hfo2"
+            android:id="@+id/hfo"
             android:layout_width="170dp"
             android:layout_height="75dp"
             android:layout_marginStart="5dp"
@@ -165,9 +164,9 @@
             android:layout_marginBottom="30dp"
             android:alpha="0.3"
             android:backgroundTint="@color/yellow"
-            android:text="@string/hfo2"
+            android:text="@string/hfo"
             android:textColor="#000000"
             android:textSize="24sp"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </LinearLayout>
 </GridLayout>

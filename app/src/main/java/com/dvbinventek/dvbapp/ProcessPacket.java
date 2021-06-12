@@ -100,7 +100,7 @@ public class ProcessPacket {
 //        Log.d("MSG", "" + ppA + " " + ppB + " " + vFlowA + " " + vFlowB + " " + vtfA + " " + vtfB);
             int mode = StaticStore.modeSelectedShort;
             showPip = (mode >= 13 && mode < 17); // 13, 14, 15, 16
-            showCpap = true; // all values
+            showCpap = mode != 22; // all modes except 22
             showVt = (mode == 17 || mode == 18 || mode == 19 || mode == 21);
             showRatef = (mode != 15 && mode != 20 && mode != 16);
             showFio2 = true; // all values
@@ -113,14 +113,14 @@ public class ProcessPacket {
                     tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showRatef ? "" + StaticStore.packet_rtotal : "");
                     tv5.get().setMaxMinValue(StaticStore.Values.fio2Max, StaticStore.Values.fio2Min, StaticStore.Values.fio2, showFio2 ? "" + StaticStore.packet_fio2 : "");
                     //modeBox.get().setText(StaticStore.modeSelected); // for displaying mode entered
-                    if (!modeBox.get().getText().equals(StaticStore.Values.mode)) {
+                    if (!modeBox.get().getText().equals(StaticStore.Values.mode)) { // enters on mode change
                         modeBox.get().setText(StaticStore.Values.mode); // for displaying a new mode received from packet
-                        if (StaticStore.Values.mode.equals("HFO2")) { // Mode changed to HFO2
+                        if (StaticStore.Values.mode.equals("HFO")) { // Mode changed to HFO2
                             tv4.get().setUnit("(lpm)");
                             tv4.get().setLabel(Html.fromHtml("Flow Rate"));
                         } else { // Mode changed to not HFO2
                             tv4.get().setUnit("(b/min)");
-                            tv4.get().setLabel(Html.fromHtml("Rate"));
+                            tv4.get().setLabel(Html.fromHtml("R<sub><small>total</small></sub>"));
                         }
                     }
                     setStatusText();

@@ -51,7 +51,7 @@ public class ReceivePacket {
             case 21:
                 return "ACV";
             case 22:
-                return "HFO2";
+                return "HFO";
             default:
                 return "--";
         }
