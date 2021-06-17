@@ -114,11 +114,10 @@ public class IEControlsBottomSheet extends BaseBottomSheet {
     }
 
     public boolean isInRange() {
-        //TODO: IE range logic
         if (et1.getText().toString().isEmpty() || et2.getText().toString().isEmpty() || et1.getText().toString().equals(".") || et2.getText().toString().equals(".")) {
             return false;
         } else
-            return !(Float.parseFloat(et1.getText().toString()) <= 0) && !(Float.parseFloat(et1.getText().toString()) > 4)
+            return !(Float.parseFloat(et1.getText().toString()) <= 0) && !(Float.parseFloat(et1.getText().toString()) > 10)
                     && !(Float.parseFloat(et2.getText().toString()) <= 0) && !(Float.parseFloat(et2.getText().toString()) > 4);
     }
 
