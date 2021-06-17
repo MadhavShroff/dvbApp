@@ -21,6 +21,7 @@ import com.arthurivanets.bottomsheets.BaseBottomSheet;
 import com.arthurivanets.bottomsheets.config.BaseConfig;
 import com.arthurivanets.bottomsheets.config.Config;
 import com.dvbinventek.dvbapp.R;
+import com.dvbinventek.dvbapp.StaticStore;
 import com.dvbinventek.dvbapp.customViews.CustomKeyboardView;
 
 public class AlarmLimitsBottomSheetApnea extends BaseBottomSheet {
@@ -39,9 +40,7 @@ public class AlarmLimitsBottomSheetApnea extends BaseBottomSheet {
         v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FCDD03")));
         new Handler().postDelayed(() -> v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#ffffff"))), 100);
     };
-    OnClickListener negativeListener = v -> {
-        Log.d("MSG", "Negative Listener");
-    };
+    OnClickListener negativeListener = v -> Log.d("MSG", "Negative Listener");
 
     public AlarmLimitsBottomSheetApnea(@NonNull Activity hostActivity, @NonNull BaseConfig config) {
         super(hostActivity, config);
@@ -86,9 +85,13 @@ public class AlarmLimitsBottomSheetApnea extends BaseBottomSheet {
     public boolean isInRange() {
         String s = value.getText().toString();
         if (s.equals(".")) return false;
-        short sh = Short.parseShort(s);
-        //TODO:
-        return true;
+        float f;
+        try {
+            f = Float.parseFloat(s);
+            return !(f > StaticStore.DeviceParameterLimits.Alarms.apnea_max) && !(f < StaticStore.DeviceParameterLimits.Alarms.apnea_min);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void backspace() {

@@ -169,7 +169,7 @@ public class LaunchActivity extends AppCompatActivity {
     public void updateProgressBar() {
         int err = StaticStore.LaunchVars.calibrationError;
         int status = StaticStore.LaunchVars.calibrationStatus;
-        Log.d("PROGRESS", "Error:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationError) + " Status:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationStatus));
+//        Log.d("PROGRESS", "Error:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationError) + " Status:" + Integer.toBinaryString(StaticStore.LaunchVars.calibrationStatus));
         if (status > 0 && isStartClicked && status < 64) {
             for (int i = 0; i < 6; i++)
                 if (((status & 1 << i) >> i) == 1)
@@ -247,13 +247,13 @@ public class LaunchActivity extends AppCompatActivity {
 
     public void updateProgressBar(int i) {
         progress += i;
-        ((TextView) findViewById(R.id.progressIndicatorText)).setText(progress + "%");
+        ((TextView) findViewById(R.id.progressIndicatorText)).setText(getString(R.string.d_percent, progress));
         ((ProgressIndicator) findViewById(R.id.progressIndicator)).setProgress(progress);
         if (progress == 100) {
             SendPacket sp = new SendPacket();
             sp.writeInfo(SendPacket.STOP, 0);
             sp.writeInfo(SendPacket.STOP, 276);
-            findViewById(R.id.skip).setBackgroundColor(getResources().getColor(R.color.yellow));
+            findViewById(R.id.skip).setBackgroundColor(getColor(R.color.yellow));
             ((MaterialButton) findViewById(R.id.skip)).setText(R.string.next);
             findViewById(R.id.skip).setEnabled(true);
             Observable.interval(200, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).take(10).subscribe(new Observer<Long>() {
@@ -298,7 +298,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 0:
                 setVisibility(R.id.progress_bar1, View.GONE);
                 if (!isChecked1) {
-                    ((CheckView) findViewById(R.id.check1)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check1)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check1)).check();
                     isChecked1 = true;
                     updateProgressBar(16);
@@ -307,7 +307,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 1:
                 setVisibility(R.id.progress_bar2, View.GONE);
                 if (!isChecked2) {
-                    ((CheckView) findViewById(R.id.check2)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check2)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check2)).check();
                     isChecked2 = true;
                     updateProgressBar(17);
@@ -316,7 +316,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 2:
                 setVisibility(R.id.progress_bar3, View.GONE);
                 if (!isChecked3) {
-                    ((CheckView) findViewById(R.id.check3)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check3)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check3)).check();
                     isChecked3 = true;
                     updateProgressBar(16);
@@ -325,7 +325,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 3:
                 setVisibility(R.id.progress_bar4, View.GONE);
                 if (!isChecked4) {
-                    ((CheckView) findViewById(R.id.check4)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check4)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check4)).check();
                     isChecked4 = true;
                     updateProgressBar(17);
@@ -334,7 +334,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 4:
                 setVisibility(R.id.progress_bar5, View.GONE);
                 if (!isChecked5) {
-                    ((CheckView) findViewById(R.id.check5)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check5)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check5)).check();
                     isChecked5 = true;
                     updateProgressBar(17);
@@ -343,7 +343,7 @@ public class LaunchActivity extends AppCompatActivity {
             case 5:
                 setVisibility(R.id.progress_bar6, View.GONE);
                 if (!isChecked6) {
-                    ((CheckView) findViewById(R.id.check6)).setVisibility(View.VISIBLE);
+                    (findViewById(R.id.check6)).setVisibility(View.VISIBLE);
                     ((CheckView) findViewById(R.id.check6)).check();
                     isChecked6 = true;
                     updateProgressBar(17);
@@ -578,7 +578,7 @@ public class LaunchActivity extends AppCompatActivity {
         return result;
     }
 
-    public class MyHandler extends Handler {
+    public static class MyHandler extends Handler {
         public final WeakReference<LaunchActivity> mActivity;
 
         public MyHandler(LaunchActivity activity) {
