@@ -230,7 +230,7 @@ public class StaticStore {
         public static String[] warningsLow = {
                 //low
                 "BATTERY LOW POWER",
-                "REPALCE BATTERY",
+                "REPLACE BATTERY",
                 "CHECK SETTINGS"
         };
         public static String[] top2warnings = new String[2];

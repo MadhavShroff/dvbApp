@@ -341,6 +341,7 @@ public class ProcessPacket {
         }
     }
 
+    String s;
     public void setWarning() {
         if (StaticStore.Warnings.currentWarnings.size() == 0) {
             if (alarm.get().getAlpha() == 0.99f) return;
@@ -350,7 +351,21 @@ public class ProcessPacket {
             modeBox.get().setTextSize(58);
             alarm.get().setAlpha(0.99f);
         } else {
-            String s = StaticStore.Warnings.top2warnings[0] + "\n" + StaticStore.Warnings.top2warnings[1];
+            if (StaticStore.Values.mode.equals("HFO")) {                 // If mode is
+                if (StaticStore.Warnings.top2warnings[0].equals("MV LOW"))
+                    s = "LOW FLOW RATE" + "\n";
+                else if (StaticStore.Warnings.top2warnings[0].equals("MV HIGH"))
+                    s = "HIGH FLOW RATE" + "\n";
+                else s = StaticStore.Warnings.top2warnings[0] + "\n";
+
+                if (StaticStore.Warnings.top2warnings[1].equals("MV LOW"))
+                    s = "LOW FLOW RATE";
+                else if (StaticStore.Warnings.top2warnings[1].equals("MV HIGH"))
+                    s = "HIGH FLOW RATE";
+                else s = StaticStore.Warnings.top2warnings[1];
+            } else {
+                s = StaticStore.Warnings.top2warnings[0] + "\n" + StaticStore.Warnings.top2warnings[1];
+            }
             if (alarm.get().getAlpha() == 0.99f || !alarm.get().getText().equals(s)) {
                 alarm.get().setText(s);
                 layoutParams.height = 45;
