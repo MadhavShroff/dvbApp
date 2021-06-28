@@ -946,11 +946,16 @@ public class MainActivity extends AppCompatActivity {
                         if (callNumber <= 20) { // 3s call
                             if (!isWarningString) {
                                 return; //return if there is no warning, called every 3 seconds
+                                // If there is a warning, a row is created every 3 seconds
+                            }
+                        } else callNumber = 0;
+                        if (!(StaticStore.Data.size() == 0)) {
+                            long y = ((new Date(StaticStore.Data.get(0).get("date")).getTime())); // time of earliest record
+                            long z = ((new Date(df.format(new Date()))).getTime()); // time of latest record
+                            if ((z - y) / 1000 > 259200) {                  // difference between earliest and latest is kept at 72 hours. (259200 seconds)
+                                StaticStore.Data.remove(0); // Retain records for 72 hours, roll over old data
                             }
                         }
-                        else callNumber = 0;
-                        if (StaticStore.Data.size() > 4800)
-                            StaticStore.Data.remove(0);
                         HashMap<String, String> t = new HashMap<>();
                         t.put("date", df.format(new Date()));
                         t.put("pinsp", String.valueOf(StaticStore.Values.pInsp));
