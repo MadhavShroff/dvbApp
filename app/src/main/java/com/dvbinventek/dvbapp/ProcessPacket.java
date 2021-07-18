@@ -57,7 +57,6 @@ public class ProcessPacket {
     public boolean showPip, showCpap, showVt, showRatef, showFio2, showFlowRate;
     public static boolean isAlarmSet = false;
 
-
     ProcessPacket(byte[] bytes) {
         MainActivity.disposables.add(Observable.fromCallable(() -> {
             new ReceivePacket(bytes);
@@ -97,8 +96,8 @@ public class ProcessPacket {
                 vFlowA = Double.NaN;
                 vtfA = Double.NaN;
             }
-//        Log.d("MSG", "" + ppA + " " + ppB + " " + vFlowA + " " + vFlowB + " " + vtfA + " " + vtfB);
             int mode = StaticStore.modeSelectedShort;
+            // boolean values representing which boxes show the "Set: " value based on mode selected
             showPip = (mode >= 13 && mode < 17); // 13, 14, 15, 16
             showCpap = mode != 22; // all modes except 22
             showVt = (mode == 17 || mode == 18 || mode == 19 || mode == 21);
@@ -106,18 +105,24 @@ public class ProcessPacket {
             showFio2 = true; // all values
             showFlowRate = true;
             return true;
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(next -> {
-                    tv1.get().setMaxMinValue(StaticStore.Values.pPeak, StaticStore.Values.pMean, StaticStore.Values.pInsp, showPip ? "" + StaticStore.packet_pinsp : "");
-                    tv2.get().setMaxMinValue(StaticStore.Values.peepMax, StaticStore.Values.peepMin, StaticStore.Values.peep, showCpap ? "" + StaticStore.packet_peep : "");
-                    tv3.get().setMaxMinValueVIT(StaticStore.Values.vtMax, StaticStore.Values.vtMin, StaticStore.Values.vt, showVt ? "" + StaticStore.packet_vt : "");
-                    if (!StaticStore.Values.mode.equals("HFO"))
-                        tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showRatef ? "" + StaticStore.packet_rtotal : "");
-                    else
-                        tv4.get().setMaxMinValue(StaticStore.Values.rateMax, StaticStore.Values.rateMin, StaticStore.Values.rateMeasured, showFlowRate ? "" + StaticStore.packet_flowRate : "");
-                    tv5.get().setMaxMinValue(StaticStore.Values.fio2Max, StaticStore.Values.fio2Min, StaticStore.Values.fio2, showFio2 ? "" + StaticStore.packet_fio2 : "");
+                    if (StaticStore.Values.mode.equals("HFO")) { // if mode is HFO, blank out all other values
+                        tv1.get().setMaxMinValue("", "", "", "");
+                        tv2.get().setMaxMinValue("", "", "", "");
+                        tv3.get().setMaxMinValue("", "", "", "");
+                        tv4.get().setMaxMinValue("", "", "" + round1(StaticStore.Values.rateMeasured), "Set: " + StaticStore.packet_rtotal);
+                        tv5.get().setMaxMinValue("", "", "" + StaticStore.Values.fio2, "Set: " + StaticStore.packet_fio2);
+                    } else {
+                        tv1.get().setMaxMinValue(round1(StaticStore.Values.pPeak), round1(StaticStore.Values.pMean), round1(StaticStore.Values.pInsp), showPip ? "Set: " + StaticStore.packet_pinsp : "");
+                        tv2.get().setMaxMinValue(round1(StaticStore.Values.peepMax), round1(StaticStore.Values.peepMin), round1(StaticStore.Values.peep), showCpap ? "Set: " + StaticStore.packet_peep : "");
+                        tv3.get().setMaxMinValue("" + (int) StaticStore.Values.vtMax, "" + (int) StaticStore.Values.vtMin, "" + (int) StaticStore.Values.vt, showVt ? "Set: " + StaticStore.packet_vt : "");
+                        tv4.get().setMaxMinValue(round1(StaticStore.Values.rateMax), round1(StaticStore.Values.rateMin), round1(StaticStore.Values.rateMeasured), showFlowRate ? "Set: " + StaticStore.packet_flowRate : "");
+                        tv5.get().setMaxMinValue(round1(StaticStore.Values.fio2Max), round1(StaticStore.Values.fio2Min), round1(StaticStore.Values.fio2), showFio2 ? "Set: " + StaticStore.packet_fio2 : "");
+                    }
                     //modeBox.get().setText(StaticStore.modeSelected); // for displaying mode entered
-                    if (!modeBox.get().getText().equals(StaticStore.Values.mode)) { // enters on mode change
+                    if (!modeBox.get().getText().equals(StaticStore.Values.mode)) { // onModeChange :
                         modeBox.get().setText(StaticStore.Values.mode); // for displaying a new mode received from packet
                         if (StaticStore.Values.mode.equals("HFO")) { // Mode changed to HFO2
                             tv4.get().setUnit("(lpm)");
@@ -172,6 +177,14 @@ public class ProcessPacket {
         setWarning();
         setWarningFlash();
         showPowerOffMessage();
+    }
+
+    public String round1(float x) {
+        return "" + Math.round(x * 10) / 10.0;
+    }
+
+    public double round2(double x) {
+        return Math.round(x * 100) / 100.0;
     }
 
     public void setWarningFlash() {
@@ -283,10 +296,6 @@ public class ProcessPacket {
             Observable.just((long) StaticStore.Values.shutdownPress).subscribe(MainActivity.shutdownClickObserver);
             StaticStore.Values.shutdownPressState = StaticStore.Values.shutdownPress;
         }
-    }
-
-    public double round2(double x) {
-        return Math.round(x * 100) / 100.0;
     }
 
     public void setStatusText() {

@@ -1,5 +1,6 @@
 package com.dvbinventek.dvbapp.viewPager;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -48,6 +50,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static android.content.Context.VIBRATOR_SERVICE;
+import static com.dvbinventek.dvbapp.viewPager.PatientFragment.ui_flags;
 
 public class ControlsFragment extends Fragment {
     public static boolean countdownStarted = false;
@@ -68,7 +71,7 @@ public class ControlsFragment extends Fragment {
     WeakReference<ControlRow> fio2, vt, pinsp, plimit, peep, ps, vtrig, tinsp, ie, rtotal, flowRate;
     WeakReference<MenuControlsBottomSheet> modeBottomSheet;
     Observable<Long> observable = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).take(60);
-    public static Observer<View> revertStandbyClickObserver;
+    public static Observer<String> revertStandbyClickObserver;
     public static Observer<String> hpaObserver;
     Observer<Long> confirmCountdownObserver = new Observer<Long>() {
         @Override
@@ -89,9 +92,9 @@ public class ControlsFragment extends Fragment {
 
         @Override
         public void onComplete() {
+            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm));
             resetChanges();
             countdownStarted = false;
-            setText(R.id.send, controlsView.get().getResources().getString(R.string.confirm));
         }
     };
 
@@ -173,7 +176,7 @@ public class ControlsFragment extends Fragment {
         cbs_fio2 = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set FiO<small><sub>2</sub></small> (%)"), "fio2");
         cbs_fio2.setSubText("21 to 100"); // no decimal
         cbs_vt = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set V<small><sub>t</sub></small> (ml)"), "vt");
-        cbs_vt.setSubText("50 to 2000");
+        cbs_vt.setSubText("20 to 2000");
         cbs_vtrig = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set Flow<small><sub>trig</sub></small> (lpm)"), "vtrig");
         cbs_vtrig.setSubText("1(least effort) to 20(greatest effort)");
         cbs_cpap = new ControlsBottomSheet(getActivity(), Html.fromHtml("Set PEEP (cm H<small><sub>2</sub></small>O)"), "cpap");
@@ -294,6 +297,7 @@ public class ControlsFragment extends Fragment {
                 setText(R.id.controls_mode_current, StaticStore.modeSelected);
             } else {
                 revertRowColor(R.id.controls_mode);
+                confirmCountdownObserver.onComplete();
                 tryToDispose(disposable);
                 setText(R.id.highlight_text, "");
                 StaticStore.modeSelected = this.new_modeString;
@@ -546,22 +550,43 @@ public class ControlsFragment extends Fragment {
                 }
             });
         });
-        vt.get().setButtonClickListener(v -> {
-            cbs_vt.show(true);
-            cbs_vt.clearValue();
-            cbs_vt.setOnDismissListener(bottomSheet -> {
-                if (cbs_vt.canceled) return;
-                String s = cbs_vt.getValue();
-                short sh = Short.parseShort(s);
-                if (StaticStore.new_packet_vt != sh) {
-                    highlight(R.id.controls_vt, true);
-                    resetList.add("vt");
-                    vt.get().setCurrent(s);
-                    StaticStore.new_packet_vt = sh;
-                } else {
-                    Log.d("MSG", "vt packet value equals entered value");
-                }
-            });
+        vt.get().setButtonClickListener(new View.OnClickListener() {
+            short sh;
+            String s;
+            AlertDialog dialog = (new AlertDialog.Builder(getContext())).setTitle("WARNING") // If Vt Lower than 50, show dialog box
+                    .setMessage("Vt lower than 50 is neither possible nor recommended. \nAre you sure?")
+                    .setPositiveButton("Yes", (dialog, which1) -> {
+                        highlight(R.id.controls_vt, true);
+                        resetList.add("vt");
+                        vt.get().setCurrent(s);
+                        StaticStore.new_packet_vt = sh;
+                    }).setNegativeButton("No", (dialog, which) -> {
+                        dialog.dismiss();
+                    }).create();
+
+            @Override
+            public void onClick(View v) {
+                cbs_vt.show(true);
+                cbs_vt.clearValue();
+                cbs_vt.setOnDismissListener(bottomSheet -> {
+                    if (cbs_vt.canceled) return;
+                    s = cbs_vt.getValue();
+                    sh = Short.parseShort(s);
+                    if (StaticStore.new_packet_vt != sh) {
+                        if (sh < 50) {
+                            showDialogHideNav(dialog);
+                            hideNav(dialog);
+                        } else {
+                            highlight(R.id.controls_vt, true);
+                            resetList.add("vt");
+                            vt.get().setCurrent(s);
+                            StaticStore.new_packet_vt = sh;
+                        }
+                    } else {
+                        Log.d("MSG", "vt packet value equals entered value");
+                    }
+                });
+            }
         });
         vtrig.get().setButtonClickListener(v -> {
             cbs_vtrig.show(true);
@@ -614,13 +639,13 @@ public class ControlsFragment extends Fragment {
                 });
             }
         });
-        revertStandbyClickObserver = new Observer<View>() {
+        revertStandbyClickObserver = new Observer<String>() {
             @Override
             public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
             }
 
             @Override
-            public void onNext(@io.reactivex.rxjava3.annotations.NonNull View view) {
+            public void onNext(@io.reactivex.rxjava3.annotations.NonNull String v) {
                 controlsView.get().findViewById(R.id.stopVentilation).setEnabled(true);
                 controlsView.get().findViewById(R.id.stopVentilation).setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#ffffff")));
                 ((Button) controlsView.get().findViewById(R.id.stopVentilation)).setTextColor(Color.parseColor("#000000"));
@@ -635,6 +660,21 @@ public class ControlsFragment extends Fragment {
             public void onComplete() {
             }
         };
+    }
+
+    public void showDialogHideNav(AlertDialog alert) {
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alert.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        alert.getWindow().getDecorView().setSystemUiVisibility(ui_flags);
+        alert.show();
+        alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    }
+
+    public void hideNav(AlertDialog alert) {
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alert.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        alert.getWindow().getDecorView().setSystemUiVisibility(ui_flags);
+        alert.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     public void setSubscriptAndPastSessionValues() {

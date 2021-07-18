@@ -86,17 +86,23 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import static com.dvbinventek.dvbapp.ProcessPacket.silenceAlarm;
 import static com.dvbinventek.dvbapp.ProcessPacket.silencedAlarm;
 import static com.dvbinventek.dvbapp.StaticStore.Values.packetType;
+import static com.dvbinventek.dvbapp.viewPager.ControlsFragment.revertStandbyClickObserver;
 
 public class MainActivity extends AppCompatActivity {
 
     //TODO: Make row list in historic data a recycler view
     //TODO: isInRange() in alarm limits
+
+    //TODO: cmh2o left params view make subscript
+    //TODO: Add averaging logic to smoothen loops
+    //TODO: Add APRV mode
 
     //Tab Layout vars
     public static final int chartWidth = 665;
@@ -127,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
     public static final PublishSubject<byte[]> packetSubject = PublishSubject.create();
     public static final String dashes = "--";
-    private static final int FIFO_CAPACITY = 100;
+    private static final int FIFO_CAPACITY = 200;
     public static boolean isSidebarShown = false;
     public static CompositeDisposable disposables = new CompositeDisposable();
     //Observe standby button in controls for a click
@@ -308,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Set default handler for crashes/force close
         Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler(this));
+        RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
 
         //Setup COSU policies
         setupCOSU();
@@ -663,6 +670,7 @@ public class MainActivity extends AppCompatActivity {
         switch (which) {
             case GRAPHS:
                 chartLayout.get().setVisibility(View.VISIBLE);
+                Observable.just("").subscribe(revertStandbyClickObserver);
                 setupSilenceButton(1);
                 break;
             case STANDBY:
@@ -893,6 +901,7 @@ public class MainActivity extends AppCompatActivity {
         MainParamsView mpv = findViewById(R.id.pinsp);
         mpv.setPeepPip(); //Set first CustomTextView's MIN and MAX as Pinsp and Peep
         mpv.setLabel(Html.fromHtml("P<small><sub>insp</sub></small>"));
+        mpv.setUnit(Html.fromHtml("(cm H<small><sub>2</sub></small>O)"));
         mpv = findViewById(R.id.rate);
         mpv.setLabel(Html.fromHtml("R<small><sub>total</sub></small>"));
         mpv = findViewById(R.id.fio2);
@@ -1098,7 +1107,6 @@ public class MainActivity extends AppCompatActivity {
         Observable.timer(8, TimeUnit.SECONDS).take(1).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Long>() {
                     Disposable disp;
-
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         disp = d;
@@ -1390,7 +1398,7 @@ public class MainActivity extends AppCompatActivity {
             Collections.addAll(
                     FVchart.getXAxes(),
                     sciChartBuilder.newNumericAxis()
-                            .withVisibleRange(-10, 10)
+                            .withVisibleRange(-50, 50)
                             .withAutoRangeMode(AutoRange.Never)
                             .withAxisBandsFill(5)
                             .withDrawMajorBands(true)
@@ -1415,7 +1423,7 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.generateLineSeries(pressureId, FVDataSeries, sciChartBuilder.newPen().withColor(ColorUtil.argb(0xFF, 0xFF, 0x66, 0x00)).withAntiAliasing(true).withThickness(1.5f).build())
             );
         });
-
+        // TODO: Enable Loops
 //        MaterialButtonToggleGroup group = findViewById(R.id.toggleGroupMain);
 //        group.addOnButtonCheckedListener((group1, checkedId, isChecked) -> {
 //            findViewById(graphShownRef).setVisibility(View.GONE);

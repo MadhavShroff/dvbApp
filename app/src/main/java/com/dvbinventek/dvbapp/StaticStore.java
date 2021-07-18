@@ -111,11 +111,10 @@ public class StaticStore {
         // vt
 //        public static short max_vt = 1500;
 //        public static short min_vt = 50;
-
-        //TODO: remove testing limits for vt
-        // vt
+//        TODO: remove testing limits for vt
+//         vt
         public static short max_vt = 2000;
-        public static short min_vt = 50;
+        public static short min_vt = 20;
 
         // V trig / Flow Trig
         public static short max_vtrig = 20;
@@ -297,6 +296,8 @@ public class StaticStore {
         public static final byte LOCKED = 2;
         public static final byte UNLOCKED = 1;
         public static byte lockState = UNLOCKED;
+
+        public static byte runtimeAck = 0;
     }
 
     public static class LaunchVars {

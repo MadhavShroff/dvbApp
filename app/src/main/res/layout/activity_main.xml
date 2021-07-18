@@ -15,7 +15,6 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/alarm"
         android:layout_height="108dp"
@@ -382,63 +381,52 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" />
         </LinearLayout>
-
-
-        <!--     Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
-        <!--        <LinearLayout-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="45dp">-->
-        <!--            <com.google.android.material.button.MaterialButtonToggleGroup-->
-        <!--                android:id="@+id/toggleGroupMain"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                app:checkedButton="@id/mainGraphsButton"-->
-        <!--                app:selectionRequired="true"-->
-        <!--                app:singleSelection="true">-->
-        <!--                <Button-->
-        <!--                    android:id="@+id/mainGraphsButton"-->
-        <!--                    android:layout_width="125dp"-->
-        <!--                    android:layout_height="50dp"-->
-        <!--                    style="@style/OutlinedButton"-->
-        <!--                    android:text="@string/main"-->
-        <!--                    android:textAllCaps="false"-->
-        <!--                    android:textSize="21sp" />-->
-        <!--                <Button-->
-        <!--                    android:id="@+id/FPbutton"-->
-        <!--                    android:layout_width="125dp"-->
-        <!--                    style="@style/OutlinedButton"-->
-        <!--                    android:layout_height="50dp"-->
-        <!--                    android:text="@string/f_p"-->
-        <!--                    android:textAllCaps="false"-->
-        <!--                    android:textSize="21sp" />-->
-        <!--                <Button-->
-        <!--                    android:id="@+id/FVbutton"-->
-        <!--                    android:layout_width="125dp"-->
-        <!--                    style="@style/OutlinedButton"-->
-        <!--                    android:layout_height="50dp"-->
-        <!--                    android:text="@string/f_v"-->
-        <!--                    android:textAllCaps="false"-->
-        <!--                    android:textSize="21sp" />-->
-        <!--                <Button-->
-        <!--                    android:id="@+id/PVbutton"-->
-        <!--                    android:layout_width="125dp"-->
-        <!--                    style="@style/OutlinedButton"-->
-        <!--                    android:layout_height="50dp"-->
-        <!--                    android:text="@string/p_v"-->
-        <!--                    android:textAllCaps="false"-->
-        <!--                    android:textSize="21sp" />-->
-
-        <!--            </com.google.android.material.button.MaterialButtonToggleGroup>-->
-        <!--            <Button-->
-        <!--                android:id="@+id/lockScreenButton"-->
-        <!--                style="@style/OutlinedButton"-->
-        <!--                android:drawableLeft="@drawable/unlocked"-->
-        <!--                android:layout_marginStart="45dp"-->
-        <!--                android:text="@string/lock_screen"-->
-        <!--                android:layout_width="125dp"-->
-        <!--                android:layout_height="50dp"-->
-        <!--                android:textSize="12sp" />-->
-        <!--        </LinearLayout>-->
+        <!--             Material Button group for selecting between main graphs, and FP, FV, PV graphs. Currently Disabled-->
+        <!--                <LinearLayout-->
+        <!--                    android:layout_width="match_parent"-->
+        <!--                    android:layout_gravity="bottom"-->
+        <!--                    android:layout_height="45dp">-->
+        <!--                    <com.google.android.material.button.MaterialButtonToggleGroup-->
+        <!--                        android:id="@+id/toggleGroupMain"-->
+        <!--                        android:layout_width="wrap_content"-->
+        <!--                        android:layout_height="wrap_content"-->
+        <!--                        app:checkedButton="@id/mainGraphsButton"-->
+        <!--                        app:selectionRequired="true"-->
+        <!--                        app:singleSelection="true">-->
+        <!--                        <Button-->
+        <!--                            android:id="@+id/mainGraphsButton"-->
+        <!--                            android:layout_width="125dp"-->
+        <!--                            android:layout_height="50dp"-->
+        <!--                            style="@style/OutlinedButton"-->
+        <!--                            android:text="@string/main"-->
+        <!--                            android:textAllCaps="false"-->
+        <!--                            android:textSize="21sp" />-->
+        <!--                        <Button-->
+        <!--                            android:id="@+id/FPbutton"-->
+        <!--                            android:layout_width="125dp"-->
+        <!--                            style="@style/OutlinedButton"-->
+        <!--                            android:layout_height="50dp"-->
+        <!--                            android:text="@string/f_p"-->
+        <!--                            android:textAllCaps="false"-->
+        <!--                            android:textSize="21sp" />-->
+        <!--                        <Button-->
+        <!--                            android:id="@+id/FVbutton"-->
+        <!--                            android:layout_width="125dp"-->
+        <!--                            style="@style/OutlinedButton"-->
+        <!--                            android:layout_height="50dp"-->
+        <!--                            android:text="@string/f_v"-->
+        <!--                            android:textAllCaps="false"-->
+        <!--                            android:textSize="21sp" />-->
+        <!--                        <Button-->
+        <!--                            android:id="@+id/PVbutton"-->
+        <!--                            android:layout_width="125dp"-->
+        <!--                            style="@style/OutlinedButton"-->
+        <!--                            android:layout_height="50dp"-->
+        <!--                            android:text="@string/p_v"-->
+        <!--                            android:textAllCaps="false"-->
+        <!--                            android:textSize="21sp" />-->
+        <!--                    </com.google.android.material.button.MaterialButtonToggleGroup>-->
+        <!--                </LinearLayout>-->
     </FrameLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -482,7 +470,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/charts"
         app:layout_constraintTop_toTopOf="parent">
-
         <Button
             android:id="@+id/viewPagerCover"
             android:layout_width="match_parent"
@@ -491,7 +478,6 @@
             android:background="?android:attr/selectableItemBackground"
             android:elevation="10dp"
             android:visibility="gone" />
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"

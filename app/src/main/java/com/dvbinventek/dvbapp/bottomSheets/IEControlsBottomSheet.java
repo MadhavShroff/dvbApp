@@ -30,7 +30,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class IEControlsBottomSheet extends BaseBottomSheet {
 
-    public boolean canceled = false;
+    public boolean canceled = true;
     public Disposable subscription;
     EditText et1, et2, value;
     ImageButton done, cancel;
@@ -87,8 +87,8 @@ public class IEControlsBottomSheet extends BaseBottomSheet {
     public IEControlsBottomSheet(@NonNull Activity hostActivity, String s) {
         this(hostActivity, new Config.Builder(hostActivity).build());
         done = findViewById(R.id.cbs_done);
-        et1 = findViewById(R.id.cbs_inspet);
-        et2 = findViewById(R.id.cbs_expet);
+        et1 = findViewById(R.id.iecbs_inspet);
+        et2 = findViewById(R.id.iecbs_expet);
         cancel = findViewById(R.id.cbs_cancel);
         cancel.setOnClickListener(v -> {
             canceled = true;

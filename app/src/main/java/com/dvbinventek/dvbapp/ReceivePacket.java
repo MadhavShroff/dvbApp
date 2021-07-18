@@ -11,8 +11,16 @@ import java.util.Objects;
 
 public class ReceivePacket {
 
-    @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
-    @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+    @SuppressLint("SimpleDateFormat")
+    SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+    @SuppressLint("SimpleDateFormat")
+    SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+
+
+    // 0 - hpa off , o2 off
+    // 1 - hpa off, o2 on
+    // 2 - hpa on , o2 off
+    // 3 - hpa on, o2 on
 
     ReceivePacket(byte[] s) {
         try {
@@ -97,6 +105,33 @@ public class ReceivePacket {
             StaticStore.Monitoring.phase = "Exp";
             StaticStore.Monitoring.phaseColor = R.color.exp;
         }
+        //TODO: Enable this code to react to changes from packet value on hpa and o2 concentrator switch state
+//        if(StaticStore.MainActivityValues.runtimeAck != byteBuffer.get(122)) { //  if there is a change in rntmAck
+//            switch(StaticStore.MainActivityValues.runtimeAck) {
+//                case 0 :
+//                    Observable.just(false).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.hpaStateObserver);
+//                    Observable.just(false).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.O2StateObserver);
+//                    // hpa off o2 off
+//                    break;
+//                case 1 :
+//                    Observable.just(false).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.hpaStateObserver);
+//                    Observable.just(true).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.O2StateObserver);
+//                    // hpa off o2 on
+//                    break;
+//                case 2 :
+//                    Observable.just(true).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.hpaStateObserver);
+//                    Observable.just(false).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.O2StateObserver);
+//                    // hpa on o2 off
+//                    break;
+//                case 3 :
+//                    Observable.just(true).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.hpaStateObserver);
+//                    Observable.just(true).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(SystemsFragment.O2StateObserver);
+//                    // hp1 on o2 on
+//                    break;
+//                default : Log.d("ERR", "Inconsistency");
+//            }
+//        }
+        StaticStore.MainActivityValues.runtimeAck = byteBuffer.get(122);
         StaticStore.Monitoring.leakVol = byteBuffer.getShort(100);
         StaticStore.Monitoring.leakPercent = byteBuffer.get(102);
         StaticStore.Monitoring.cStat = byteBuffer.getFloat(104);
@@ -107,6 +142,7 @@ public class ReceivePacket {
         StaticStore.Warnings.warningHigh = byteBuffer.getInt(152);
         StaticStore.Warnings.warningMed = byteBuffer.getInt(156);
         StaticStore.Warnings.warningLow = byteBuffer.getInt(160);
+
         // Set current warnings
         getWarningModeString(StaticStore.Warnings.warningHigh, StaticStore.Warnings.warningMed, StaticStore.Warnings.warningLow);
         // Parse Systems Values
@@ -121,7 +157,7 @@ public class ReceivePacket {
         StaticStore.System.lastServiceHrs = String.valueOf(new char[]{(char) byteBuffer.get(188), (char) byteBuffer.get(189), (char) byteBuffer.get(190), (char) byteBuffer.get(191), (char) byteBuffer.get(192)});
         StaticStore.System.nextServiceDate = String.valueOf(new char[]{(char) byteBuffer.get(193), (char) byteBuffer.get(194), (char) byteBuffer.get(195), (char) byteBuffer.get(196), (char) byteBuffer.get(197), (char) byteBuffer.get(198)});
         StaticStore.System.nextServiceHrs = String.valueOf(new char[]{(char) byteBuffer.get(199), (char) byteBuffer.get(200), (char) byteBuffer.get(201), (char) byteBuffer.get(202), (char) byteBuffer.get(203)});
-        StaticStore.System.systemVersion = String.valueOf(new char[]{(char) byteBuffer.get(204), (char) byteBuffer.get(205), (char) byteBuffer.get(206), (char) byteBuffer.get(207), (char) byteBuffer.get(208), (char) byteBuffer.get(209), (char) byteBuffer.get(210), (char) byteBuffer.get(211), (char) byteBuffer.get(212)});
+        StaticStore.System.systemVersion = String.valueOf(new char[]{(char) byteBuffer.get(204), (char) byteBuffer.get(205), (char) byteBuffer.get(206), (char) byteBuffer.get(207), (char) byteBuffer.get(208), (char) byteBuffer.get(209), (char) byteBuffer.get(210), (char) byteBuffer.get(211), (char) byteBuffer.get(212), (char) byteBuffer.get(213)});
         try {
             StaticStore.System.lastServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.lastServiceDate)));
             StaticStore.System.nextServiceDate = formatter.format(Objects.requireNonNull(format.parse(StaticStore.System.nextServiceDate)));

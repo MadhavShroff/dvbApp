@@ -61,49 +61,22 @@ public class MainParamsView extends LinearLayout {
         return Math.round(x * 10) / 10.0;
     }
 
-    public void setMaxMinValue(float max, float min, float value, String setval) {
-        String maxs = "" + round1(max);
-        String mins = "" + round1(min);
+    public void setMaxMinValue(String max, String min, String value, String setStr) {
         boolean set = false;
-        String values = "" + round1(value);
-        if (!Value.getText().equals(values)) {
-            Value.setText(values);
+        if (!Value.getText().equals(value)) {
+            Value.setText(value);
             set = true;
         }
-        if (!Max.getText().equals(maxs)) {
-            Max.setText(maxs);
+        if (!Max.getText().equals(max)) {
+            Max.setText(max);
             set = true;
         }
-        if (!Min.getText().equals(mins)) {
-            Min.setText(mins);
+        if (!Min.getText().equals(min)) {
+            Min.setText(min);
             set = true;
         }
-        if (!setValue.getText().equals(setval)) {
-            setValue.setText(getResources().getString(R.string.set, setval));
-            set = true;
-        }
-        if (set) this.invalidate();
-    }
-
-    public void setMaxMinValueVIT(float max, float min, float value, String setval) {
-        String maxs = "" + (int) max;
-        String mins = "" + (int) min;
-        boolean set = false;
-        String values = "" + (int) value;
-        if (!Value.getText().equals(values)) {
-            Value.setText(values);
-            set = true;
-        }
-        if (!Max.getText().equals(maxs)) {
-            Max.setText(maxs);
-            set = true;
-        }
-        if (!Min.getText().equals(mins)) {
-            Min.setText(mins);
-            set = true;
-        }
-        if (!setValue.getText().equals(setval)) {
-            setValue.setText(getResources().getString(R.string.set, setval));
+        if (!setValue.getText().equals(setStr)) {
+            setValue.setText(setStr);
             set = true;
         }
         if (set) this.invalidate();
