@@ -103,7 +103,7 @@ public class ProcessPacket {
             showVt = (mode == 17 || mode == 18 || mode == 19 || mode == 21);
             showRatef = (mode != 15 && mode != 20 && mode != 16);
             showFio2 = true; // all values
-            showFlowRate = true;
+//            showFlowRate = true;
             return true;
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -112,13 +112,13 @@ public class ProcessPacket {
                         tv1.get().setMaxMinValue("", "", "", "");
                         tv2.get().setMaxMinValue("", "", "", "");
                         tv3.get().setMaxMinValue("", "", "", "");
-                        tv4.get().setMaxMinValue("", "", "" + round1(StaticStore.Values.rateMeasured), "Set: " + StaticStore.packet_rtotal);
+                        tv4.get().setMaxMinValue("", "", "" + round1(StaticStore.Values.rateMeasured), "Set: " + StaticStore.packet_flowRate);
                         tv5.get().setMaxMinValue("", "", "" + StaticStore.Values.fio2, "Set: " + StaticStore.packet_fio2);
                     } else {
                         tv1.get().setMaxMinValue(round1(StaticStore.Values.pPeak), round1(StaticStore.Values.pMean), round1(StaticStore.Values.pInsp), showPip ? "Set: " + StaticStore.packet_pinsp : "");
                         tv2.get().setMaxMinValue(round1(StaticStore.Values.peepMax), round1(StaticStore.Values.peepMin), round1(StaticStore.Values.peep), showCpap ? "Set: " + StaticStore.packet_peep : "");
                         tv3.get().setMaxMinValue("" + (int) StaticStore.Values.vtMax, "" + (int) StaticStore.Values.vtMin, "" + (int) StaticStore.Values.vt, showVt ? "Set: " + StaticStore.packet_vt : "");
-                        tv4.get().setMaxMinValue(round1(StaticStore.Values.rateMax), round1(StaticStore.Values.rateMin), round1(StaticStore.Values.rateMeasured), showFlowRate ? "Set: " + StaticStore.packet_flowRate : "");
+                        tv4.get().setMaxMinValue(round1(StaticStore.Values.rateMax), round1(StaticStore.Values.rateMin), round1(StaticStore.Values.rateMeasured), "Set: " + StaticStore.packet_rtotal);
                         tv5.get().setMaxMinValue(round1(StaticStore.Values.fio2Max), round1(StaticStore.Values.fio2Min), round1(StaticStore.Values.fio2), showFio2 ? "Set: " + StaticStore.packet_fio2 : "");
                     }
                     //modeBox.get().setText(StaticStore.modeSelected); // for displaying mode entered

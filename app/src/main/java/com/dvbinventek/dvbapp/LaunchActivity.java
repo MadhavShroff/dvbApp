@@ -247,7 +247,7 @@ public class LaunchActivity extends AppCompatActivity {
 
     public void updateProgressBar(int i) {
         progress += i;
-        ((TextView) findViewById(R.id.progressIndicatorText)).setText(getString(R.string.d_percent, progress));
+        ((TextView) findViewById(R.id.progressIndicatorText)).setText("" + progress + "%");
         ((ProgressIndicator) findViewById(R.id.progressIndicator)).setProgress(progress);
         if (progress == 100) {
             SendPacket sp = new SendPacket();

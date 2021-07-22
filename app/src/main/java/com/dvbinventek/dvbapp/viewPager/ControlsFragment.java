@@ -877,7 +877,6 @@ public class ControlsFragment extends Fragment {
     }
 
     public void resetValues() {
-        TextView tv;
         for (String s : resetList) {
             switch (s) {
                 case "fio2":
@@ -925,10 +924,11 @@ public class ControlsFragment extends Fragment {
                     flowRate.get().setCurrent(String.valueOf(cleanNumber(StaticStore.packet_flowRate)));
                     break;
                 case "mode":
+                    if (StaticStore.modeSelectedShort != this.new_mode)
+                        modeBottomSheet.get().clickCorrectModeButton(StaticStore.modeSelectedShort);
                     StaticStore.modeSelected = this.new_modeString;
                     StaticStore.modeSelectedShort = this.new_mode;
                     setText(R.id.controls_mode_current, StaticStore.modeSelected);
-                    modeBottomSheet.get().clickCorrectModeButton(StaticStore.modeSelectedShort);
                     setControlsForMode();
                     break;
             }
