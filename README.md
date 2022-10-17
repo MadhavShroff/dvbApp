@@ -7,3 +7,4 @@ Uses RxJava for Asynchronous data processing, and for inter component communicat
 
 Uses SciChart for plotting *Real Time Pressure, Flow and Volume Graphs*
 
+Available to view at the play store [here](https://play.google.com/store/apps/details?id=com.dvbinventek.dvbapp&hl=en_US&gl=US) (Requiures 10.1" Android Tablet, VJ-03 Ventilator Hardware, Serial USB data connection with Arduino Duo)
